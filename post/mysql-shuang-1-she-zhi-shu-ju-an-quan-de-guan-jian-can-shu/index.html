@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" >
 
-<title>Grey</title>
+<title>Mysql双1设置-数据安全的关键参数 | Grey</title>
 <meta name="description" content="温故而知新">
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
@@ -23,6 +23,7 @@
 
   </head>
   <body>
+  
     <nav class="navbar border fixed split-nav">
   <div class="nav-brand">
     <h3><a href="https://esp0x.github.io">Grey</a></h3>
@@ -76,93 +77,68 @@
   </div>
 </nav>
 
-
     <div id="top" class="row site">
       <div class="sm-12 md-8 col">
         <div class="paper">
+          <article class="article">
+            <h1>Mysql双1设置-数据安全的关键参数</h1>
+            <p class="article-meta">
+              2021-01-15
+              
+                <a href="https://esp0x.github.io/tag/lEg5TWDNv/" class="badge warning">
+                  mysql
+                </a>
+              
+            </p>
+            
+            <div class="post-content">
+              <h2 id="一-参数及设置说明">一、参数及设置说明</h2>
+<pre><code class="language-shell"># innodb_flush_log_at_trx_commit
+1.设置为0：log buffer将每秒一次地写入log file中，并且log file的flush操作同时进行；该模式下，在事务提交时，不会主动触发写入磁盘的操作；
+2.设置为1：每次事务提交时MySQL都会把log buffer的数据写入log file，并且flush(刷到磁盘)中去;
+3.设置为2：每次事务提交时MySQL都会把log buffer的数据写入log file，但是flush(刷到磁盘)操作并不会同时进行。该模式下,MySQL会每秒执行一次 flush(刷到磁盘)操作。
+
+# sync_binlog
+sync_binlog 的默认值是0，像操作系统刷其他文件的机制一样，MySQL不会同步到磁盘中去而是依赖操作系统来刷新binary log。
+当sync_binlog =N (N&gt;0) ，MySQL 在每写 N次 二进制日志binary log时，会使用fdatasync()函数将它的写二进制日志binary log同步到磁盘中去。
+
+注意：如果启用了autocommit，那么每一个语句statement就会有一次写操作；否则每个事务对应一个写操作。
+
+# 性能与安全性对比
+1.双1设置时，写入性能最差，安全性最高；
+2.sync_binlog=N (N&gt;1 ) innodb_flush_log_at_trx_commit=2 时，性能最好，安全性较差；
+3.innodb_flush_log_at_trx_commit设置为0，mysqld进程崩溃会导致上一秒钟所有事务数据的丢失；
+4.innodb_flush_log_at_trx_commit设置为2，当系统崩溃或者断电时，上一秒的所有数据才有可能丢失；
+</code></pre>
+<h2 id="二-对io影响较大的几个参数">二、对IO影响较大的几个参数</h2>
+<pre><code class="language-shell">1.innodb_buffer_pool_size # 该参数控制innodb缓存大小，用于缓存应用访问的数据，推荐配置为系统可用内存的80%。
+2.binlog_cache_size       # 该参数控制二进制日志缓冲大小，当事务还没有提交时，事务日志存放于cache，当遇到大事务cache不够用的时，mysql会把uncommitted的部分写入临时文件,等到committed的时候才会写入正式的持久化日志文件。
+3.innodb_max_dirty_pages_pct     # 该参数可以直接控制Dirty Page在BP中所占的比率，当dirty page达到了该参数的阈值，就会触发MySQL系统刷新数据到磁盘。
+4.innodb_flush_log_at_trx_commit # 该参数确定日志文件何时write、flush。
+5.sync_binlog         # sync_binlog的默认值是0，像操作系统刷其他文件的机制一样，MySQL不会同步到磁盘中去而是依赖操作系统来刷新binary log。
+6.innodb_flush_method # 该参数控制日志或数据文件如何write、flush。可选的值为fsync，o_dsync，o_direct，littlesync，nosync。
+</code></pre>
+
+            </div>
+          </article>
+        </div>
+        <div class="paper" data-aos="fade-in">
           
-  <article class="article">
-    <h2 class="article-title">
-      <a href="https://esp0x.github.io/post/mysql-shuang-1-she-zhi-shu-ju-an-quan-de-guan-jian-can-shu/">Mysql双1设置-数据安全的关键参数</a>
-    </h2>
-    <p class="article-meta">
-      2021-01-15
-      
-        <a href="https://esp0x.github.io/tag/lEg5TWDNv/" class="badge warning">
-          mysql
-        </a>
-      
-    </p>
-    <p class="text-lead">
-      
-    </p>
-    <div class="row">
-      <a href="https://esp0x.github.io/post/mysql-shuang-1-she-zhi-shu-ju-an-quan-de-guan-jian-can-shu/" class="readmore-link">
-        <button>
-          Read More
-        </button>
-      </a>
-    </div>
-  </article>
-
-  <article class="article">
-    <h2 class="article-title">
-      <a href="https://esp0x.github.io/post/mysql-fen-ku-fen-biao-ce-lue/">Mysql分库分表策略</a>
-    </h2>
-    <p class="article-meta">
-      2021-01-15
-      
-        <a href="https://esp0x.github.io/tag/lEg5TWDNv/" class="badge secondary">
-          mysql
-        </a>
-      
-    </p>
-    <p class="text-lead">
-      
-    </p>
-    <div class="row">
-      <a href="https://esp0x.github.io/post/mysql-fen-ku-fen-biao-ce-lue/" class="readmore-link">
-        <button>
-          Read More
-        </button>
-      </a>
-    </div>
-  </article>
-
-  <article class="article">
-    <h2 class="article-title">
-      <a href="https://esp0x.github.io/post/mysql-zhu-cong-fu-zhi-yuan-li/">Mysql主从复制原理</a>
-    </h2>
-    <p class="article-meta">
-      2021-01-14
-      
-        <a href="https://esp0x.github.io/tag/lEg5TWDNv/" class="badge success">
-          mysql
-        </a>
-      
-    </p>
-    <p class="text-lead">
-      
-    </p>
-    <div class="row">
-      <a href="https://esp0x.github.io/post/mysql-zhu-cong-fu-zhi-yuan-li/" class="readmore-link">
-        <button>
-          Read More
-        </button>
-      </a>
-    </div>
-  </article>
-
-
+            <div class="next-post">
+              <div class="next">
+                下一篇
+              </div>
+              <a href="https://esp0x.github.io/post/mysql-fen-ku-fen-biao-ce-lue/">
+                <h3 class="post-title">
+                  Mysql分库分表策略
+                </h3>
+              </a>
+            </div>
+          
         </div>
         
-        <div class="row flex-edges">
-  
-  
-</div>
-
       </div>
-      
+
       <div class="sm-12 md-4 col sidebar">
   <div class="paper info-container">
     <img src="https://esp0x.github.io/images/avatar.png?v=1610676897126" class="no-responsive avatar">
@@ -221,7 +197,7 @@
     </div>
     <div class="row">
       
-        <a href="https://esp0x.github.io/tag/lEg5TWDNv/" class="badge secondary">
+        <a href="https://esp0x.github.io/tag/lEg5TWDNv/" class="badge success">
           mysql
         </a>
       
@@ -232,7 +208,9 @@
   </div>
 </div>
 
+
     </div>
+
     <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
 
 <script type="application/javascript">
