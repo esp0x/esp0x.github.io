@@ -6,7 +6,7 @@
 
 <title>Mysql双1设置-数据安全的关键参数 | Grey</title>
 
-<link rel="shortcut icon" href="https://esp0x.github.io/favicon.ico?v=1610677705867">
+<link rel="shortcut icon" href="https://esp0x.github.io/favicon.ico?v=1610677851655">
 
 <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://esp0x.github.io/styles/main.css">
@@ -179,7 +179,7 @@
             
         </div>
         <div style="text-align: center">
-            <form id="gridea-search-form" style="position: relative" data-update="1610677705867"
+            <form id="gridea-search-form" style="position: relative" data-update="1610677851655"
                 action="/search/index.html">
                 <input class="search-input" autocomplete="off" spellcheck="false" name="q" placeholder="搜索文章" />
                 <i class="fas fa-search gt-c-content-color-first" style="position: absolute; top: 9px; left: 10px;"></i>
@@ -227,7 +227,7 @@ sync_binlog 的默认值是0，像操作系统刷其他文件的机制一样，M
 
 注意：如果启用了autocommit，那么每一个语句statement就会有一次写操作；否则每个事务对应一个写操作。
 
-# 性能与安全性对比
+# 性能与安全性对比 
 1.双1设置时，写入性能最差，安全性最高；
 2.sync_binlog=N (N&gt;1 ) innodb_flush_log_at_trx_commit=2 时，性能最好，安全性较差；
 3.innodb_flush_log_at_trx_commit设置为0，mysqld进程崩溃会导致上一秒钟所有事务数据的丢失；

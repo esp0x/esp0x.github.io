@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://esp0x.github.io</id>
     <title>Grey</title>
-    <updated>2021-01-15T02:28:29.384Z</updated>
+    <updated>2021-01-15T02:30:54.769Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://esp0x.github.io"/>
     <link rel="self" href="https://esp0x.github.io/atom.xml"/>
@@ -156,7 +156,7 @@ sync_binlog 的默认值是0，像操作系统刷其他文件的机制一样，M
 
 注意：如果启用了autocommit，那么每一个语句statement就会有一次写操作；否则每个事务对应一个写操作。
 
-# 性能与安全性对比
+# 性能与安全性对比 
 1.双1设置时，写入性能最差，安全性最高；
 2.sync_binlog=N (N&gt;1 ) innodb_flush_log_at_trx_commit=2 时，性能最好，安全性较差；
 3.innodb_flush_log_at_trx_commit设置为0，mysqld进程崩溃会导致上一秒钟所有事务数据的丢失；
