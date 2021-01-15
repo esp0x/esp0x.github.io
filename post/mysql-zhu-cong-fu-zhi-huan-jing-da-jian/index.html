@@ -6,7 +6,7 @@
 
 <title>Mysql主从复制环境搭建 | Grey</title>
 
-<link rel="shortcut icon" href="https://esp0x.github.io/favicon.ico?v=1610677274011">
+<link rel="shortcut icon" href="https://esp0x.github.io/favicon.ico?v=1610677705867">
 
 <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://esp0x.github.io/styles/main.css">
@@ -179,7 +179,7 @@
             
         </div>
         <div style="text-align: center">
-            <form id="gridea-search-form" style="position: relative" data-update="1610677274011"
+            <form id="gridea-search-form" style="position: relative" data-update="1610677705867"
                 action="/search/index.html">
                 <input class="search-input" autocomplete="off" spellcheck="false" name="q" placeholder="搜索文章" />
                 <i class="fas fa-search gt-c-content-color-first" style="position: absolute; top: 9px; left: 10px;"></i>
@@ -298,7 +298,7 @@ mysql&gt; start slave;            #开启从库
 mysql&gt; show slave status \G;   #Slave_IO_Running,Slave_SQL_Running 都为Yes的时候表示配置成功
 </code></pre>
 <h2 id="主库创建数据库和数据表">主库创建数据库和数据表</h2>
-<pre><code class="language-mysql">create database topmanager DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
+<pre><code class="language-sql">create database topmanager DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
 
 use topmanager;
 CREATE TABLE `chain_hosts` (
