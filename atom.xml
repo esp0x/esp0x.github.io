@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://esp0x.github.io</id>
     <title>Grey</title>
-    <updated>2021-01-15T02:15:02.669Z</updated>
+    <updated>2021-01-15T02:15:55.455Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://esp0x.github.io"/>
     <link rel="self" href="https://esp0x.github.io/atom.xml"/>
@@ -10,6 +10,134 @@
     <logo>https://esp0x.github.io/images/avatar.png</logo>
     <icon>https://esp0x.github.io/favicon.ico</icon>
     <rights>All rights reserved 2021, Grey</rights>
+    <entry>
+        <title type="html"><![CDATA[Mysql主从复制环境搭建]]></title>
+        <id>https://esp0x.github.io/post/mysql-zhu-cong-fu-zhi-huan-jing-da-jian/</id>
+        <link href="https://esp0x.github.io/post/mysql-zhu-cong-fu-zhi-huan-jing-da-jian/">
+        </link>
+        <updated>2021-01-15T02:15:27.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="准备机器">准备机器</h2>
+<p>两台centos7系统服务器：</p>
+<p>主mysql：192.168.50.1</p>
+<p>从mysql：192.168.50.2</p>
+<h2 id="安装mysql">安装mysql</h2>
+<ol>
+<li>
+<p>下载yum源</p>
+<pre><code class="language-shell">wget https://dev.mysql.com/get/mysql80-community-release-el7-3.noarch.rpm
+</code></pre>
+</li>
+<li>
+<p>安装yum源</p>
+<pre><code class="language-shell">rpm -Uvh mysql80-community-release-el7-3.noarch.rpm
+</code></pre>
+</li>
+<li>
+<p>安装mysql</p>
+<pre><code class="language-shell">yum install -y mysql-community-server
+</code></pre>
+</li>
+<li>
+<p>启动mysql，并获取root初始密码</p>
+<pre><code class="language-shell"># 确保selinux为disabled
+# 确保关闭了firewalld服务
+
+systemctl start mysqld
+
+[root@localhost ~]# grep password /var/log/mysqld.log 
+2020-10-19T02:47:35.912896Z 1 [Note] A temporary password is generated for root@localhost: -1k-1KjU*LG)
+</code></pre>
+</li>
+<li>
+<p>登入mysql，并重置root密码</p>
+<pre><code class="language-shell">mysql -uroot -p 
+mysql&gt; ALTER USER 'root'@'localhost' IDENTIFIED BY 'qUXmZP11JwJ_11'; # root本地访问，且重置
+mysql&gt; exit
+</code></pre>
+</li>
+</ol>
+<h2 id="主mysql数据库配置">主Mysql数据库配置</h2>
+<p>编辑my.cnf配置文件</p>
+<pre><code class="language-shell">vim /etc/my.cnf
+
+[mysqld]
+port=9006          #指定新的端口
+server-id=110      #设置主服务器的ID(不能和别的服务器重复，建议使用ip的最后一段)
+log-bin=mysql-bin  #binlog日志文件名
+</code></pre>
+<p>创建用于主从同步的账户</p>
+<pre><code class="language-shell">$ mysql -u root -p  #登录MySQL
+mysql&gt; CREATE USER 'repl'@'192.168.50.2' IDENTIFIED WITH mysql_native_password BY 'Top_master_1'; # 主库创建用于从库同步的账号
+mysql&gt; grant replication slave on *.* to 'repl'@'192.168.50.2';  #赋予主从同步权限，指定具体的数据库在/etc/my.cnf中完成
+mysql&gt; flush privileges;
+</code></pre>
+<p>重启MySQL，使my.cnf 配置生效；查看主库状态</p>
+<pre><code class="language-shell">$ systemctl restart mysqld #重启MySQL
+mysql -u root -p
+mysql&gt; show master status; #查看主库的状态  File,Position 这两个值需要放到slave配置中
++--------------------+----------+--------------+------------------+-------------------+
+| File               | Position | Binlog_Do_DB | Binlog_Ignore_DB | Executed_Gtid_Set |
++--------------------+----------+--------------+------------------+-------------------+
+| mysql-bin.00001    |      156 |     xxxx     |                  |                   |
++--------------------+----------+--------------+------------------+-------------------+
+1 row in set (0.00 sec)
+</code></pre>
+<h2 id="从mysql数据库配置">从Mysql数据库配置</h2>
+<p>编辑配置文件</p>
+<pre><code class="language-shell">vim /etc/my.cnf
+
+[mysqld]
+port=9006
+server-id=111
+</code></pre>
+<p>配置完成后，重启从库的MySQL</p>
+<pre><code class="language-shell">$ systemctl restart mysqld  #重启MySQL
+$ mysql -u root -p          #登录mysql
+mysql&gt; stop slave;          #关闭从库
+mysql&gt; change master to master_host='192.168.50.1',master_port=9006,master_user='repl',master_password='Top_master_1',master_log_file='mysql-bin.00001',master_log_pos=156; #配置主库信息
+mysql&gt; start slave;            #开启从库 
+mysql&gt; show slave status \G;   #Slave_IO_Running,Slave_SQL_Running 都为Yes的时候表示配置成功
+</code></pre>
+<h2 id="主库创建数据库和数据表">主库创建数据库和数据表</h2>
+<pre><code class="language-mysql">create database topmanager DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
+
+use topmanager;
+CREATE TABLE `chain_hosts` (
+  `hostid` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键ID，hostid',
+  `moudle_name` varchar(255) DEFAULT '' COMMENT '应用名称，这里node_type和数字的组合',
+  `hostip` varchar(60) NOT NULL COMMENT '主机IP地址，能通过jenkins远程得外网地址',
+  `status` varchar(1) DEFAULT '1' COMMENT '主机当前状态1可用，0不可用,2分配IP失败，3挂载卷失败，4挂载防火墙失败，5平台异常',
+  `keystore_pwd` varchar(512) DEFAULT NULL,
+  `second_keystore_pwd` varchar(512) DEFAULT NULL,
+  `uptime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新日期',
+  `createtime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建日期',
+  `netgroup` varchar(60) DEFAULT '' COMMENT '组网类型',
+  `node_type` varchar(60) DEFAULT '' COMMENT '节点类型  ',
+  `privite_key` varchar(512) DEFAULT '',
+  `public_key` varchar(512) DEFAULT '',
+  `second_privite_key` varchar(512) DEFAULT '',
+  `second_public_key` varchar(512) DEFAULT '',
+  `key_path` varchar(512) DEFAULT '',
+  `second_key_path` varchar(512) DEFAULT '',
+  `key_content` text COMMENT 'owner key文件内容',
+  `second_key_content` text COMMENT 'second key文件内容',
+  `expire_time` int(11) DEFAULT '10' COMMENT '使用时间0表示不销毁，其他表示可用时间，默认10小时',
+  `node_flag` varchar(60) DEFAULT NULL COMMENT '用于识别不同批次主机',  
+  PRIMARY KEY (`hostid`),
+  UNIQUE KEY `IDX_UNIWUE_IP_ENV_C` (`hostip`) USING BTREE,
+  KEY `IDX_CREATE_TIME` (`createtime`) USING BTREE,
+  KEY `IDX_UPTIME` (`uptime`),
+  KEY `IDX_NETGROUP` (`netgroup`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+# 创建topuser用户
+create user 'topuser'@'localhost' IDENTIFIED BY 'q1_amZP11JwJ';
+# 赋权
+GRANT select, insert, update ON topmanager.* TO 'topuser'@'localhost';
+</code></pre>
+<p>登入从库，可以看到从库中出现同样的数据库和数据表，表明已同步</p>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Mysql双1设置-数据安全的关键参数]]></title>
         <id>https://esp0x.github.io/post/mysql-shuang-1-she-zhi-shu-ju-an-quan-de-guan-jian-can-shu/</id>
