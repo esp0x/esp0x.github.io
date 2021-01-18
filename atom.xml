@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://esp0x.github.io</id>
     <title>Grey</title>
-    <updated>2021-01-18T09:03:45.971Z</updated>
+    <updated>2021-01-18T09:26:25.054Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://esp0x.github.io"/>
     <link rel="self" href="https://esp0x.github.io/atom.xml"/>
@@ -10,6 +10,88 @@
     <logo>https://esp0x.github.io/images/avatar.png</logo>
     <icon>https://esp0x.github.io/favicon.ico</icon>
     <rights>All rights reserved 2021, Grey</rights>
+    <entry>
+        <title type="html"><![CDATA[Mysql的组提交原理]]></title>
+        <id>https://esp0x.github.io/post/mysql-de-zu-ti-jiao-yuan-li/</id>
+        <link href="https://esp0x.github.io/post/mysql-de-zu-ti-jiao-yuan-li/">
+        </link>
+        <updated>2021-01-18T09:25:56.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="事务提交流程">事务提交流程</h2>
+<h3 id="大致流程如下">大致流程如下：</h3>
+<p>有binlog的情况下，commit动作开始时，会有一个Redo XID写入redo，然后写data到binlog，binlog写成功后，会将binlog的filename和日志写的position再写回redo（position也会写入pos文件），此时事务完成（committed）。如果只有XID，没有filename和position，则表示事务为prepare状态。</p>
+<h3 id="流程">流程：</h3>
+<pre><code class="language-shell"># commit; --&gt; write XID to redo. --&gt; write data to Binlog. --&gt; write filename,postsion of binlog to redo. --&gt; commited.
+# 记录Binlog是在InnoDB引擎Prepare（即Redo Log写入磁盘）之后，这点至关重要。
+</code></pre>
+<figure data-type="image" tabindex="1"><img src="./Mysql%E4%BA%8B%E5%8A%A1%E7%9A%84%E7%BB%84%E6%8F%90%E4%BA%A4.assets/1386165-20200402174840141-1059775640.png" alt="avatar" loading="lazy"></figure>
+<h3 id="不同阶段crash的情况">不同阶段crash的情况：</h3>
+<table>
+<thead>
+<tr>
+<th>crash发生阶段</th>
+<th>事务状态</th>
+<th>事务结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>当事务在prepare阶段crash</td>
+<td>该事务未写入binlog，引擎层也未写入redo到磁盘</td>
+<td>该事务rollback</td>
+</tr>
+<tr>
+<td>当事务在binlog写阶段crash</td>
+<td>此时引擎层redo写盘完成，但binlog日志还未落盘</td>
+<td>该事务rollback</td>
+</tr>
+<tr>
+<td>当事务在binlog日志写入磁盘后crash，但引擎层未来得及commit</td>
+<td>此时引擎层redo已经写盘，server层binlog已经写盘，但redo中事务状态未正确结束</td>
+<td>读出binlog中的XID，并通知引擎层提交这些XID的事务。引擎层提交这些事务后，会回滚其他事务，使引擎层redo和binlog日志在事务上始终保持一致。事务通过recovery自动完成提交</td>
+</tr>
+</tbody>
+</table>
+<h2 id="wal机制">WAL机制</h2>
+<ul>
+<li>WAL（Write Ahead Log）：对数据文件进行修改前，必须将修改先记录到日志。</li>
+<li>Redo log就是一种WAL应用，用于保证数据库的持久性，每次事务提交时，不用同步刷新磁盘，只需要刷新redo log就行了。相比刷盘的随机IO，写redo log的顺序IO能够提升事务提交速度。</li>
+<li>组提交：
+<ol>
+<li>未开启binlog：redo log的刷盘操作是主要瓶颈，mysql使用组提交，将多个redo log刷盘操作合并成一个。</li>
+<li>开启binlog：为了保证redo log和binlog数据一致性，mysql使用了二阶段提交，此时binlog成为瓶颈，mysql增加了binlog的组提交来解决这个问题，分为三个阶段（Flush、Sync、Commit），最大化刷盘收益。</li>
+</ol>
+</li>
+</ul>
+<h3 id="过程详解">过程详解</h3>
+<p>在Mysql中每个阶段都有一个队列，每个队列都有一把锁保护，第一个进入队列的事务成为leader，leader领导所在队列的所有事务，全权负责整队的操作，完成后通知队内其他事务操作结束。</p>
+<h4 id="flush阶段">Flush阶段</h4>
+<ul>
+<li>首先获取队列中的事务组；</li>
+<li>将redo中prepare阶段的数据刷盘；</li>
+<li>将binlog数据写入文件，此处是文件缓冲，不保证数据库crash时，binlog的完整性；</li>
+<li>Flush阶段的作用是提供了redo 的组提交；</li>
+<li>如果这一步crash，由于不保证binlog中存在事务记录，所以数据库恢复后会回滚，此时二阶段提交状态还是prepare；</li>
+</ul>
+<h4 id="sync阶段">Sync阶段</h4>
+<ul>
+<li>为了增加一组事务中的事务数量，提升刷盘效率，使用两个参数进行控制：
+<ol>
+<li>binlog_group_commit_sync_delay=N  等待N 微秒后，开始事务刷盘</li>
+<li>binlog_group_commit_sync_no_delay=N  对列中事务达到N个，立刻刷盘，忽略上面那个时间参数</li>
+</ol>
+</li>
+<li>Sync阶段的作用是支持binlog的组提交；</li>
+<li>如果此时crash，由于binlog中有事务记录，数据库恢复后会继续提交该事务；</li>
+</ul>
+<h4 id="commit阶段">Commit阶段</h4>
+<ul>
+<li>首先获取队列中的事务组；</li>
+<li>依次将redo中已经prepare的事务在引擎层进行提交；</li>
+<li>Commit阶段不用刷盘，如上所述，Flush阶段中的Redo log刷盘已经足够保证数据库崩溃时的数据安全了；</li>
+<li>Commit阶段队列的作用是承接Sync阶段的事务，完成最后的引擎提交，使得Sync可以尽早的处理下一组事务，最大化组提交的效率；</li>
+</ul>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[GTID基础原理]]></title>
         <id>https://esp0x.github.io/post/gtid-ji-chu-yuan-li/</id>
