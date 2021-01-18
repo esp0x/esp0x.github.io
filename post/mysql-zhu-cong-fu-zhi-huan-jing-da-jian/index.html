@@ -6,7 +6,7 @@
 
 <title>Mysql主从复制环境搭建 | Grey</title>
 
-<link rel="shortcut icon" href="https://esp0x.github.io/favicon.ico?v=1610696948221">
+<link rel="shortcut icon" href="https://esp0x.github.io/favicon.ico?v=1610933120812">
 
 <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://esp0x.github.io/styles/main.css">
@@ -179,7 +179,7 @@
             
         </div>
         <div style="text-align: center">
-            <form id="gridea-search-form" style="position: relative" data-update="1610696948221"
+            <form id="gridea-search-form" style="position: relative" data-update="1610933120812"
                 action="/search/index.html">
                 <input class="search-input" autocomplete="off" spellcheck="false" name="q" placeholder="搜索文章" />
                 <i class="fas fa-search gt-c-content-color-first" style="position: absolute; top: 9px; left: 10px;"></i>
@@ -299,42 +299,7 @@ mysql&gt; show slave status \G;   #Slave_IO_Running,Slave_SQL_Running 都为Yes�
 </code></pre>
 <h2 id="主库创建数据库和数据表">主库创建数据库和数据表</h2>
 <pre><code class="language-sql">create database topmanager DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
-
-use topmanager;
-CREATE TABLE `chain_hosts` (
-  `hostid` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键ID，hostid',
-  `moudle_name` varchar(255) DEFAULT '' COMMENT '应用名称，这里node_type和数字的组合',
-  `hostip` varchar(60) NOT NULL COMMENT '主机IP地址，能通过jenkins远程得外网地址',
-  `status` varchar(1) DEFAULT '1' COMMENT '主机当前状态1可用，0不可用,2分配IP失败，3挂载卷失败，4挂载防火墙失败，5平台异常',
-  `keystore_pwd` varchar(512) DEFAULT NULL,
-  `second_keystore_pwd` varchar(512) DEFAULT NULL,
-  `uptime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新日期',
-  `createtime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建日期',
-  `netgroup` varchar(60) DEFAULT '' COMMENT '组网类型',
-  `node_type` varchar(60) DEFAULT '' COMMENT '节点类型  ',
-  `privite_key` varchar(512) DEFAULT '',
-  `public_key` varchar(512) DEFAULT '',
-  `second_privite_key` varchar(512) DEFAULT '',
-  `second_public_key` varchar(512) DEFAULT '',
-  `key_path` varchar(512) DEFAULT '',
-  `second_key_path` varchar(512) DEFAULT '',
-  `key_content` text COMMENT 'owner key文件内容',
-  `second_key_content` text COMMENT 'second key文件内容',
-  `expire_time` int(11) DEFAULT '10' COMMENT '使用时间0表示不销毁，其他表示可用时间，默认10小时',
-  `node_flag` varchar(60) DEFAULT NULL COMMENT '用于识别不同批次主机',  
-  PRIMARY KEY (`hostid`),
-  UNIQUE KEY `IDX_UNIWUE_IP_ENV_C` (`hostip`) USING BTREE,
-  KEY `IDX_CREATE_TIME` (`createtime`) USING BTREE,
-  KEY `IDX_UPTIME` (`uptime`),
-  KEY `IDX_NETGROUP` (`netgroup`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-# 创建topuser用户
-create user 'topuser'@'localhost' IDENTIFIED BY 'q1_amZP11JwJ';
-# 赋权
-GRANT select, insert, update ON topmanager.* TO 'topuser'@'localhost';
-</code></pre>
-<p>登入从库，可以看到从库中出现同样的数据库和数据表，表明已同步</p>
+登入从库，可以看到从库中出现同样的数据库和数据表，表明已同步</code></pre>
 
                 </div>
             </article>
