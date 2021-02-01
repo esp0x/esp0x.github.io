@@ -4,7 +4,7 @@
 <meta name="description" content="" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<title>关于 | Grey</title>
+<title>StorCLI工具使用说明 | Grey</title>
 
 <link rel="shortcut icon" href="https://esp0x.github.io/favicon.ico?v=1612144817908">
 
@@ -202,23 +202,170 @@
         <div class="post-detail gt-bg-theme-color-second">
             <article class="gt-post-content">
                 <h2 class="post-title">
-                    关于
+                    StorCLI工具使用说明
                 </h2>
                 <div class="post-info">
                     <time class="post-time gt-c-content-color-first">
-                        · 2019-01-25 ·
+                        · 2021-02-01 ·
                     </time>
+                    
+                        <a href="https://esp0x.github.io/tag/ETGdbG1UX/" class="post-tags">
+                            # 工具使用
+                        </a>
                     
                 </div>
                 <div class="post-content">
-                    <blockquote>
-<p>此人很懒，嗯，很懒...... 🤝</p>
-</blockquote>
+                    <h3 id="记录一下storcli工具的基本查询方法主要用于实现监控目的对于更改raid的相关命令暂时不在这里记录">记录一下storcli工具的基本查询方法，主要用于实现监控目的，对于更改Raid的相关命令暂时不在这里记录。</h3>
+<h3 id="获取帮助信息">获取帮助信息</h3>
+<pre><code class="language-shell"># ./storcli64 -h
+     Storage Command Line Tool  Ver 1.23.02 Mar 28, 2017
+
+     (c)Copyright 2017, AVAGO Corporation, All Rights Reserved.
+
+storcli -v 
+storcli -h| -help| ? 
+storcli -h| -help| ? legacy
+storcli show 
+storcli show all
+storcli show ctrlcount
+storcli show file=&lt;filepath&gt;
+storcli /cx add vd r[0|1|5|6|00|10|50|60]
+...
+</code></pre>
+<h3 id="显示raid卡相关信息">显示Raid卡相关信息</h3>
+<pre><code class="language-shell"># ./storcli64 show all
+Status Code = 0
+Status = Success
+Description = None
+
+Number of Controllers = 1
+Host Name = A-f8f21e93eca4-nas014
+Operating System  = Linux3.10.0-1062.el7.x86_64
+
+System Overview :
+===============
+
+-------------------------------------------------------------------------------------
+Ctl Model                   Ports PDs DGs DNOpt VDs VNOpt BBU sPR DS  EHS ASOs Hlth  
+-------------------------------------------------------------------------------------
+  0 AVAGOMegaRAIDSAS9361-8i     8  25   2     1   2     1 Opt On  1&amp;2 Y      3 NdAtn 
+-------------------------------------------------------------------------------------
+
+Ctl=Controller Index|DGs=Drive groups|VDs=Virtual drives|Fld=Failed
+PDs=Physical drives|DNOpt=DG NotOptimal|VNOpt=VD NotOptimal|Opt=Optimal
+Msng=Missing|Dgd=Degraded|NdAtn=Need Attention|Unkwn=Unknown
+sPR=Scheduled Patrol Read|DS=DimmerSwitch|EHS=Emergency Hot Spare
+Y=Yes|N=No|ASOs=Advanced Software Options|BBU=Battery backup unit
+Hlth=Health|Safe=Safe-mode boot
+
+# 这里的optimal表示是否是最优状态
+</code></pre>
+<h3 id="显示控制器信息">显示控制器信息</h3>
+<pre><code class="language-shell"># ./storcli64 /c0 show   //这里c0表示第一个控制器
+Generating detailed summary of the adapter, it may take a while to complete.
+
+Controller = 0
+...省略
+Device Number = 0
+Function Number = 0
+Drive Groups = 2
+
+TOPOLOGY :
+========
+
+-----------------------------------------------------------------------------
+DG Arr Row EID:Slot DID Type  State BT       Size PDC  PI SED DS3  FSpace TR 
+-----------------------------------------------------------------------------
+ ... 省略
+ 1 0   12  10:12    37  DRIVE Onln  Y   14.551 TB dflt N  N   dflt -      N  
+ 1 0   13  10:13    36  DRIVE Onln  Y   14.551 TB dflt N  N   dflt -      N  
+ 1 0   14  10:14    46  DRIVE Onln  Y   14.551 TB dflt N  N   dflt -      N  
+ 1 0   15  -        -   DRIVE Msng  -   14.551 TB -    -  -   -    -      N  
+ 1 0   16  10:16    38  DRIVE Onln  Y   14.551 TB dflt N  N   dflt -      N  
+ 1 0   17  10:17    35  DRIVE Onln  Y   14.551 TB dflt N  N   dflt -      N  
+ 1 0   18  10:18    45  DRIVE Onln  Y   14.551 TB dflt N  N   dflt -      N    
+-----------------------------------------------------------------------------
+... 省略
+
+Missing Drives Count = 1
+
+# 这里提示我们有一块盘丢失，需要进行处理
+</code></pre>
+<h3 id="显示剩余空间">显示剩余空间</h3>
+<pre><code class="language-shell"># ./storcli64 /c0 show freespace
+</code></pre>
+<h3 id="显示ccconsistency-check">显示CC（Consistency Check）</h3>
+<pre><code class="language-shell"># ./storcli64 /c0 show cc
+Controller = 0
+Status = Success
+Description = None
+
+Controller Properties :
+=====================
+
+-----------------------------------------------
+Ctrl_Prop                 Value                
+-----------------------------------------------
+CC Operation Mode         Concurrent           
+CC Execution Delay        168                  
+CC Next Starttime         02/04/2021, 15:00:00 
+CC Current State          Stopped              
+CC Number of iterations   15                   
+CC Number of VD completed 1                    
+CC Excluded VDs           None                 
+-----------------------------------------------
+
+</code></pre>
+<h3 id="显示cc速率">显示CC速率</h3>
+<pre><code class="language-shell"># ./storcli64 /c0 show ccrate
+Controller = 0
+Status = Success
+Description = None
+
+
+Controller Properties :
+=====================
+
+----------------
+Ctrl_Prop Value 
+----------------
+CC Rate   30%   
+----------------
+</code></pre>
+<h3 id="查看与设置rebuild速率">查看与设置Rebuild速率</h3>
+<pre><code class="language-shell"># ./storcli64 /c0 show rebuildrate     //查看速率
+# ./storcli64 /c0 set rebuildrate=30   //设置速率
+</code></pre>
+<h3 id="清除raid卡物理磁盘cache">清除Raid卡，物理磁盘Cache</h3>
+<pre><code class="language-shell"># ./storcli64 /c0 flushcache
+</code></pre>
+<h3 id="获取所有enclosure信息">获取所有enclosure信息</h3>
+<pre><code class="language-shell"># ./storcli64 /c0/eall show
+</code></pre>
+<h3 id="获取单个enclosure信息">获取单个enclosure信息</h3>
+<pre><code class="language-shell"># ./storcli64 /c0/e10 show &lt;all&gt;    //加上all参数表示获取详细信息
+# ./strocli64 /c0/e10 show status   //获取风扇等设备详细信息
+</code></pre>
+<h3 id="获取所有磁盘详细信息">获取所有磁盘详细信息</h3>
+<pre><code class="language-shell"># ./storcli64 /c0/eall/sall show
+</code></pre>
+<h3 id="卷组信息获取">卷组信息获取</h3>
+<pre><code class="language-shell"># ./storcli64 /c0/dall show   // 这里的卷组称为DG
+</code></pre>
+<h2 id="参考文献">参考文献</h2>
+<p>https://www.cnblogs.com/luxiaodai/p/9878747.html</p>
 
                 </div>
             </article>
         </div>
 
+        
+            <div class="next-post">
+                <div class="next gt-c-content-color-first">下一篇</div>
+                <a href="https://esp0x.github.io/post/mysql-de-zu-ti-jiao-yuan-li/" class="post-title gt-a-link">
+                    Mysql的组提交原理
+                </a>
+            </div>
         
 
         
