@@ -4,7 +4,7 @@
 <meta name="description" content="" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<title>关于 | Grey</title>
+<title>nc命令使用 | Grey</title>
 
 <link rel="shortcut icon" href="https://esp0x.github.io/favicon.ico?v=1612315704164">
 
@@ -202,23 +202,48 @@
         <div class="post-detail gt-bg-theme-color-second">
             <article class="gt-post-content">
                 <h2 class="post-title">
-                    关于
+                    nc命令使用
                 </h2>
                 <div class="post-info">
                     <time class="post-time gt-c-content-color-first">
-                        · 2019-01-25 ·
+                        · 2021-02-03 ·
                     </time>
+                    
+                        <a href="https://esp0x.github.io/tag/ETGdbG1UX/" class="post-tags">
+                            # 工具使用
+                        </a>
                     
                 </div>
                 <div class="post-content">
-                    <blockquote>
-<p>此人很懒，嗯，很懒...... 🤝</p>
-</blockquote>
+                    <h3 id="端口扫描">端口扫描</h3>
+<pre><code class="language-shell"># nc -vz -w 5 127.0.0.1 1-1024   // 扫描本地1-1024端口范围
+</code></pre>
+<h3 id="监听端口">监听端口</h3>
+<pre><code class="language-shell"># nc -l 8000     // 监听TCP端口
+# nc -ul 9999    // 监听UDP端口
+# nc -vuz 127.0.0.1 9999   // 测试本地UDP端口
+</code></pre>
+<h3 id="传输文件">传输文件</h3>
+<pre><code class="language-shell">1.上传
+# nc -l 9999 &gt; filename
+# nc 127.0.0.1 9999 &lt; source
+
+2.下载
+# nc -l 9999 &lt; filename
+# nc 127.0.0.1 9999 &gt; target
+</code></pre>
 
                 </div>
             </article>
         </div>
 
+        
+            <div class="next-post">
+                <div class="next gt-c-content-color-first">下一篇</div>
+                <a href="https://esp0x.github.io/post/storcli-gong-ju-shi-yong-shuo-ming/" class="post-title gt-a-link">
+                    StorCLI工具使用说明
+                </a>
+            </div>
         
 
         
