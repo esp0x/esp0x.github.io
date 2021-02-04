@@ -4,7 +4,7 @@
 <meta name="description" content="" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<title>关于 | Grey</title>
+<title>理解OAuth 2.0的基本流程 | Grey</title>
 
 <link rel="shortcut icon" href="https://esp0x.github.io/favicon.ico?v=1612400506530">
 
@@ -202,23 +202,46 @@
         <div class="post-detail gt-bg-theme-color-second">
             <article class="gt-post-content">
                 <h2 class="post-title">
-                    关于
+                    理解OAuth 2.0的基本流程
                 </h2>
                 <div class="post-info">
                     <time class="post-time gt-c-content-color-first">
-                        · 2019-01-25 ·
+                        · 2021-02-04 ·
                     </time>
+                    
+                        <a href="https://esp0x.github.io/tag/a5GDIyqF3/" class="post-tags">
+                            # 信息安全
+                        </a>
                     
                 </div>
                 <div class="post-content">
-                    <blockquote>
-<p>此人很懒，嗯，很懒...... 🤝</p>
-</blockquote>
+                    <h3 id="快递员场景">快递员场景</h3>
+<p>需求：有没有一种办法，让快递员能够自由出入小区，又不用知道小区居民的密码，而且他的唯一权限就是送货，其他需要密码的场合，他都没有权限？</p>
+<h3 id="授权机制的设计">授权机制的设计</h3>
+<p>第一步，门禁系统的密码输入器下面，增加一个按钮，叫做&quot;获取授权&quot;。快递员需要首先按这个按钮，去申请授权。</p>
+<p>第二步，他按下按钮以后，屋主（也就是我）的手机就会跳出对话框：有人正在要求授权。系统还会显示该快递员的姓名、工号和所属的快递公司。</p>
+<p>我确认请求属实，就点击按钮，告诉门禁系统，我同意给予他进入小区的授权。</p>
+<p>第三步，门禁系统得到我的确认以后，向快递员显示一个进入小区的令牌（access token）。令牌就是类似密码的一串数字，只在短期内（比如七天）有效。</p>
+<p>第四步，快递员向门禁系统输入令牌，进入小区。</p>
+<p>有人可能会问，为什么不是远程为快递员开门，而要为他单独生成一个令牌？这是因为快递员可能每天都会来送货，第二天他还可以复用这个令牌。另外，有的小区有多重门禁，快递员可以使用同一个令牌通过它们。</p>
+<h3 id="转换理解">转换理解</h3>
+<p>所以，OAuth就是一种授权机制，数据的所有者告诉系统，同意授权第三方应用进入系统，获取这些数据。系统从而产生一个短期的进入令牌（Token），用于替代密码，以供第三方使用。</p>
+<h3 id="关于token">关于Token</h3>
+<p>只需要记住三点：1、令牌的有效期是有限的，为了安全；2、令牌的权限范围一般很小；3、令牌可以被撤销；</p>
+<h3 id="参考文献">参考文献</h3>
+<p>http://www.ruanyifeng.com/blog/2019/04/oauth_design.html</p>
 
                 </div>
             </article>
         </div>
 
+        
+            <div class="next-post">
+                <div class="next gt-c-content-color-first">下一篇</div>
+                <a href="https://esp0x.github.io/post/nginx-pei-zhi-wen-jian-xiang-jie/" class="post-title gt-a-link">
+                    Nginx配置文件详解
+                </a>
+            </div>
         
 
         
