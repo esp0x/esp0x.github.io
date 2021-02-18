@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://esp0x.github.io</id>
     <title>Grey</title>
-    <updated>2021-02-04T01:01:52.917Z</updated>
+    <updated>2021-02-18T01:37:48.595Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://esp0x.github.io"/>
     <link rel="self" href="https://esp0x.github.io/atom.xml"/>
@@ -10,6 +10,61 @@
     <logo>https://esp0x.github.io/images/avatar.png</logo>
     <icon>https://esp0x.github.io/favicon.ico</icon>
     <rights>All rights reserved 2021, Grey</rights>
+    <entry>
+        <title type="html"><![CDATA[NVIDIA显卡常用命令]]></title>
+        <id>https://esp0x.github.io/post/nvidia-xian-qia-chang-yong-ming-ling/</id>
+        <link href="https://esp0x.github.io/post/nvidia-xian-qia-chang-yong-ming-ling/">
+        </link>
+        <updated>2021-02-18T01:37:06.000Z</updated>
+        <content type="html"><![CDATA[<h3 id="gpu日志收集">GPU日志收集</h3>
+<pre><code class="language-shell"># nvidia-bug-report.sh   // 执行后输出nvidia-bug-report.log.gz文件
+</code></pre>
+<h3 id="驱动问题常见解决方法">驱动问题常见解决方法</h3>
+<ol>
+<li>维持较新的驱动版本</li>
+<li>禁用nouveau模块</li>
+<li>打开GPU驱动常驻内存模式并配置开机自启动</li>
+<li>GPU故障后，可尝试重启主机解决</li>
+</ol>
+<h3 id="禁用nouveau模块">禁用nouveau模块</h3>
+<pre><code class="language-shell"># lsmod | grep -i nouveau   // 如果有输出，表示启动状态，否则为禁用状态
+
+# CentOS 7
+# 编辑或新建 blacklist-nouveau.conf 文件
+[root@zj ~]# vim /usr/lib/modprobe.d/blacklist-nouveau.conf
+blacklist nouveau
+options nouveau modeset=0
+
+# 执行如下命令并重启系统使内核生效
+[root@zj ~]# dracut -f
+[root@zj ~]# shutdown -ry 0
+
+
+# ubuntu 
+# vi /etc/modprobe.d/blacklist.conf 最后一行加入
+blacklist nouveau
+# update-initramfs -u
+# reboot
+</code></pre>
+<h3 id="gpu驱动内存常驻模式">GPU驱动内存常驻模式</h3>
+<pre><code class="language-shell"># nvidia-smi -pm 1
+</code></pre>
+<h3 id="gpu加载数量和err检查">GPU加载数量和ERR检查</h3>
+<pre><code class="language-shell"># 以下两个命令显示的GPU卡数量需要保持一致，可用于判断是否有GPU离线
+# lspci | grep -i nvidia 
+# nvidia-smi
+
+# 检查输出中是否包含ERR错误字样，可用于实现健康检查
+</code></pre>
+<h3 id="gpu常用性能指标获取">GPU常用性能指标获取</h3>
+<pre><code class="language-shell"># nvidia-smi \
+&gt;  --query-gpu=memory.total,memory.used,memory.free,utilization.memory,utilization.gpu,temperature.gpu,fan.speed \
+&gt;  --format=csv,noheader,nounits
+
+# nvidia-smi --help-query-gpu   // 查看可用的查询参数
+</code></pre>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[理解OAuth 2.0的基本流程]]></title>
         <id>https://esp0x.github.io/post/li-jie-oauth-20-de-ji-ben-liu-cheng/</id>
@@ -937,108 +992,6 @@ sync_binlog 的默认值是0，像操作系统刷其他文件的机制一样，M
 5.sync_binlog         # sync_binlog的默认值是0，像操作系统刷其他文件的机制一样，MySQL不会同步到磁盘中去而是依赖操作系统来刷新binary log。
 6.innodb_flush_method # 该参数控制日志或数据文件如何write、flush。可选的值为fsync，o_dsync，o_direct，littlesync，nosync。
 </code></pre>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[Mysql分库分表策略]]></title>
-        <id>https://esp0x.github.io/post/mysql-fen-ku-fen-biao-ce-lue/</id>
-        <link href="https://esp0x.github.io/post/mysql-fen-ku-fen-biao-ce-lue/">
-        </link>
-        <updated>2021-01-15T02:12:20.000Z</updated>
-        <content type="html"><![CDATA[<p>数据切分就是将数据分散存储到多个数据库中，使得单一数据库中的数据量变小，通过扩充主机的数量缓解单一数据库的性能问题，从而达到提升数据库性能的目的。</p>
-<h2 id="垂直切分">垂直切分</h2>
-<p><img src="https://esp0x.github.io/post-images/1610676801903.jpg" alt="" loading="lazy"><br>
-垂直切分常见有垂直分库和垂直分表两种：</p>
-<p>垂直分库就是根据业务耦合性，将关联度低的不同表存储在不同的数据库中。类似微服务架构，每一个微服务单独使用一个数据库的形式。</p>
-<p>垂直分表是基于数据库中的列进行， 针对某个表字段过多，可以新建一张扩展表，将不常用的字段或长度较大的字段拆分到扩展表中。这样可以避免跨页问题，MySQL底层是通过数据页存储的，一条记录过大会导致跨页，造成额外的性能损失。</p>
-<h3 id="垂直切分的优点">垂直切分的优点：</h3>
-<ol>
-<li>解决业务系统层面的耦合，使得业务逻辑更清晰；</li>
-<li>与微服务的治理类似，也能对不同业务的数据进行分级管理、维护、监控、扩展等；</li>
-<li>高并发场景下，垂直切分一定程度上能够提升访问性能；</li>
-</ol>
-<h3 id="垂直切分的缺点">垂直切分的缺点：</h3>
-<ol>
-<li>部分表无法join，只能通过接口方式，开发难度增加；</li>
-<li>分布式事务处理复杂；</li>
-<li>没有解决单表数据过大的问题；</li>
-</ol>
-<h2 id="水平切分">水平切分</h2>
-<p><img src="https://esp0x.github.io/post-images/1610676821810.jpg" alt="" loading="lazy"><br>
-当一个应用难以再细粒化的垂直切分，或切分后单表数据量过大，存在读写性能问题时，就需要考虑水平切分了。</p>
-<p>水平切分包括库内分表和分库分表，库内分表只解决了单一表数据量过大的问题，没有将表分布到不同的机器上，对于数据库访问性能提升有限。</p>
-<h3 id="水平切分的优点">水平切分的优点：</h3>
-<ol>
-<li>不存在单表数据量过大问题，提升了表的访问性能；</li>
-<li>应用端改造较小，不需要进行业务拆分；</li>
-</ol>
-<h3 id="水平切分的缺点">水平切分的缺点：</h3>
-<ol>
-<li>跨分片事务的一致性难以保证；</li>
-<li>跨库的join关联查询性能较差；</li>
-<li>数据库多次扩展难度和维护量增加；</li>
-</ol>
-<h2 id="几种典型的数据分片规则">几种典型的数据分片规则</h2>
-<ul>
-<li>
-<p>根据数值范围</p>
-<p>例如：按照时间维度，将不同月，甚至不同日的数据存储到不同的表；又或者，按照userId进行划分，1-9999的记录分到第一个库，10000-20000的分到第二个库，以此类推；</p>
-<p>优点：</p>
-<ol>
-<li>单表大小可控；</li>
-<li>天然便于水平扩展，后期如果想对整个分片集群扩容时，只需要添加节点，无需对其他分片进行数据迁移；</li>
-<li>使用分片字段进行查询时，速度更快；</li>
-</ol>
-<p>缺点：</p>
-<ol>
-<li>热点数据成为性能瓶颈。连续分片可能存在数据热点，例如按时间字段分片，有些分片存储最近时间的数据，可能会被频繁地读写，有些分片存储历史数据，则很少被查询。</li>
-</ol>
-</li>
-<li>
-<p>根据数值取模</p>
-<p>一般采用hash取模mod的切分方式。</p>
-<p>优点：</p>
-<ol>
-<li>数据分片相对比较均匀，不容易出现热点和并发访问的瓶颈；</li>
-</ol>
-<p>缺点：</p>
-<ol>
-<li>后期扩展时，需要迁移旧的数据；（通过一致性hash算法可以避免这个问题）</li>
-<li>容易面临跨分片查询的复杂问题，比如频繁查询中不包含分片字段，将会导致无法定位数据库，从而向所有数据库发起请求，再在内存中合并数据，性能损失严重；</li>
-</ol>
-</li>
-</ul>
-<h2 id="分库分表需要解决的问题">分库分表需要解决的问题</h2>
-<ul>
-<li>
-<p>事务问题</p>
-<p>方案一：使用分布式事务，交由数据库管理，简单有效；缺点是随着节点增加，性能代价越来越高。（需要协调的节点变多）</p>
-<p>方案二：由应用程序和数据库共同控制，性能上有优势；缺点是开发难度较大；</p>
-</li>
-<li>
-<p>跨节点Join问题</p>
-<p>分两次查询，第一次查询的结果集中找出关联数据的ID，根据这些ID发起第二次请求得到关联数据；在应用设计时应尽量避免进行关联查询；</p>
-</li>
-<li>
-<p>跨节点的count、order by、group by以及聚合函数问题</p>
-<p>分别在各个节点进行数据合并，最后在统一进行合并，缺点是当数据集较大时，占用的内存资源很多；</p>
-</li>
-<li>
-<p>数据迁移、容量规划、扩容等问题</p>
-<p>当业务高速发展，面临性能和存储的瓶颈时，才会考虑分片设计，此时就不可避免的需要考虑历史数据迁移的问题。一般做法是先读出历史数据，然后按指定的分片规则再将数据写入到各个分片节点中。此外还需要根据当前的数据量和QPS，以及业务发展的速度，进行容量规划，推算出大概需要多少分片（一般建议单个分片上的单表数据量不超过1000W）如果采用数值范围分片，只需要添加节点就可以进行扩容了，不需要对分片数据迁移。如果采用的是数值取模分片，则考虑后期的扩容问题就相对比较麻烦。</p>
-</li>
-<li>
-<p>全局主键避重问题</p>
-<p>由于表同时存在于多个数据库中，主键值设置为自增序列将不能使用，需要单独设计全局主键，一般可以用UUID的方案解决；</p>
-</li>
-<li>
-<p>跨分片的排序分页</p>
-<p>一般来讲，分页时需要按照指定字段进行排序。当排序字段就是分片字段的时候，我们通过分片规则可以比较容易定位到指定的分片，而当排序字段非分片字段的时候，情况就会变得比较复杂了。为了最终结果的准确性，我们需要在不同的分片节点中将数据进行排序并返回，并将不同分片返回的结果集进行汇总和再次排序，最后再返回给用户。</p>
-<p>如果是在前台应用提供分页，则限定用户只能看前面n页，这个限制在业务上也是合理的，一般看后面的分页意义不大（如果一定要看，可以要求用户缩小范围重新查询）。</p>
-<p>如果是后台批处理任务要求分批获取数据，则可以加大page size，比如每次获取5000条记录，有效减少分页数（当然离线访问一般走备库，避免冲击主库）。</p>
-<p>分库设计时，一般还有配套大数据平台汇总所有分库的记录，有些分页查询可以考虑走大数据平台。</p>
-</li>
-</ul>
 ]]></content>
     </entry>
 </feed>

@@ -4,7 +4,7 @@
 <meta name="description" content="" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<title>归档 | Grey</title>
+<title>NVIDIA显卡常用命令 | Grey</title>
 
 <link rel="shortcut icon" href="https://esp0x.github.io/favicon.ico?v=1613612263183">
 
@@ -33,11 +33,11 @@
 <!--<script src="media/scripts/index.js"></script>-->
 
 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.css">
 </head>
 <body>
 <div class="main gt-bg-theme-color-first">
-    <div class="main-content">
-        <style>
+    <style>
     /* 导航栏样式 */
     .navbar {
         position: relative;
@@ -198,159 +198,90 @@
         }
     }
 </script>
-        <div class="post-container">
-            <div class="post-detail gt-bg-theme-color-first">
-                <article class="gt-post-content">
-                    <h2 class="post-title">归档</h2>
+    <div class="post-container">
+        <div class="post-detail gt-bg-theme-color-second">
+            <article class="gt-post-content">
+                <h2 class="post-title">
+                    NVIDIA显卡常用命令
+                </h2>
+                <div class="post-info">
+                    <time class="post-time gt-c-content-color-first">
+                        · 2021-02-18 ·
+                    </time>
+                    
+                        <a href="https://esp0x.github.io/tag/ETGdbG1UX/" class="post-tags">
+                            # 工具使用
+                        </a>
+                    
+                </div>
+                <div class="post-content">
+                    <h3 id="gpu日志收集">GPU日志收集</h3>
+<pre><code class="language-shell"># nvidia-bug-report.sh   // 执行后输出nvidia-bug-report.log.gz文件
+</code></pre>
+<h3 id="驱动问题常见解决方法">驱动问题常见解决方法</h3>
+<ol>
+<li>维持较新的驱动版本</li>
+<li>禁用nouveau模块</li>
+<li>打开GPU驱动常驻内存模式并配置开机自启动</li>
+<li>GPU故障后，可尝试重启主机解决</li>
+</ol>
+<h3 id="禁用nouveau模块">禁用nouveau模块</h3>
+<pre><code class="language-shell"># lsmod | grep -i nouveau   // 如果有输出，表示启动状态，否则为禁用状态
+
+# CentOS 7
+# 编辑或新建 blacklist-nouveau.conf 文件
+[root@zj ~]# vim /usr/lib/modprobe.d/blacklist-nouveau.conf
+blacklist nouveau
+options nouveau modeset=0
+
+# 执行如下命令并重启系统使内核生效
+[root@zj ~]# dracut -f
+[root@zj ~]# shutdown -ry 0
+
+
+# ubuntu 
+# vi /etc/modprobe.d/blacklist.conf 最后一行加入
+blacklist nouveau
+# update-initramfs -u
+# reboot
+</code></pre>
+<h3 id="gpu驱动内存常驻模式">GPU驱动内存常驻模式</h3>
+<pre><code class="language-shell"># nvidia-smi -pm 1
+</code></pre>
+<h3 id="gpu加载数量和err检查">GPU加载数量和ERR检查</h3>
+<pre><code class="language-shell"># 以下两个命令显示的GPU卡数量需要保持一致，可用于判断是否有GPU离线
+# lspci | grep -i nvidia 
+# nvidia-smi
+
+# 检查输出中是否包含ERR错误字样，可用于实现健康检查
+</code></pre>
+<h3 id="gpu常用性能指标获取">GPU常用性能指标获取</h3>
+<pre><code class="language-shell"># nvidia-smi \
+&gt;  --query-gpu=memory.total,memory.used,memory.free,utilization.memory,utilization.gpu,temperature.gpu,fan.speed \
+&gt;  --format=csv,noheader,nounits
+
+# nvidia-smi --help-query-gpu   // 查看可用的查询参数
+</code></pre>
+
+                </div>
+            </article>
+        </div>
+
+        
+            <div class="next-post">
+                <div class="next gt-c-content-color-first">下一篇</div>
+                <a href="https://esp0x.github.io/post/li-jie-oauth-20-de-ji-ben-liu-cheng/" class="post-title gt-a-link">
+                    理解OAuth 2.0的基本流程
+                </a>
+            </div>
         
 
-<div class="archives-container">
-    
-        <h2 class="year gt-c-cotent-color-first">2021</h2>
         
-            
-                <article class="post">
-                    <a href="https://esp0x.github.io/post/nvidia-xian-qia-chang-yong-ming-ling/">
-                        <div class="post-title gt-c-content-color-first">
-                            <small><b>2021-02-18&nbsp;&nbsp;·&nbsp;&nbsp;</b></small>
-                            NVIDIA显卡常用命令
-                        </div>
-                    </a>
-                </article>
-            
-        
-            
-                <article class="post">
-                    <a href="https://esp0x.github.io/post/li-jie-oauth-20-de-ji-ben-liu-cheng/">
-                        <div class="post-title gt-c-content-color-first">
-                            <small><b>2021-02-04&nbsp;&nbsp;·&nbsp;&nbsp;</b></small>
-                            理解OAuth 2.0的基本流程
-                        </div>
-                    </a>
-                </article>
-            
-        
-            
-                <article class="post">
-                    <a href="https://esp0x.github.io/post/nginx-pei-zhi-wen-jian-xiang-jie/">
-                        <div class="post-title gt-c-content-color-first">
-                            <small><b>2021-02-03&nbsp;&nbsp;·&nbsp;&nbsp;</b></small>
-                            Nginx配置文件详解
-                        </div>
-                    </a>
-                </article>
-            
-        
-            
-                <article class="post">
-                    <a href="https://esp0x.github.io/post/nc-ming-ling-shi-yong/">
-                        <div class="post-title gt-c-content-color-first">
-                            <small><b>2021-02-03&nbsp;&nbsp;·&nbsp;&nbsp;</b></small>
-                            nc命令使用
-                        </div>
-                    </a>
-                </article>
-            
-        
-            
-                <article class="post">
-                    <a href="https://esp0x.github.io/post/storcli-gong-ju-shi-yong-shuo-ming/">
-                        <div class="post-title gt-c-content-color-first">
-                            <small><b>2021-02-01&nbsp;&nbsp;·&nbsp;&nbsp;</b></small>
-                            StorCLI工具使用说明
-                        </div>
-                    </a>
-                </article>
-            
-        
-            
-                <article class="post">
-                    <a href="https://esp0x.github.io/post/mysql-de-zu-ti-jiao-yuan-li/">
-                        <div class="post-title gt-c-content-color-first">
-                            <small><b>2021-01-18&nbsp;&nbsp;·&nbsp;&nbsp;</b></small>
-                            Mysql的组提交原理
-                        </div>
-                    </a>
-                </article>
-            
-        
-            
-                <article class="post">
-                    <a href="https://esp0x.github.io/post/gtid-ji-chu-yuan-li/">
-                        <div class="post-title gt-c-content-color-first">
-                            <small><b>2021-01-18&nbsp;&nbsp;·&nbsp;&nbsp;</b></small>
-                            GTID基础原理
-                        </div>
-                    </a>
-                </article>
-            
-        
-            
-                <article class="post">
-                    <a href="https://esp0x.github.io/post/mysql-shi-wu-ge-chi-ji-bie-ji-shi-xian/">
-                        <div class="post-title gt-c-content-color-first">
-                            <small><b>2021-01-18&nbsp;&nbsp;·&nbsp;&nbsp;</b></small>
-                            Mysql事务隔离级别及实现
-                        </div>
-                    </a>
-                </article>
-            
-        
-            
-                <article class="post">
-                    <a href="https://esp0x.github.io/post/mysql-zhu-cong-fu-zhi-huan-jing-da-jian/">
-                        <div class="post-title gt-c-content-color-first">
-                            <small><b>2021-01-15&nbsp;&nbsp;·&nbsp;&nbsp;</b></small>
-                            Mysql主从复制环境搭建
-                        </div>
-                    </a>
-                </article>
-            
-        
-            
-                <article class="post">
-                    <a href="https://esp0x.github.io/post/mysql-shuang-1-she-zhi-shu-ju-an-quan-de-guan-jian-can-shu/">
-                        <div class="post-title gt-c-content-color-first">
-                            <small><b>2021-01-15&nbsp;&nbsp;·&nbsp;&nbsp;</b></small>
-                            Mysql双1设置-数据安全的关键参数
-                        </div>
-                    </a>
-                </article>
-            
-        
-            
-                <article class="post">
-                    <a href="https://esp0x.github.io/post/mysql-fen-ku-fen-biao-ce-lue/">
-                        <div class="post-title gt-c-content-color-first">
-                            <small><b>2021-01-15&nbsp;&nbsp;·&nbsp;&nbsp;</b></small>
-                            Mysql分库分表策略
-                        </div>
-                    </a>
-                </article>
-            
-        
-            
-                <article class="post">
-                    <a href="https://esp0x.github.io/post/mysql-zhu-cong-fu-zhi-yuan-li/">
-                        <div class="post-title gt-c-content-color-first">
-                            <small><b>2021-01-14&nbsp;&nbsp;·&nbsp;&nbsp;</b></small>
-                            Mysql主从复制原理
-                        </div>
-                    </a>
-                </article>
-            
-        
-    
-</div>
 
-        <div class="pagination-container">
-    
-    
-</div>
+        
 
-    </article>
-</div>
-</div>
+        
+
         <div class="site-footer gt-c-content-color-first">
     <div class="slogan gt-c-content-color-first">温故而知新</div>
     <div class="social-container">
