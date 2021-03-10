@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://esp0x.github.io</id>
     <title>Grey</title>
-    <updated>2021-02-18T01:37:48.595Z</updated>
+    <updated>2021-03-10T02:10:21.574Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://esp0x.github.io"/>
     <link rel="self" href="https://esp0x.github.io/atom.xml"/>
@@ -10,6 +10,124 @@
     <logo>https://esp0x.github.io/images/avatar.png</logo>
     <icon>https://esp0x.github.io/favicon.ico</icon>
     <rights>All rights reserved 2021, Grey</rights>
+    <entry>
+        <title type="html"><![CDATA[ipmitool工具的使用说明]]></title>
+        <id>https://esp0x.github.io/post/ipmitool-gong-ju-de-shi-yong-shuo-ming/</id>
+        <link href="https://esp0x.github.io/post/ipmitool-gong-ju-de-shi-yong-shuo-ming/">
+        </link>
+        <updated>2021-03-10T02:09:43.000Z</updated>
+        <content type="html"><![CDATA[<h3 id="安装工具">安装工具</h3>
+<pre><code class="language-shell">yum install -y ipmitool 
+</code></pre>
+<h3 id="启动服务">启动服务</h3>
+<pre><code class="language-shell">service ipmi start
+ipmitool -I open shell     # 进入交互式shell
+</code></pre>
+<h3 id="一-开关机重启">一、开关机，重启</h3>
+<pre><code class="language-shell">1. 查看开关机状态：
+ipmitool -H (BMC的管理IP地址) -I lanplus -U (BMC登录用户名) -P (BMC 登录用户名的密码) power status
+
+2. 开机：
+ipmitool -H (BMC的管理IP地址) -I lanplus -U (BMC登录用户名) -P (BMC 登录用户名的密码) power on
+
+3. 关机：
+ipmitool -H (BMC的管理IP地址) -I lanplus -U (BMC登录用户名) -P (BMC 登录用户名的密码) power off
+
+4. 重启：
+ipmitool -H (BMC的管理IP地址) -I lanplus -U (BMC登录用户名) -P (BMC 登录用户名的密码) power reset
+</code></pre>
+<h3 id="二-用户管理">二、用户管理</h3>
+<pre><code class="language-shell"># 说明：[ChannelNo] 字段是可选的，ChannoNo为1或者8；BMC默认有2个用户：user id为1的匿名用户，user id为2的ADMIN用户；&lt;&gt;字段为必选内容；&lt;privilege level&gt;：2为user权限，3为Operator权限，4为Administrator权限；
+
+1. 查看用户信息：
+ipmitool -H (BMC的管理IP地址) -I lanplus -U (BMC登录用户名) -P (BMC 登录用户名的密码) user list [ChannelNo]
+
+2. 增加用户：
+ipmitool -H (BMC的管理IP地址) -I lanplus -U (BMC登录用户名) -P (BMC 登录用户名的密码) user set name &lt;user id&gt; &lt;username&gt;
+
+3. 设置密码：
+ipmitool -H (BMC的管理IP地址) -I lanplus -U (BMC登录用户名) -P (BMC 登录用户名的密码) user set password &lt;user id&gt; &lt;password&gt;
+
+4. 设置用户权限：
+ipmitool -H (BMC的管理IP地址) -I lanplus -U (BMC登录用户名) -P (BMC 登录用户名的密码) user priv &lt;user id&gt; &lt;privilege level&gt; [ChannelNo]
+
+5. 启用/禁用用户：
+ipmitool -H (BMC的管理IP地址) -I lanplus -U (BMC登录用户名) -P (BMC 登录用户名的密码) user enable/disable &lt;user id&gt;
+</code></pre>
+<h3 id="三-ip网络设置">三、IP网络设置</h3>
+<pre><code class="language-shell"># 说明：[ChannelNo] 字段是可选的，ChannoNo为1(Share Nic网络)或者8（BMC独立管理网络）；设置网络参数，必须首先设置IP为静态，然后再进行其他设置；
+
+1. 查看网络信息：
+ipmitool -H (BMC的管理IP地址) -I lanplus -U (BMC登录用户名) -P (BMC 登录用户名的密码) lan print [ChannelNo]
+
+2. 修改IP为静态还是DHCP模式：
+ipmitool -H (BMC的管理IP地址) -I lanplus -U (BMC登录用户名) -P (BMC 登录用户名的密码) lan set &lt;ChannelNo&gt; ipsrc &lt;static/dhcp&gt;
+
+3. 修改IP地址：
+ipmitool -H (BMC的管理IP地址) -I lanplus -U (BMC登录用户名) -P (BMC 登录用户名的密码) lan set &lt;ChannelNo&gt; ipaddr &lt;IPAddress&gt;
+
+4. 修改子网掩码：
+ipmitool -H (BMC的管理IP地址) -I lanplus -U (BMC登录用户名) -P (BMC 登录用户名的密码) lan set &lt;ChannelNo&gt; netmask &lt;NetMask&gt;
+
+5. 修改默认网关：
+ipmitool -H (BMC的管理IP地址) -I lanplus -U (BMC登录用户名) -P (BMC 登录用户名的密码) lan set &lt;ChannelNo&gt; defgw ipaddr &lt;默认网关&gt;
+</code></pre>
+<h3 id="四-sol功能">四、SOL功能</h3>
+<pre><code class="language-shell"># 说明：&lt;9.6/19.2/38.4/57.6/115.2&gt;其中115.2代表115200，即*1000是表示的波特率;
+
+1. 设置SOL串口波特率：
+ipmitool -H (BMC的管理IP地址) -I lanplus -U (BMC登录用户名) -P (BMC 登录用户名的密码) sol set volatile-bit-rate &lt;9.6/19.2/38.4/57.6/115.2&gt;
+
+2. 打开SOL功能：
+ipmitool -H (BMC的管理IP地址) -I lanplus -U (BMC登录用户名) -P (BMC 登录用户名的密码) sol activate
+
+3. 关闭SOL功能：
+ipmitool -H (BMC的管理IP地址) -I lanplus -U (BMC登录用户名) -P (BMC 登录用户名的密码) sol deactivate
+</code></pre>
+<h3 id="五-sel日志查看">五、SEL日志查看</h3>
+<pre><code class="language-shell">1. 查看SEL日志：
+ipmitool -H (BMC的管理IP地址) -I lanplus -U (BMC登录用户名) -P (BMC 登录用户名的密码) sel list
+</code></pre>
+<h3 id="六-fru信息查看">六、FRU信息查看</h3>
+<pre><code class="language-shell">1. 查看FRU信息：
+ipmitool -H (BMC的管理IP地址) -I lanplus -U (BMC登录用户名) -P (BMC 登录用户名的密码) fru list
+</code></pre>
+<h3 id="七-sdrsensor信息查看">七、SDR，Sensor信息查看</h3>
+<pre><code class="language-shell">1. 查看SDR Sensor信息：
+ipmitool -H (BMC的管理IP地址) -I lanplus -U (BMC登录用户名) -P (BMC 登录用户名的密码) sdr
+
+2. 查看Sensor信息：
+ipmitool -H (BMC的管理IP地址) -I lanplus -U (BMC登录用户名) -P (BMC 登录用户名的密码) sensor list
+</code></pre>
+<h3 id="八-mc管理单元bmc状态和控制">八、mc(管理单元BMC)状态和控制</h3>
+<pre><code class="language-shell">1. 重启动BMC：
+ipmitool -H (BMC的管理IP地址) -I lanplus -U (BMC登录用户名) -P (BMC 登录用户名的密码) mc reset &lt;warm/cold&gt;
+</code></pre>
+<h3 id="九-设置bmc的iptables防火墙">九、设置BMC的iptables防火墙</h3>
+<pre><code class="language-shell">1. 设置某一段IP可以访问BMC
+ipmitool -H (BMC的管理IP地址) -I lanplus -U (BMC登录用户名) -P (BMC 登录用户名的密码) raw 0x32 0x76 0x01 0x01 ip1(0xa 0xa 0xa 0xa) ip2(0xb 0xb 0xb 0xb)
+ipmitool -H (BMC的管理IP地址) -I lanplus -U (BMC登录用户名) -P (BMC 登录用户名的密码) raw 0x32 0x76 0x09
+
+2. 设置某个IP可以访问BMC
+ipmitool -H (BMC的管理IP地址) -I lanplus -U (BMC登录用户名) -P (BMC 登录用户名的密码) raw 0x32 0x76 0x00 0x01 ip1(0xa 0xa 0xa 0xa)
+ipmitool -H (BMC的管理IP地址) -I lanplus -U (BMC登录用户名) -P (BMC 登录用户名的密码) raw 0x32 0x76 0x09
+
+3. 取消设置
+ipmitool -H (BMC的管理IP地址) -I lanplus -U (BMC登录用户名) -P (BMC 登录用户名的密码) raw 0x32 0x76 0x08
+
+4．获取防火墙设置
+ipmitool -H (BMC的管理IP地址) -I lanplus -U (BMC登录用户名) -P (BMC 登录用户名的密码) raw 0x32 0x77 0x01 0x00
+
+5. 阻止/开启某个端口
+ipmitool -H (BMC的管理IP地址) -I lanplus -U (BMC登录用户名) -P (BMC 登录用户名的密码) raw 0x32 0x76 0x02 0x00/0x01 0x00 (portno)0x22 0x00
+
+6. 取消某个端口的设置（6是5的对应取消操作）
+ipmitool -H (BMC的管理IP地址) -I lanplus -U (BMC登录用户名) -P (BMC 登录用户名的密码) raw 0x32 0x76 0x06 0x00/0x01 0x00 (portno)0x22 0x00
+</code></pre>
+<h3 id="参考文献">参考文献</h3>
+<p>https://www.cnblogs.com/EricDing/p/8995263.html</p>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[NVIDIA显卡常用命令]]></title>
         <id>https://esp0x.github.io/post/nvidia-xian-qia-chang-yong-ming-ling/</id>
@@ -958,40 +1076,6 @@ mysql&gt; show slave status \G;   #Slave_IO_Running,Slave_SQL_Running 都为Yes�
 <h2 id="主库创建数据库和数据表">主库创建数据库和数据表</h2>
 <pre><code class="language-sql">create database topmanager DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
 登入从库，可以看到从库中出现同样的数据库和数据表，表明已同步</code></pre>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[Mysql双1设置-数据安全的关键参数]]></title>
-        <id>https://esp0x.github.io/post/mysql-shuang-1-she-zhi-shu-ju-an-quan-de-guan-jian-can-shu/</id>
-        <link href="https://esp0x.github.io/post/mysql-shuang-1-she-zhi-shu-ju-an-quan-de-guan-jian-can-shu/">
-        </link>
-        <updated>2021-01-15T02:14:24.000Z</updated>
-        <content type="html"><![CDATA[<h2 id="一-参数及设置说明">一、参数及设置说明</h2>
-<pre><code class="language-shell"># innodb_flush_log_at_trx_commit
-1.设置为0：log buffer将每秒一次地写入log file中，并且log file的flush操作同时进行；该模式下，在事务提交时，不会主动触发写入磁盘的操作；
-2.设置为1：每次事务提交时MySQL都会把log buffer的数据写入log file，并且flush(刷到磁盘)中去;
-3.设置为2：每次事务提交时MySQL都会把log buffer的数据写入log file，但是flush(刷到磁盘)操作并不会同时进行。该模式下,MySQL会每秒执行一次 flush(刷到磁盘)操作。
-
-# sync_binlog
-sync_binlog 的默认值是0，像操作系统刷其他文件的机制一样，MySQL不会同步到磁盘中去而是依赖操作系统来刷新binary log。
-当sync_binlog =N (N&gt;0) ，MySQL 在每写 N次 二进制日志binary log时，会使用fdatasync()函数将它的写二进制日志binary log同步到磁盘中去。
-
-注意：如果启用了autocommit，那么每一个语句statement就会有一次写操作；否则每个事务对应一个写操作。
-
-# 性能与安全性对比 
-1.双1设置时，写入性能最差，安全性最高；
-2.sync_binlog=N (N&gt;1 ) innodb_flush_log_at_trx_commit=2 时，性能最好，安全性较差；
-3.innodb_flush_log_at_trx_commit设置为0，mysqld进程崩溃会导致上一秒钟所有事务数据的丢失；
-4.innodb_flush_log_at_trx_commit设置为2，当系统崩溃或者断电时，上一秒的所有数据才有可能丢失；
-</code></pre>
-<h2 id="二-对io影响较大的几个参数">二、对IO影响较大的几个参数</h2>
-<pre><code class="language-shell">1.innodb_buffer_pool_size # 该参数控制innodb缓存大小，用于缓存应用访问的数据，推荐配置为系统可用内存的80%。
-2.binlog_cache_size       # 该参数控制二进制日志缓冲大小，当事务还没有提交时，事务日志存放于cache，当遇到大事务cache不够用的时，mysql会把uncommitted的部分写入临时文件,等到committed的时候才会写入正式的持久化日志文件。
-3.innodb_max_dirty_pages_pct     # 该参数可以直接控制Dirty Page在BP中所占的比率，当dirty page达到了该参数的阈值，就会触发MySQL系统刷新数据到磁盘。
-4.innodb_flush_log_at_trx_commit # 该参数确定日志文件何时write、flush。
-5.sync_binlog         # sync_binlog的默认值是0，像操作系统刷其他文件的机制一样，MySQL不会同步到磁盘中去而是依赖操作系统来刷新binary log。
-6.innodb_flush_method # 该参数控制日志或数据文件如何write、flush。可选的值为fsync，o_dsync，o_direct，littlesync，nosync。
-</code></pre>
 ]]></content>
     </entry>
 </feed>
