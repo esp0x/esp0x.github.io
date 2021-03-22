@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://esp0x.github.io</id>
     <title>Grey</title>
-    <updated>2021-03-22T01:30:46.981Z</updated>
+    <updated>2021-03-22T02:35:18.593Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://esp0x.github.io"/>
     <link rel="self" href="https://esp0x.github.io/atom.xml"/>
@@ -10,6 +10,37 @@
     <logo>https://esp0x.github.io/images/avatar.png</logo>
     <icon>https://esp0x.github.io/favicon.ico</icon>
     <rights>All rights reserved 2021, Grey</rights>
+    <entry>
+        <title type="html"><![CDATA[XFS文件系统修复流程]]></title>
+        <id>https://esp0x.github.io/post/xfs-wen-jian-xi-tong-xiu-fu-liu-cheng/</id>
+        <link href="https://esp0x.github.io/post/xfs-wen-jian-xi-tong-xiu-fu-liu-cheng/">
+        </link>
+        <updated>2021-03-22T02:34:29.000Z</updated>
+        <content type="html"><![CDATA[<h3 id="详细流程如下">详细流程如下：</h3>
+<p>1.使用 xfs_repair -n 执行文件系统错误检测，和 fsck -n 类似；<br>
+2.使用 xfs_repair 尝试进行修复；<br>
+3.当遇见无法正常挂载文件系统时，需要使用强制模式 -L 模式进行修复，会丢失部分数据，可以先对metadata进行模拟修复测试：</p>
+<ul>
+<li>xfs_metadump [partition] /path/to/file.metadump                                  # 对需要修复的分区进行dump</li>
+<li>xfs_mdrestore /path/to/file.metadump /path/to/file.img                         # 生成img文件</li>
+<li>losetup --show --find /path/to/file.img                                                    # 使用lostup工具将数据放到/dev/loop0</li>
+<li>xfs_repair -L /dev/loop0                                                                        # 尝试模拟修复</li>
+<li>mount /dev/loop0 /mnt</li>
+<li>check the damage</li>
+<li>(note, this is an image of file system layout, but not the actual data)</li>
+</ul>
+<p>4.拷贝真实数据，并对拷贝的数据进行修复：</p>
+<ul>
+<li>ddrescue -f -n [partition] /path/to/rescued.img rescue.log                      # 这需要一个比原分区大小更大的磁盘</li>
+<li>ddrescue -d -f -r3 [partition] /path/to/rescued.img rescue.log</li>
+<li>losetup --show --find /path/to/rescued.img</li>
+<li>xfs_repair -L /dev/loop0</li>
+<li>mount /dev/loop0 /mnt</li>
+<li>check the damage</li>
+</ul>
+<p>5.如果真实环境缺少这样的备份分区，那么直接使用xfs_repair -L模式进行强制修复。</p>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[ipmitool工具的使用说明]]></title>
         <id>https://esp0x.github.io/post/ipmitool-gong-ju-de-shi-yong-shuo-ming/</id>
@@ -983,99 +1014,6 @@ innodb_rollback_on_timeout: 如果这个参数为true，则当发生因为等待
 <h4 id="httpswwwcnblogscomkismetvp10331633html">https://www.cnblogs.com/kismetv/p/10331633.html</h4>
 <h4 id="httpszhuanlanzhihucomp40208895">https://zhuanlan.zhihu.com/p/40208895</h4>
 <h4 id="httpswwwcnblogscomhuanongyingp7021555html">https://www.cnblogs.com/huanongying/p/7021555.html</h4>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[Mysql主从复制环境搭建]]></title>
-        <id>https://esp0x.github.io/post/mysql-zhu-cong-fu-zhi-huan-jing-da-jian/</id>
-        <link href="https://esp0x.github.io/post/mysql-zhu-cong-fu-zhi-huan-jing-da-jian/">
-        </link>
-        <updated>2021-01-15T02:15:27.000Z</updated>
-        <content type="html"><![CDATA[<h2 id="准备机器">准备机器</h2>
-<p>两台centos7系统服务器：</p>
-<p>主mysql：192.168.50.1</p>
-<p>从mysql：192.168.50.2</p>
-<h2 id="安装mysql">安装mysql</h2>
-<ol>
-<li>
-<p>下载yum源</p>
-<pre><code class="language-shell">wget https://dev.mysql.com/get/mysql80-community-release-el7-3.noarch.rpm
-</code></pre>
-</li>
-<li>
-<p>安装yum源</p>
-<pre><code class="language-shell">rpm -Uvh mysql80-community-release-el7-3.noarch.rpm
-</code></pre>
-</li>
-<li>
-<p>安装mysql</p>
-<pre><code class="language-shell">yum install -y mysql-community-server
-</code></pre>
-</li>
-<li>
-<p>启动mysql，并获取root初始密码</p>
-<pre><code class="language-shell"># 确保selinux为disabled
-# 确保关闭了firewalld服务
-
-systemctl start mysqld
-
-[root@localhost ~]# grep password /var/log/mysqld.log 
-2020-10-19T02:47:35.912896Z 1 [Note] A temporary password is generated for root@localhost: -1k-1KjU*LG)
-</code></pre>
-</li>
-<li>
-<p>登入mysql，并重置root密码</p>
-<pre><code class="language-shell">mysql -uroot -p 
-mysql&gt; ALTER USER 'root'@'localhost' IDENTIFIED BY 'qUXmZP11JwJ_11'; # root本地访问，且重置
-mysql&gt; exit
-</code></pre>
-</li>
-</ol>
-<h2 id="主mysql数据库配置">主Mysql数据库配置</h2>
-<p>编辑my.cnf配置文件</p>
-<pre><code class="language-shell">vim /etc/my.cnf
-
-[mysqld]
-port=9006          #指定新的端口
-server-id=110      #设置主服务器的ID(不能和别的服务器重复，建议使用ip的最后一段)
-log-bin=mysql-bin  #binlog日志文件名
-</code></pre>
-<p>创建用于主从同步的账户</p>
-<pre><code class="language-shell">$ mysql -u root -p  #登录MySQL
-mysql&gt; CREATE USER 'repl'@'192.168.50.2' IDENTIFIED WITH mysql_native_password BY 'Top_master_1'; # 主库创建用于从库同步的账号
-mysql&gt; grant replication slave on *.* to 'repl'@'192.168.50.2';  #赋予主从同步权限，指定具体的数据库在/etc/my.cnf中完成
-mysql&gt; flush privileges;
-</code></pre>
-<p>重启MySQL，使my.cnf 配置生效；查看主库状态</p>
-<pre><code class="language-shell">$ systemctl restart mysqld #重启MySQL
-mysql -u root -p
-mysql&gt; show master status; #查看主库的状态  File,Position 这两个值需要放到slave配置中
-+--------------------+----------+--------------+------------------+-------------------+
-| File               | Position | Binlog_Do_DB | Binlog_Ignore_DB | Executed_Gtid_Set |
-+--------------------+----------+--------------+------------------+-------------------+
-| mysql-bin.00001    |      156 |     xxxx     |                  |                   |
-+--------------------+----------+--------------+------------------+-------------------+
-1 row in set (0.00 sec)
-</code></pre>
-<h2 id="从mysql数据库配置">从Mysql数据库配置</h2>
-<p>编辑配置文件</p>
-<pre><code class="language-shell">vim /etc/my.cnf
-
-[mysqld]
-port=9006
-server-id=111
-</code></pre>
-<p>配置完成后，重启从库的MySQL</p>
-<pre><code class="language-shell">$ systemctl restart mysqld  #重启MySQL
-$ mysql -u root -p          #登录mysql
-mysql&gt; stop slave;          #关闭从库
-mysql&gt; change master to master_host='192.168.50.1',master_port=9006,master_user='repl',master_password='Top_master_1',master_log_file='mysql-bin.00001',master_log_pos=156; #配置主库信息
-mysql&gt; start slave;            #开启从库 
-mysql&gt; show slave status \G;   #Slave_IO_Running,Slave_SQL_Running 都为Yes的时候表示配置成功
-</code></pre>
-<h2 id="主库创建数据库和数据表">主库创建数据库和数据表</h2>
-<pre><code class="language-sql">create database topmanager DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
-登入从库，可以看到从库中出现同样的数据库和数据表，表明已同步</code></pre>
 ]]></content>
     </entry>
 </feed>
