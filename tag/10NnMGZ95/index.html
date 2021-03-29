@@ -4,7 +4,7 @@
 <meta name="description" content="" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<title>XFS文件系统修复流程 | Grey</title>
+<title>nmap | Grey</title>
 
 <link rel="shortcut icon" href="https://esp0x.github.io/favicon.ico?v=1616997089657">
 
@@ -33,11 +33,11 @@
 <!--<script src="media/scripts/index.js"></script>-->
 
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.css">
 </head>
 <body>
 <div class="main gt-bg-theme-color-first">
-    <style>
+    <div class="main-content">
+        <style>
     /* 导航栏样式 */
     .navbar {
         position: relative;
@@ -198,65 +198,49 @@
         }
     }
 </script>
-    <div class="post-container">
-        <div class="post-detail gt-bg-theme-color-second">
-            <article class="gt-post-content">
-                <h2 class="post-title">
-                    XFS文件系统修复流程
-                </h2>
-                <div class="post-info">
-                    <time class="post-time gt-c-content-color-first">
-                        · 2021-03-22 ·
-                    </time>
-                    
-                        <a href="https://esp0x.github.io/tag/U7XkBZwyl/" class="post-tags">
-                            # Linux
-                        </a>
-                    
-                </div>
-                <div class="post-content">
-                    <h3 id="详细流程如下">详细流程如下：</h3>
-<p>1.使用 xfs_repair -n 执行文件系统错误检测，和 fsck -n 类似；<br>
-2.使用 xfs_repair 尝试进行修复；<br>
-3.当遇见无法正常挂载文件系统时，需要使用强制模式 -L 模式进行修复，会丢失部分数据，可以先对metadata进行模拟修复测试：</p>
-<ul>
-<li>xfs_metadump [partition] /path/to/file.metadump                                  # 对需要修复的分区进行dump</li>
-<li>xfs_mdrestore /path/to/file.metadump /path/to/file.img                         # 生成img文件</li>
-<li>losetup --show --find /path/to/file.img                                                    # 使用lostup工具将数据放到/dev/loop0</li>
-<li>xfs_repair -L /dev/loop0                                                                        # 尝试模拟修复</li>
-<li>mount /dev/loop0 /mnt</li>
-<li>check the damage</li>
-<li>(note, this is an image of file system layout, but not the actual data)</li>
-</ul>
-<p>4.拷贝真实数据，并对拷贝的数据进行修复：</p>
-<ul>
-<li>ddrescue -f -n [partition] /path/to/rescued.img rescue.log                      # 这需要一个比原分区大小更大的磁盘</li>
-<li>ddrescue -d -f -r3 [partition] /path/to/rescued.img rescue.log</li>
-<li>losetup --show --find /path/to/rescued.img</li>
-<li>xfs_repair -L /dev/loop0</li>
-<li>mount /dev/loop0 /mnt</li>
-<li>check the damage</li>
-</ul>
-<p>5.如果真实环境缺少这样的备份分区，那么直接使用xfs_repair -L模式进行强制修复。</p>
-
-                </div>
-            </article>
+        <div class="current-tag-container">
+            <h2 class="title gt-c-content-color-first">
+                #nmap
+            </h2>
         </div>
-
+        <div class="post-list-container">
+    <div class="post-inner">
         
-            <div class="next-post">
-                <div class="next gt-c-content-color-first">下一篇</div>
-                <a href="https://esp0x.github.io/post/ipmitool-gong-ju-de-shi-yong-shuo-ming/" class="post-title gt-a-link">
-                    ipmitool工具的使用说明
-                </a>
+            <div class="post gt-bg-theme-color-second">
+                <div class="post-left">
+                    <div>
+                        
+                        <a href="https://esp0x.github.io/post/nmap-gong-ju-chang-yong-shi-yong-chang-jing/">
+                            <span class="post-title gt-c-content-color-first">Nmap工具常用使用场景</span>
+                        </a>
+                    </div>
+                    <div class="gt-post-content post-abstract gt-c-content-color-second">
+                        
+                    </div>
+                    <div class="post-info">
+                        <time class="post-time gt-c-content-color-first">
+                            发布于 · 2021-03-29 ·
+                        </time>
+                        
+                            <a href="https://esp0x.github.io/tag/10NnMGZ95/" class="post-tag">
+                                # nmap
+                            </a>
+                        
+                            <a href="https://esp0x.github.io/tag/ETGdbG1UX/" class="post-tag">
+                                # 工具使用
+                            </a>
+                        
+                    </div>
+                </div>
+                
             </div>
         
-
-        
-
-        
-
-        
+    </div>
+</div>
+        <div class="pagination-container">
+    
+    
+</div>
 
         <div class="site-footer gt-c-content-color-first">
     <div class="slogan gt-c-content-color-first">温故而知新</div>

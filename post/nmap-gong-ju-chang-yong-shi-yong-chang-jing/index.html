@@ -4,7 +4,7 @@
 <meta name="description" content="" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<title>XFS文件系统修复流程 | Grey</title>
+<title>Nmap工具常用使用场景 | Grey</title>
 
 <link rel="shortcut icon" href="https://esp0x.github.io/favicon.ico?v=1616997089657">
 
@@ -202,42 +202,78 @@
         <div class="post-detail gt-bg-theme-color-second">
             <article class="gt-post-content">
                 <h2 class="post-title">
-                    XFS文件系统修复流程
+                    Nmap工具常用使用场景
                 </h2>
                 <div class="post-info">
                     <time class="post-time gt-c-content-color-first">
-                        · 2021-03-22 ·
+                        · 2021-03-29 ·
                     </time>
                     
-                        <a href="https://esp0x.github.io/tag/U7XkBZwyl/" class="post-tags">
-                            # Linux
+                        <a href="https://esp0x.github.io/tag/10NnMGZ95/" class="post-tags">
+                            # nmap
+                        </a>
+                    
+                        <a href="https://esp0x.github.io/tag/ETGdbG1UX/" class="post-tags">
+                            # 工具使用
                         </a>
                     
                 </div>
                 <div class="post-content">
-                    <h3 id="详细流程如下">详细流程如下：</h3>
-<p>1.使用 xfs_repair -n 执行文件系统错误检测，和 fsck -n 类似；<br>
-2.使用 xfs_repair 尝试进行修复；<br>
-3.当遇见无法正常挂载文件系统时，需要使用强制模式 -L 模式进行修复，会丢失部分数据，可以先对metadata进行模拟修复测试：</p>
-<ul>
-<li>xfs_metadump [partition] /path/to/file.metadump                                  # 对需要修复的分区进行dump</li>
-<li>xfs_mdrestore /path/to/file.metadump /path/to/file.img                         # 生成img文件</li>
-<li>losetup --show --find /path/to/file.img                                                    # 使用lostup工具将数据放到/dev/loop0</li>
-<li>xfs_repair -L /dev/loop0                                                                        # 尝试模拟修复</li>
-<li>mount /dev/loop0 /mnt</li>
-<li>check the damage</li>
-<li>(note, this is an image of file system layout, but not the actual data)</li>
-</ul>
-<p>4.拷贝真实数据，并对拷贝的数据进行修复：</p>
-<ul>
-<li>ddrescue -f -n [partition] /path/to/rescued.img rescue.log                      # 这需要一个比原分区大小更大的磁盘</li>
-<li>ddrescue -d -f -r3 [partition] /path/to/rescued.img rescue.log</li>
-<li>losetup --show --find /path/to/rescued.img</li>
-<li>xfs_repair -L /dev/loop0</li>
-<li>mount /dev/loop0 /mnt</li>
-<li>check the damage</li>
-</ul>
-<p>5.如果真实环境缺少这样的备份分区，那么直接使用xfs_repair -L模式进行强制修复。</p>
+                    <h3 id="主机发现">主机发现</h3>
+<pre><code class="language-shell">以192.168.1.0/24举例
+
+nmap -PE 192.168.1.0/24  # icmp
+namp -PO 192.168.1.0/24  # ip
+nmap -PS 192.168.1.0/24  # tcp syn
+nmap -PA 192.168.1.0/24  # tcp ack
+nmap -PU 192.168.1.0/24  # udp
+nmap -PY 192.168.1.0/24  # sctp
+</code></pre>
+<h3 id="端口扫描">端口扫描</h3>
+<pre><code class="language-shell">1.SYN Scanning
+nmap -sS 192.168.1.0/24  # 仅发送SYN，返回SYN/ACK应答表示端口开启，返回RST表示端口关闭
+
+2.TCP Scanning
+nmap -sT 192.168.1.0/24  # 建立完整的TCP连接，表示端口开启，否则表示关闭
+
+3.UDP Scanning
+nmap -sU 192.168.1.0/24  # UDP，无应答，表示端口开启；返回&quot;Port Unreachable&quot;信息，表示关闭
+
+4.FIN Scanning
+nmap -sF 192.168.1.0/24  # 在TCP数据包中重置FIN标志位，无应答，表示开启；返回RST，表示端口关闭
+
+5.NULL Scanning
+nmap -sN 192.168.1.0/24  # 在TCP数据包中不包含任何标志位，无应答，表示开启；返回RST，表示端口关闭
+
+6.Xmas Scanning
+nmap -sX 192.168.1.0/24  # 在TCP数据包中重置FIN、RST、PUSH标志位，无应答，表示开启；返回RST，表示端口关闭
+
+7.IDLE Scanning
+nmap -sI 172.16.1.1 192.168.1.0/24  
+# 利用僵尸主机进行扫描，假设僵尸IP为172.16.1.1，当僵尸机返回序列ID增加数量为2时，表示开启，为1时关闭
+
+8.指定端口扫描
+nmap -p 80,443 192.168.1.0/24  # 可以指定多个端口
+
+9.扫描常见的100个端口
+nmap -F 192.168.1.0/24  # 快速模式
+
+10.使用协议名进行扫描
+nmap -p http 192.168.1.0/24
+nmap -p smtp 192.168.1.0/24
+
+11.扫描常用端口
+nmap --top-ports &lt;端口数量&gt; 192.168.1.0/24
+
+</code></pre>
+<h3 id="操作系统指纹识别">操作系统指纹识别</h3>
+<pre><code class="language-shell">nmap -O 192.168.1.0/24   # os
+nmap -sV 192.168.1.0/24  # service version
+nmap -A 192.168.1.0/24   # all
+</code></pre>
+<h3 id="使用脚本">使用脚本</h3>
+<pre><code class="language-shell">nmap --script &lt;脚本名称&gt; 192.168.1.0/24
+</code></pre>
 
                 </div>
             </article>
@@ -246,8 +282,8 @@
         
             <div class="next-post">
                 <div class="next gt-c-content-color-first">下一篇</div>
-                <a href="https://esp0x.github.io/post/ipmitool-gong-ju-de-shi-yong-shuo-ming/" class="post-title gt-a-link">
-                    ipmitool工具的使用说明
+                <a href="https://esp0x.github.io/post/xfs-wen-jian-xi-tong-xiu-fu-liu-cheng/" class="post-title gt-a-link">
+                    XFS文件系统修复流程
                 </a>
             </div>
         
