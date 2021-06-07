@@ -4,7 +4,7 @@
 <meta name="description" content="" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<title>标签 | Grey</title>
+<title>使用prometheus监控主机docker容器运行状态 | Grey</title>
 
 <link rel="shortcut icon" href="https://esp0x.github.io/favicon.ico?v=1623054494571">
 
@@ -33,11 +33,11 @@
 <!--<script src="media/scripts/index.js"></script>-->
 
 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.css">
 </head>
 <body>
 <div class="main gt-bg-theme-color-first">
-    <div class="main-content">
-        <style>
+    <style>
     /* 导航栏样式 */
     .navbar {
         position: relative;
@@ -198,37 +198,89 @@
         }
     }
 </script>
-        <div class="post-container">
-            <div class="post-detail gt-bg-theme-color-first">
-                <article class="gt-post-content">
-                    <h2 class="post-title">标签</h2>
-        <div class="tags-container">
-            
-                <a class="tag gt-c-content-color-first gt-a-link"
-                   href="https://esp0x.github.io/tag/R7jEZk-Br/">#Prometheus</a>
-            
-                <a class="tag gt-c-content-color-first gt-a-link"
-                   href="https://esp0x.github.io/tag/U7XkBZwyl/">#Linux</a>
-            
-                <a class="tag gt-c-content-color-first gt-a-link"
-                   href="https://esp0x.github.io/tag/10NnMGZ95/">#nmap</a>
-            
-                <a class="tag gt-c-content-color-first gt-a-link"
-                   href="https://esp0x.github.io/tag/ETGdbG1UX/">#工具使用</a>
-            
-                <a class="tag gt-c-content-color-first gt-a-link"
-                   href="https://esp0x.github.io/tag/a5GDIyqF3/">#信息安全</a>
-            
-                <a class="tag gt-c-content-color-first gt-a-link"
-                   href="https://esp0x.github.io/tag/0UDqNZrMg/">#Nginx</a>
-            
-                <a class="tag gt-c-content-color-first gt-a-link"
-                   href="https://esp0x.github.io/tag/lEg5TWDNv/">#mysql</a>
-            
+    <div class="post-container">
+        <div class="post-detail gt-bg-theme-color-second">
+            <article class="gt-post-content">
+                <h2 class="post-title">
+                    使用prometheus监控主机docker容器运行状态
+                </h2>
+                <div class="post-info">
+                    <time class="post-time gt-c-content-color-first">
+                        · 2021-06-07 ·
+                    </time>
+                    
+                        <a href="https://esp0x.github.io/tag/R7jEZk-Br/" class="post-tags">
+                            # Prometheus
+                        </a>
+                    
+                </div>
+                <div class="post-content">
+                    <h3 id="部署方式容器化部署">部署方式：容器化部署</h3>
+<h4 id="部署流程">部署流程：</h4>
+<pre><code class="language-shell"># 运行node-exporter监控主机基本信息，访问9100端口进行验证
+docker run -d --name node \
+	-p 9100:9100 \
+	-v /proc:/host/proc \
+	-v /sys:/host/sys \
+	-v /:/rootfs \
+	--net=host prom/node-exporter \
+	--path.procfs /host/proc \
+	--path.sysfs /host/sys \
+	--collector.filesystem.ignored-mount-points &quot;^/(sys|proc|dev|host|etc)($|/)&quot;
+
+# 运行cAdvisor监控容器运行状态，访问8080端口进行验证
+docker run -v /:/rootfs:ro \
+	-v /var/run:/var/run/:rw \
+	-v /sys:/sys:ro \
+	-v /var/lib/docker:/var/lib/docker:ro \
+	-p 8080:8080 \
+	--detach=true \
+	--name=cadvisor \
+	--net=host google/cadvisor
+
+# 在监控主节点上部署prometheus server，客户节点无需安装
+docker run -d -p 9090:9090 --name prometheus --net=host prom/prometheus
+# 将容器中的配置文件拷贝到宿主，进行修改
+docker cp prometheus:/etc/prometheus/prometheus.yml ./
+# 修改static_configs，指向所有客户节点的9100和8080端口获取数据
+vim prometheus.yml
+
+# 配置更新完成后，删除原prometheus server容器
+docker rm prometheus -f
+# 重新将本地配置文件映射到容器中，访问9090端口进行验证
+docker run -d -p 9090:9090 --name prometheus --net=host -v /root/prometheus.yml:/etc/prometheus/prometheus.yml prom/prometheus
+
+# 部署grafana图形化界面，访问3000端口进行验证
+mkdir grafana-storage
+chmod 777 -R grafana-storage/
+docker run -d -p 3000:3000 \
+	--name grafana \
+	-v /root/grafana-storage:/var/lib/grafana \
+	-e &quot;GF_SECURITY_ADMIN_PASSWORD=123456&quot; grafana/grafana
+	
+# grafana模板，打开grafana.com, 点击dashborads，根据数据源和类型选择合适的模板
+
+</code></pre>
+
+                </div>
+            </article>
         </div>
-    </article>
-</div>
-</div>
+
+        
+            <div class="next-post">
+                <div class="next gt-c-content-color-first">下一篇</div>
+                <a href="https://esp0x.github.io/post/ru-he-chai-chu-linux-ruan-raid-she-bei/" class="post-title gt-a-link">
+                    如何拆除Linux软Raid设备
+                </a>
+            </div>
+        
+
+        
+
+        
+
+        
+
         <div class="site-footer gt-c-content-color-first">
     <div class="slogan gt-c-content-color-first">温故而知新</div>
     <div class="social-container">
