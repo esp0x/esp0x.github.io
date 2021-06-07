@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://esp0x.github.io</id>
     <title>Grey</title>
-    <updated>2021-06-07T09:22:51.410Z</updated>
+    <updated>2021-06-07T09:23:14.871Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://esp0x.github.io"/>
     <link rel="self" href="https://esp0x.github.io/atom.xml"/>
@@ -42,7 +42,7 @@ sudo_user            # 如果设置user为A，sudo为yes，sudo_user为B时，�
 ]]></content>
     </entry>
     <entry>
-        <title type="html"><![CDATA[Playbook - 利用tags执行部分task]]></title>
+        <title type="html"><![CDATA[Playbook利用tags执行部分task]]></title>
         <id>https://esp0x.github.io/post/playbook-li-yong-tags-zhi-xing-bu-fen-task/</id>
         <link href="https://esp0x.github.io/post/playbook-li-yong-tags-zhi-xing-bu-fen-task/">
         </link>
