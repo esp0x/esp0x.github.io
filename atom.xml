@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://esp0x.github.io</id>
     <title>Grey</title>
-    <updated>2021-06-07T08:31:33.134Z</updated>
+    <updated>2021-06-07T09:22:51.410Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://esp0x.github.io"/>
     <link rel="self" href="https://esp0x.github.io/atom.xml"/>
@@ -10,6 +10,91 @@
     <logo>https://esp0x.github.io/images/avatar.png</logo>
     <icon>https://esp0x.github.io/favicon.ico</icon>
     <rights>All rights reserved 2021, Grey</rights>
+    <entry>
+        <title type="html"><![CDATA[Playbook中用户的切换问题]]></title>
+        <id>https://esp0x.github.io/post/playbook-zhong-yong-hu-de-qie-huan-wen-ti/</id>
+        <link href="https://esp0x.github.io/post/playbook-zhong-yong-hu-de-qie-huan-wen-ti/">
+        </link>
+        <updated>2021-06-07T09:21:20.000Z</updated>
+        <content type="html"><![CDATA[<h3 id="become配置示例">become配置示例：</h3>
+<pre><code class="language-shell">- hosts: www.360.com
+  remote_user: zabbix
+  become: yes
+  become_method: su
+  tasks:
+   - selinux:
+        state: disabled
+   - name: disable firewalld
+     shell: systemctl stop firewalld &amp;&amp; systemctl disable firewalld
+ 
+# become说明
+become:        yes  # 是否允许身份切换
+become_method: su   # 切换用户身份的方式，有sudo、su、pbrun等方式，默认为sudo
+become_user: root   # 切换指定的用户，默认不写，就是root
+</code></pre>
+<h3 id="sudo配置解释">sudo配置解释</h3>
+<pre><code class="language-shell">hosts                # 指定主机分组，可以取并集，交集等
+remote_user          # 用于指定远程主机上的执行任务的用户，最佳实践是该用户具有sudo权限
+user                 # 和remote_user相同
+sudo                 # 如果设置为yes，执行该任务组的用户在执行任务的时候，获取root权限，也可以命令行使用-b参数
+sudo_user            # 如果设置user为A，sudo为yes，sudo_user为B时，则A用户在执行任务时会获得B用户的权限，比较麻烦，不推荐
+</code></pre>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Playbook - 利用tags执行部分task]]></title>
+        <id>https://esp0x.github.io/post/playbook-li-yong-tags-zhi-xing-bu-fen-task/</id>
+        <link href="https://esp0x.github.io/post/playbook-li-yong-tags-zhi-xing-bu-fen-task/">
+        </link>
+        <updated>2021-06-07T09:20:35.000Z</updated>
+        <content type="html"><![CDATA[<h3 id="基本使用方法示例配置">基本使用方法，示例配置：</h3>
+<pre><code class="language-shell">tasks:
+  - yum: name={{ item }} state=installed
+    with_items:
+       - httpd
+    tags:
+       - packages
+  - name: copy httpd.conf
+    template: src=templates/httpd.conf.j2 dest=/etc/httpd/conf/httpd.conf
+    tags:
+       - configuration
+  - name: copy index.html
+    template: src=templates/index.html.j2 dest=/var/www/html/index.html
+    tags:
+       - configuration
+  
+ 
+# 执行部分任务
+ansible-playbook example.yml --tags &quot;packages&quot;
+
+# 指定不执行packages部分的任务
+ansible-playbook example.yml --skip-tags &quot;configuration&quot;
+</code></pre>
+<h3 id="特殊的tags">特殊的tags</h3>
+<pre><code class="language-shell"># always 标签，即使指定执行了某tag的任务，标记为always的任务也会被执行
+tasks:
+  - debug: msg=&quot;Always print this debug message&quot;
+    tags:
+      - always
+  - yum: name={{ item }} state=installed
+    with_items:
+       - httpd
+    tags:
+       - packages
+  - template: src=templates/httpd.conf.j2 dest=/etc/httpd/conf/httpd.conf
+    tags:
+       - configuration
+
+# 这里标记为always的任务也会被执行
+ansible-playbook tags_always.yml --tags &quot;packages&quot;
+
+# targged，untagged，all，使用这些标签时，不需要加双引号
+tagged，即执行所有被打标签的任务
+untagged，即执行所有未被打标签的任务
+all，所有任务
+</code></pre>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[使用prometheus监控主机docker容器运行状态]]></title>
         <id>https://esp0x.github.io/post/shi-yong-prometheus-jian-kong-zhu-ji-docker-rong-qi-yun-xing-zhuang-tai/</id>
@@ -697,178 +782,6 @@ http
 }
 ######Nginx配置文件nginx.conf中文详解#####
 </code></pre>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[nc命令使用]]></title>
-        <id>https://esp0x.github.io/post/nc-ming-ling-shi-yong/</id>
-        <link href="https://esp0x.github.io/post/nc-ming-ling-shi-yong/">
-        </link>
-        <updated>2021-02-03T01:27:30.000Z</updated>
-        <content type="html"><![CDATA[<h3 id="端口扫描">端口扫描</h3>
-<pre><code class="language-shell"># nc -vz -w 5 127.0.0.1 1-1024   // 扫描本地1-1024端口范围
-</code></pre>
-<h3 id="监听端口">监听端口</h3>
-<pre><code class="language-shell"># nc -l 8000     // 监听TCP端口
-# nc -ul 9999    // 监听UDP端口
-# nc -vuz 127.0.0.1 9999   // 测试本地UDP端口
-</code></pre>
-<h3 id="传输文件">传输文件</h3>
-<pre><code class="language-shell">1.上传
-# nc -l 9999 &gt; filename
-# nc 127.0.0.1 9999 &lt; source
-
-2.下载
-# nc -l 9999 &lt; filename
-# nc 127.0.0.1 9999 &gt; target
-</code></pre>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[StorCLI工具使用说明]]></title>
-        <id>https://esp0x.github.io/post/storcli-gong-ju-shi-yong-shuo-ming/</id>
-        <link href="https://esp0x.github.io/post/storcli-gong-ju-shi-yong-shuo-ming/">
-        </link>
-        <updated>2021-02-01T01:59:11.000Z</updated>
-        <content type="html"><![CDATA[<h3 id="记录一下storcli工具的基本查询方法主要用于实现监控目的对于更改raid的相关命令暂时不在这里记录">记录一下storcli工具的基本查询方法，主要用于实现监控目的，对于更改Raid的相关命令暂时不在这里记录。</h3>
-<h3 id="获取帮助信息">获取帮助信息</h3>
-<pre><code class="language-shell"># ./storcli64 -h
-     Storage Command Line Tool  Ver 1.23.02 Mar 28, 2017
-
-     (c)Copyright 2017, AVAGO Corporation, All Rights Reserved.
-
-storcli -v 
-storcli -h| -help| ? 
-storcli -h| -help| ? legacy
-storcli show 
-storcli show all
-storcli show ctrlcount
-storcli show file=&lt;filepath&gt;
-storcli /cx add vd r[0|1|5|6|00|10|50|60]
-...
-</code></pre>
-<h3 id="显示raid卡相关信息">显示Raid卡相关信息</h3>
-<pre><code class="language-shell"># ./storcli64 show all
-Status Code = 0
-Status = Success
-Description = None
-
-Number of Controllers = 1
-Host Name = A-f8f21e93eca4-nas014
-Operating System  = Linux3.10.0-1062.el7.x86_64
-
-System Overview :
-===============
-
--------------------------------------------------------------------------------------
-Ctl Model                   Ports PDs DGs DNOpt VDs VNOpt BBU sPR DS  EHS ASOs Hlth  
--------------------------------------------------------------------------------------
-  0 AVAGOMegaRAIDSAS9361-8i     8  25   2     1   2     1 Opt On  1&amp;2 Y      3 NdAtn 
--------------------------------------------------------------------------------------
-
-Ctl=Controller Index|DGs=Drive groups|VDs=Virtual drives|Fld=Failed
-PDs=Physical drives|DNOpt=DG NotOptimal|VNOpt=VD NotOptimal|Opt=Optimal
-Msng=Missing|Dgd=Degraded|NdAtn=Need Attention|Unkwn=Unknown
-sPR=Scheduled Patrol Read|DS=DimmerSwitch|EHS=Emergency Hot Spare
-Y=Yes|N=No|ASOs=Advanced Software Options|BBU=Battery backup unit
-Hlth=Health|Safe=Safe-mode boot
-
-# 这里的optimal表示是否是最优状态
-</code></pre>
-<h3 id="显示控制器信息">显示控制器信息</h3>
-<pre><code class="language-shell"># ./storcli64 /c0 show   //这里c0表示第一个控制器
-Generating detailed summary of the adapter, it may take a while to complete.
-
-Controller = 0
-...省略
-Device Number = 0
-Function Number = 0
-Drive Groups = 2
-
-TOPOLOGY :
-========
-
------------------------------------------------------------------------------
-DG Arr Row EID:Slot DID Type  State BT       Size PDC  PI SED DS3  FSpace TR 
------------------------------------------------------------------------------
- ... 省略
- 1 0   12  10:12    37  DRIVE Onln  Y   14.551 TB dflt N  N   dflt -      N  
- 1 0   13  10:13    36  DRIVE Onln  Y   14.551 TB dflt N  N   dflt -      N  
- 1 0   14  10:14    46  DRIVE Onln  Y   14.551 TB dflt N  N   dflt -      N  
- 1 0   15  -        -   DRIVE Msng  -   14.551 TB -    -  -   -    -      N  
- 1 0   16  10:16    38  DRIVE Onln  Y   14.551 TB dflt N  N   dflt -      N  
- 1 0   17  10:17    35  DRIVE Onln  Y   14.551 TB dflt N  N   dflt -      N  
- 1 0   18  10:18    45  DRIVE Onln  Y   14.551 TB dflt N  N   dflt -      N    
------------------------------------------------------------------------------
-... 省略
-
-Missing Drives Count = 1
-
-# 这里提示我们有一块盘丢失，需要进行处理
-</code></pre>
-<h3 id="显示剩余空间">显示剩余空间</h3>
-<pre><code class="language-shell"># ./storcli64 /c0 show freespace
-</code></pre>
-<h3 id="显示ccconsistency-check">显示CC（Consistency Check）</h3>
-<pre><code class="language-shell"># ./storcli64 /c0 show cc
-Controller = 0
-Status = Success
-Description = None
-
-Controller Properties :
-=====================
-
------------------------------------------------
-Ctrl_Prop                 Value                
------------------------------------------------
-CC Operation Mode         Concurrent           
-CC Execution Delay        168                  
-CC Next Starttime         02/04/2021, 15:00:00 
-CC Current State          Stopped              
-CC Number of iterations   15                   
-CC Number of VD completed 1                    
-CC Excluded VDs           None                 
------------------------------------------------
-
-</code></pre>
-<h3 id="显示cc速率">显示CC速率</h3>
-<pre><code class="language-shell"># ./storcli64 /c0 show ccrate
-Controller = 0
-Status = Success
-Description = None
-
-
-Controller Properties :
-=====================
-
-----------------
-Ctrl_Prop Value 
-----------------
-CC Rate   30%   
-----------------
-</code></pre>
-<h3 id="查看与设置rebuild速率">查看与设置Rebuild速率</h3>
-<pre><code class="language-shell"># ./storcli64 /c0 show rebuildrate     //查看速率
-# ./storcli64 /c0 set rebuildrate=30   //设置速率
-</code></pre>
-<h3 id="清除raid卡物理磁盘cache">清除Raid卡，物理磁盘Cache</h3>
-<pre><code class="language-shell"># ./storcli64 /c0 flushcache
-</code></pre>
-<h3 id="获取所有enclosure信息">获取所有enclosure信息</h3>
-<pre><code class="language-shell"># ./storcli64 /c0/eall show
-</code></pre>
-<h3 id="获取单个enclosure信息">获取单个enclosure信息</h3>
-<pre><code class="language-shell"># ./storcli64 /c0/e10 show &lt;all&gt;    //加上all参数表示获取详细信息
-# ./strocli64 /c0/e10 show status   //获取风扇等设备详细信息
-</code></pre>
-<h3 id="获取所有磁盘详细信息">获取所有磁盘详细信息</h3>
-<pre><code class="language-shell"># ./storcli64 /c0/eall/sall show
-</code></pre>
-<h3 id="卷组信息获取">卷组信息获取</h3>
-<pre><code class="language-shell"># ./storcli64 /c0/dall show   // 这里的卷组称为DG
-</code></pre>
-<h2 id="参考文献">参考文献</h2>
-<p>https://www.cnblogs.com/luxiaodai/p/9878747.html</p>
 ]]></content>
     </entry>
 </feed>
