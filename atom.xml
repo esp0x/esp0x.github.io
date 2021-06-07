@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://esp0x.github.io</id>
     <title>Grey</title>
-    <updated>2021-06-07T09:28:04.602Z</updated>
+    <updated>2021-06-07T09:29:26.380Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://esp0x.github.io"/>
     <link rel="self" href="https://esp0x.github.io/atom.xml"/>
@@ -36,6 +36,9 @@
   
  
 # 使用{{ item.src }}读取with_items中的数组元素，访问需要拷贝的每一个文件即可。
+
+# 检查语法
+ansible-playbook --syntax-check example.yaml
 </code></pre>
 ]]></content>
     </entry>
