@@ -4,7 +4,7 @@
 <meta name="description" content="" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<title>Prometheus | Grey</title>
+<title>K8s-Namespace基本知识 | Grey</title>
 
 <link rel="shortcut icon" href="https://esp0x.github.io/favicon.ico?v=1623136015041">
 
@@ -33,11 +33,11 @@
 <!--<script src="media/scripts/index.js"></script>-->
 
 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.css">
 </head>
 <body>
 <div class="main gt-bg-theme-color-first">
-    <div class="main-content">
-        <style>
+    <style>
     /* 导航栏样式 */
     .navbar {
         position: relative;
@@ -198,45 +198,83 @@
         }
     }
 </script>
-        <div class="current-tag-container">
-            <h2 class="title gt-c-content-color-first">
-                #Prometheus
-            </h2>
-        </div>
-        <div class="post-list-container">
-    <div class="post-inner">
-        
-            <div class="post gt-bg-theme-color-second">
-                <div class="post-left">
-                    <div>
-                        
-                        <a href="https://esp0x.github.io/post/shi-yong-prometheus-jian-kong-zhu-ji-docker-rong-qi-yun-xing-zhuang-tai/">
-                            <span class="post-title gt-c-content-color-first">使用prometheus监控主机docker容器运行状态</span>
+    <div class="post-container">
+        <div class="post-detail gt-bg-theme-color-second">
+            <article class="gt-post-content">
+                <h2 class="post-title">
+                    K8s-Namespace基本知识
+                </h2>
+                <div class="post-info">
+                    <time class="post-time gt-c-content-color-first">
+                        · 2021-06-08 ·
+                    </time>
+                    
+                        <a href="https://esp0x.github.io/tag/wZhxXn6g4/" class="post-tags">
+                            # Kubernetes
                         </a>
-                    </div>
-                    <div class="gt-post-content post-abstract gt-c-content-color-second">
-                        
-                    </div>
-                    <div class="post-info">
-                        <time class="post-time gt-c-content-color-first">
-                            发布于 · 2021-06-07 ·
-                        </time>
-                        
-                            <a href="https://esp0x.github.io/tag/R7jEZk-Br/" class="post-tag">
-                                # Prometheus
-                            </a>
-                        
-                    </div>
+                    
                 </div>
-                
+                <div class="post-content">
+                    <h3 id="名词解释">名词解释</h3>
+<h5 id="namespace是对一组资源和对象的抽象集合比如可用来将系统内部的对象划分为不同的项目或用户组-常见的podsservicesrc和deployments等都是属于某一个namespace的默认是default而nodepersistentvolumns等则不属于任何namespace">Namespace是对一组资源和对象的抽象集合，比如可用来将系统内部的对象划分为不同的项目或用户组。常见的pods，services，rc和deployments等都是属于某一个namespace的（默认是default），而node，persistentVolumns等则不属于任何namespace。</h5>
+<h3 id="namespace相关操作">Namespace相关操作</h3>
+<pre><code class="language-shell">kubectl可以通过–namespace或者-n选项指定namespace。如果不指定，默认为default。查看操作下,也可以通过设置–all-namespace=true来查看所有namespace下的资源。
+
+# 查询ns
+$ kubectl get namespaces
+NAME          STATUS    AGE
+default       Active    11d
+kube-system   Active    11d
+
+# 查询哪些资源位于namespace中
+kubectl api-resources --namespaced=true
+# 查看哪些资源不在命令空间
+kubectl api-resources --namespaced=false
+
+# 指定ns查询对应ns中的资源情况
+kubectl get pods -n kube-system
+
+# 创建
+# 1.命令行直接创建
+$ kubectl create namespace new-namespace
+
+# 2.通过文件创建
+$ cat my-namespace.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: new-namespace
+
+$ kubectl create -f ./my-namespace.yaml
+
+# 删除，即删除该ns下所有资源
+# 注意：default和kube-system命名空间不能删除
+$ kubectl delete namespaces new-namespace
+
+# 切换ns
+kubectl config set-context --current --namespace=kube-system
+</code></pre>
+<h3 id="关于namespace是否隔离网络">关于Namespace是否隔离网络</h3>
+<h5 id="一般情况下默认是不会隔离网络流量的除非对某个namespace设置了安全策略">一般情况下，默认是不会隔离网络流量的，除非对某个namespace设置了安全策略。</h5>
+
+                </div>
+            </article>
+        </div>
+
+        
+            <div class="next-post">
+                <div class="next gt-c-content-color-first">下一篇</div>
+                <a href="https://esp0x.github.io/post/shi-yong-minikube-da-jian-ben-di-xue-xi-huan-jing/" class="post-title gt-a-link">
+                    K8s-使用Minikube搭建本地学习环境
+                </a>
             </div>
         
-    </div>
-</div>
-        <div class="pagination-container">
-    
-    
-</div>
+
+        
+
+        
+
+        
 
         <div class="site-footer gt-c-content-color-first">
     <div class="slogan gt-c-content-color-first">温故而知新</div>

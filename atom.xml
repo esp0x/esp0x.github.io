@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://esp0x.github.io</id>
     <title>Grey</title>
-    <updated>2021-06-07T09:29:26.380Z</updated>
+    <updated>2021-06-08T07:07:07.058Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://esp0x.github.io"/>
     <link rel="self" href="https://esp0x.github.io/atom.xml"/>
@@ -10,6 +10,218 @@
     <logo>https://esp0x.github.io/images/avatar.png</logo>
     <icon>https://esp0x.github.io/favicon.ico</icon>
     <rights>All rights reserved 2021, Grey</rights>
+    <entry>
+        <title type="html"><![CDATA[K8s-Pod简单介绍]]></title>
+        <id>https://esp0x.github.io/post/k8s-pod-jian-dan-jie-shao/</id>
+        <link href="https://esp0x.github.io/post/k8s-pod-jian-dan-jie-shao/">
+        </link>
+        <updated>2021-06-08T07:06:03.000Z</updated>
+        <content type="html"><![CDATA[<h3 id="概念">概念</h3>
+<h5 id="在kubernetes集群中pod是所有业务类型的基础也是k8s管理的最小单位级它是一个或多个容器的组合-这些容器共享存储-网络和命名空间以及如何运行的规范-在pod中所有容器都被同一安排和调度并运行在共享的上下文中-对于具体应用而言pod是它们的逻辑主机pod包含业务相关的多个应用容器">在Kubernetes集群中，Pod是所有业务类型的基础，也是K8S管理的最小单位级，它是一个或多个容器的组合。这些容器共享存储、网络和命名空间，以及如何运行的规范。在Pod中，所有容器都被同一安排和调度，并运行在共享的上下文中。对于具体应用而言，Pod是它们的逻辑主机，Pod包含业务相关的多个应用容器。</h5>
+<h3 id="两个注意点">两个注意点</h3>
+<pre><code class="language-python">1.网络:
+  每一个Pod都会被指派一个唯一的Ip地址，在Pod中的每一个容器共享网络命名空间，包括Ip地址和网络端口。在同一个Pod中的容器可以同locahost进行互相通信。当Pod中的容器需要与Pod外的实体进行通信时，则需要通过端口等共享的网络资源。
+
+2.存储:
+  Pod能够被指定共享存储卷的集合，在Pod中所有的容器能够访问共享存储卷，允许这些容器共享数据。存储卷也允许在一个Pod持久化数据，以防止其中的容器需要被重启。
+</code></pre>
+<h3 id="pod的生命周期">Pod的生命周期</h3>
+<pre><code class="language-shel">一共有4种状态：
+
+1. Pending：APIserver已经创建该server，但pod中有一个或多个容器的镜像还未创建，可能在下载中；
+2. Running：Pod中的所有容器都已创建，且至少有一个容器处于运行状态，正在启动或重启状态；
+3. Failed：Pod内所有容器都已退出，其中至少有一个容器退出失败；
+4. Unknown：由于某种原因无法获取Pod的状态比如网络问题；
+</code></pre>
+<h3 id="pod的重启策略">Pod的重启策略</h3>
+<pre><code class="language-py">重启策略对同一个Pod中的所有容器起作用，容器的重启由Node上的kubelet执行，支持三种策略，在配置文件中通过restartPolicy字段设置：
+1. Always：只要退出就会重启
+2. OnFailure：只有在失败退出时，才会重启
+3. Never：只要退出，就不再重启
+
+注意，这里的重启是指在Pod的宿主Node上进行本地重启，而不是调度到其它Node上。
+</code></pre>
+<h3 id="健康检查">健康检查</h3>
+<pre><code class="language-shell"># 两种探针类型：
+一、LivenessProbe探针：  判断容器是否存活（running）
+1.ExecAction，在容器内部执行一个命令，状态返回码为0，表示健康，示例：
+apiVersion: v1
+kind: Pod
+metadata:
+ name: liveness
+spec:
+  containers:
+  - name: liveness
+    image: liveness
+    args: 
+    - /bin/sh
+    - -c
+    - echo ok &gt; /tmp/healthy: sleep 10; rm - rf /tmp/healthy; sleep 600
+    livenessProbe:
+      exec:
+        command:
+        - cat
+        - /tmp/health
+    initialDelaySeconds: 15
+    timeoutSeconds: 1
+    
+2.TcpAction，通过IP和PORT，如果能够和容器建立连接则表示容器健康，示例：
+apiVersion: v1
+kind: Pod
+metadata:
+ name: pod-with-healthcheck
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    ports:
+    - containerPort: 80
+    livenessProbe:
+      tcpSocket:
+        port: 80
+    initialDelaySeconds: 15
+    timeoutSeconds: 1
+3.HttpGetAction，发送get请求，返回码在200-400之间表示健康， 示例：
+apiVersion: v1
+kind: Pod
+metadata:
+ name: pod-with-healthcheck
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    ports:
+    - containerPort: 80
+    livenessProbe:
+      httpGet:
+        path: /_status/healthz  //请求路径
+        port: 80
+    initialDelaySeconds: 15
+    timeoutSeconds: 1
+    
+二、ReadinessProbe探针： 用于判断容器是否启动完成（ready）
+</code></pre>
+<h3 id="pod的调度">Pod的调度</h3>
+<pre><code class="language-shell"># 定向调度，nodeSelector
+1.首先通过kubectl给node打上标签：
+格式： kubectl label nodes &lt;node-name&gt; &lt;label-key&gt;=&lt;label-value&gt;
+kubectl label nodes node1 zone=north
+
+2.在pod定义里选择某个node
+apiVersion: v1
+kind: Pod
+metadata:
+name: pod-with-healthcheck
+spec:
+containers:
+- name: nginx
+  image: nginx
+  ports:
+  - containerPort: 80
+nodeSelector:
+  zone: north
+
+# 亲和性和非亲和性
+一、Node affinity（节点亲和性）
+1. requiredDuringSchedulingIgnoredDuringExecution：
+可认为一种强制限制，如果 Node 的标签发生了变化导致其没有符合 Pod 的调度要求节点，那么pod调度就会失败。
+2.preferredDuringSchedulingIgnoredDuringExecution：
+软限或偏好，同样如果 Node 的标签发生了变化导致其不再符合 pod 的调度要求，pod 依然会调度运行。
+
+二、Pod Affinity（Pod亲和性）
+    podAffinity用于调度pod可以和哪些pod部署在同一拓扑结构之下。而podAntiAffinity相反，其用于规定pod不可以和哪些pod部署在同一拓扑结构下。通过pod affinity与anti-affinity来解决pod和pod之间的关系。
+</code></pre>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[K8s-Namespace基本知识]]></title>
+        <id>https://esp0x.github.io/post/namespace-ji-ben-zhi-shi/</id>
+        <link href="https://esp0x.github.io/post/namespace-ji-ben-zhi-shi/">
+        </link>
+        <updated>2021-06-08T07:03:54.000Z</updated>
+        <content type="html"><![CDATA[<h3 id="名词解释">名词解释</h3>
+<h5 id="namespace是对一组资源和对象的抽象集合比如可用来将系统内部的对象划分为不同的项目或用户组-常见的podsservicesrc和deployments等都是属于某一个namespace的默认是default而nodepersistentvolumns等则不属于任何namespace">Namespace是对一组资源和对象的抽象集合，比如可用来将系统内部的对象划分为不同的项目或用户组。常见的pods，services，rc和deployments等都是属于某一个namespace的（默认是default），而node，persistentVolumns等则不属于任何namespace。</h5>
+<h3 id="namespace相关操作">Namespace相关操作</h3>
+<pre><code class="language-shell">kubectl可以通过–namespace或者-n选项指定namespace。如果不指定，默认为default。查看操作下,也可以通过设置–all-namespace=true来查看所有namespace下的资源。
+
+# 查询ns
+$ kubectl get namespaces
+NAME          STATUS    AGE
+default       Active    11d
+kube-system   Active    11d
+
+# 查询哪些资源位于namespace中
+kubectl api-resources --namespaced=true
+# 查看哪些资源不在命令空间
+kubectl api-resources --namespaced=false
+
+# 指定ns查询对应ns中的资源情况
+kubectl get pods -n kube-system
+
+# 创建
+# 1.命令行直接创建
+$ kubectl create namespace new-namespace
+
+# 2.通过文件创建
+$ cat my-namespace.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: new-namespace
+
+$ kubectl create -f ./my-namespace.yaml
+
+# 删除，即删除该ns下所有资源
+# 注意：default和kube-system命名空间不能删除
+$ kubectl delete namespaces new-namespace
+
+# 切换ns
+kubectl config set-context --current --namespace=kube-system
+</code></pre>
+<h3 id="关于namespace是否隔离网络">关于Namespace是否隔离网络</h3>
+<h5 id="一般情况下默认是不会隔离网络流量的除非对某个namespace设置了安全策略">一般情况下，默认是不会隔离网络流量的，除非对某个namespace设置了安全策略。</h5>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[K8s-使用Minikube搭建本地学习环境]]></title>
+        <id>https://esp0x.github.io/post/shi-yong-minikube-da-jian-ben-di-xue-xi-huan-jing/</id>
+        <link href="https://esp0x.github.io/post/shi-yong-minikube-da-jian-ben-di-xue-xi-huan-jing/">
+        </link>
+        <updated>2021-06-08T07:02:59.000Z</updated>
+        <content type="html"><![CDATA[<h3 id="安装kubectl">安装kubectl</h3>
+<pre><code class="language-shell"># 注意：安装方法推荐参考官方网站，安装方式随着版本变更会发生变动
+# 下载二进制文件
+curl -LO &quot;https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl&quot;
+# 下载校验文件
+curl -LO &quot;https://dl.k8s.io/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256&quot;
+# 检查下载文件和校验文件是否匹配
+echo &quot;$(&lt;kubectl.sha256) kubectl&quot; | sha256sum --check
+# 安装二进制文件
+sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+# 检查安装是否成功
+kubectl version --client
+</code></pre>
+<h3 id="安装minikube">安装Minikube</h3>
+<pre><code class="language-shell"># 下载二进制文件
+curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+# 安装二进制文件
+sudo install minikube-linux-amd64 /usr/local/bin/minikube
+# 启动集群，启动之前需要确保系统中有容器运行时，比如docker，kvm，否则集群启动失败
+minikube start
+
+# 若出现：The &quot;docker&quot; driver should not be used with root privileges.
+# 将当前具有sudo权限的用户添加到docker组即可
+sudo usermod -aG docker &lt;username&gt;
+# 激活组的配置，这步必须
+newgrp docker
+# 再次启动
+minikube start
+# 查看集群信息
+kubectl cluster-info
+
+</code></pre>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Playbook中使用copy来传输文件]]></title>
         <id>https://esp0x.github.io/post/playbook-zhong-shi-yong-copy-lai-chuan-shu-wen-jian/</id>
@@ -298,202 +510,6 @@ nmap -A 192.168.1.0/24   # all
 <li>check the damage</li>
 </ul>
 <p>5.如果真实环境缺少这样的备份分区，那么直接使用xfs_repair -L模式进行强制修复。</p>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[ipmitool工具的使用说明]]></title>
-        <id>https://esp0x.github.io/post/ipmitool-gong-ju-de-shi-yong-shuo-ming/</id>
-        <link href="https://esp0x.github.io/post/ipmitool-gong-ju-de-shi-yong-shuo-ming/">
-        </link>
-        <updated>2021-03-10T02:09:43.000Z</updated>
-        <content type="html"><![CDATA[<h3 id="安装工具">安装工具</h3>
-<pre><code class="language-shell">yum install -y ipmitool 
-</code></pre>
-<h3 id="启动服务">启动服务</h3>
-<pre><code class="language-shell">service ipmi start
-ipmitool -I open shell     # 进入交互式shell
-</code></pre>
-<h3 id="一-开关机重启">一、开关机，重启</h3>
-<pre><code class="language-shell">1. 查看开关机状态：
-ipmitool -H (BMC的管理IP地址) -I lanplus -U (BMC登录用户名) -P (BMC 登录用户名的密码) power status
-
-2. 开机：
-ipmitool -H (BMC的管理IP地址) -I lanplus -U (BMC登录用户名) -P (BMC 登录用户名的密码) power on
-
-3. 关机：
-ipmitool -H (BMC的管理IP地址) -I lanplus -U (BMC登录用户名) -P (BMC 登录用户名的密码) power off
-
-4. 重启：
-ipmitool -H (BMC的管理IP地址) -I lanplus -U (BMC登录用户名) -P (BMC 登录用户名的密码) power reset
-</code></pre>
-<h3 id="二-用户管理">二、用户管理</h3>
-<pre><code class="language-shell"># 说明：[ChannelNo] 字段是可选的，ChannoNo为1或者8；BMC默认有2个用户：user id为1的匿名用户，user id为2的ADMIN用户；&lt;&gt;字段为必选内容；&lt;privilege level&gt;：2为user权限，3为Operator权限，4为Administrator权限；
-
-1. 查看用户信息：
-ipmitool -H (BMC的管理IP地址) -I lanplus -U (BMC登录用户名) -P (BMC 登录用户名的密码) user list [ChannelNo]
-
-2. 增加用户：
-ipmitool -H (BMC的管理IP地址) -I lanplus -U (BMC登录用户名) -P (BMC 登录用户名的密码) user set name &lt;user id&gt; &lt;username&gt;
-
-3. 设置密码：
-ipmitool -H (BMC的管理IP地址) -I lanplus -U (BMC登录用户名) -P (BMC 登录用户名的密码) user set password &lt;user id&gt; &lt;password&gt;
-
-4. 设置用户权限：
-ipmitool -H (BMC的管理IP地址) -I lanplus -U (BMC登录用户名) -P (BMC 登录用户名的密码) user priv &lt;user id&gt; &lt;privilege level&gt; [ChannelNo]
-
-5. 启用/禁用用户：
-ipmitool -H (BMC的管理IP地址) -I lanplus -U (BMC登录用户名) -P (BMC 登录用户名的密码) user enable/disable &lt;user id&gt;
-</code></pre>
-<h3 id="三-ip网络设置">三、IP网络设置</h3>
-<pre><code class="language-shell"># 说明：[ChannelNo] 字段是可选的，ChannoNo为1(Share Nic网络)或者8（BMC独立管理网络）；设置网络参数，必须首先设置IP为静态，然后再进行其他设置；
-
-1. 查看网络信息：
-ipmitool -H (BMC的管理IP地址) -I lanplus -U (BMC登录用户名) -P (BMC 登录用户名的密码) lan print [ChannelNo]
-
-2. 修改IP为静态还是DHCP模式：
-ipmitool -H (BMC的管理IP地址) -I lanplus -U (BMC登录用户名) -P (BMC 登录用户名的密码) lan set &lt;ChannelNo&gt; ipsrc &lt;static/dhcp&gt;
-
-3. 修改IP地址：
-ipmitool -H (BMC的管理IP地址) -I lanplus -U (BMC登录用户名) -P (BMC 登录用户名的密码) lan set &lt;ChannelNo&gt; ipaddr &lt;IPAddress&gt;
-
-4. 修改子网掩码：
-ipmitool -H (BMC的管理IP地址) -I lanplus -U (BMC登录用户名) -P (BMC 登录用户名的密码) lan set &lt;ChannelNo&gt; netmask &lt;NetMask&gt;
-
-5. 修改默认网关：
-ipmitool -H (BMC的管理IP地址) -I lanplus -U (BMC登录用户名) -P (BMC 登录用户名的密码) lan set &lt;ChannelNo&gt; defgw ipaddr &lt;默认网关&gt;
-</code></pre>
-<h3 id="四-sol功能">四、SOL功能</h3>
-<pre><code class="language-shell"># 说明：&lt;9.6/19.2/38.4/57.6/115.2&gt;其中115.2代表115200，即*1000是表示的波特率;
-
-1. 设置SOL串口波特率：
-ipmitool -H (BMC的管理IP地址) -I lanplus -U (BMC登录用户名) -P (BMC 登录用户名的密码) sol set volatile-bit-rate &lt;9.6/19.2/38.4/57.6/115.2&gt;
-
-2. 打开SOL功能：
-ipmitool -H (BMC的管理IP地址) -I lanplus -U (BMC登录用户名) -P (BMC 登录用户名的密码) sol activate
-
-3. 关闭SOL功能：
-ipmitool -H (BMC的管理IP地址) -I lanplus -U (BMC登录用户名) -P (BMC 登录用户名的密码) sol deactivate
-</code></pre>
-<h3 id="五-sel日志查看">五、SEL日志查看</h3>
-<pre><code class="language-shell">1. 查看SEL日志：
-ipmitool -H (BMC的管理IP地址) -I lanplus -U (BMC登录用户名) -P (BMC 登录用户名的密码) sel list
-</code></pre>
-<h3 id="六-fru信息查看">六、FRU信息查看</h3>
-<pre><code class="language-shell">1. 查看FRU信息：
-ipmitool -H (BMC的管理IP地址) -I lanplus -U (BMC登录用户名) -P (BMC 登录用户名的密码) fru list
-</code></pre>
-<h3 id="七-sdrsensor信息查看">七、SDR，Sensor信息查看</h3>
-<pre><code class="language-shell">1. 查看SDR Sensor信息：
-ipmitool -H (BMC的管理IP地址) -I lanplus -U (BMC登录用户名) -P (BMC 登录用户名的密码) sdr
-
-2. 查看Sensor信息：
-ipmitool -H (BMC的管理IP地址) -I lanplus -U (BMC登录用户名) -P (BMC 登录用户名的密码) sensor list
-</code></pre>
-<h3 id="八-mc管理单元bmc状态和控制">八、mc(管理单元BMC)状态和控制</h3>
-<pre><code class="language-shell">1. 重启动BMC：
-ipmitool -H (BMC的管理IP地址) -I lanplus -U (BMC登录用户名) -P (BMC 登录用户名的密码) mc reset &lt;warm/cold&gt;
-</code></pre>
-<h3 id="九-设置bmc的iptables防火墙">九、设置BMC的iptables防火墙</h3>
-<pre><code class="language-shell">1. 设置某一段IP可以访问BMC
-ipmitool -H (BMC的管理IP地址) -I lanplus -U (BMC登录用户名) -P (BMC 登录用户名的密码) raw 0x32 0x76 0x01 0x01 ip1(0xa 0xa 0xa 0xa) ip2(0xb 0xb 0xb 0xb)
-ipmitool -H (BMC的管理IP地址) -I lanplus -U (BMC登录用户名) -P (BMC 登录用户名的密码) raw 0x32 0x76 0x09
-
-2. 设置某个IP可以访问BMC
-ipmitool -H (BMC的管理IP地址) -I lanplus -U (BMC登录用户名) -P (BMC 登录用户名的密码) raw 0x32 0x76 0x00 0x01 ip1(0xa 0xa 0xa 0xa)
-ipmitool -H (BMC的管理IP地址) -I lanplus -U (BMC登录用户名) -P (BMC 登录用户名的密码) raw 0x32 0x76 0x09
-
-3. 取消设置
-ipmitool -H (BMC的管理IP地址) -I lanplus -U (BMC登录用户名) -P (BMC 登录用户名的密码) raw 0x32 0x76 0x08
-
-4．获取防火墙设置
-ipmitool -H (BMC的管理IP地址) -I lanplus -U (BMC登录用户名) -P (BMC 登录用户名的密码) raw 0x32 0x77 0x01 0x00
-
-5. 阻止/开启某个端口
-ipmitool -H (BMC的管理IP地址) -I lanplus -U (BMC登录用户名) -P (BMC 登录用户名的密码) raw 0x32 0x76 0x02 0x00/0x01 0x00 (portno)0x22 0x00
-
-6. 取消某个端口的设置（6是5的对应取消操作）
-ipmitool -H (BMC的管理IP地址) -I lanplus -U (BMC登录用户名) -P (BMC 登录用户名的密码) raw 0x32 0x76 0x06 0x00/0x01 0x00 (portno)0x22 0x00
-</code></pre>
-<h3 id="参考文献">参考文献</h3>
-<p>https://www.cnblogs.com/EricDing/p/8995263.html</p>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[NVIDIA显卡常用命令]]></title>
-        <id>https://esp0x.github.io/post/nvidia-xian-qia-chang-yong-ming-ling/</id>
-        <link href="https://esp0x.github.io/post/nvidia-xian-qia-chang-yong-ming-ling/">
-        </link>
-        <updated>2021-02-18T01:37:06.000Z</updated>
-        <content type="html"><![CDATA[<h3 id="gpu日志收集">GPU日志收集</h3>
-<pre><code class="language-shell"># nvidia-bug-report.sh   // 执行后输出nvidia-bug-report.log.gz文件
-</code></pre>
-<h3 id="驱动问题常见解决方法">驱动问题常见解决方法</h3>
-<ol>
-<li>维持较新的驱动版本</li>
-<li>禁用nouveau模块</li>
-<li>打开GPU驱动常驻内存模式并配置开机自启动</li>
-<li>GPU故障后，可尝试重启主机解决</li>
-</ol>
-<h3 id="禁用nouveau模块">禁用nouveau模块</h3>
-<pre><code class="language-shell"># lsmod | grep -i nouveau   // 如果有输出，表示启动状态，否则为禁用状态
-
-# CentOS 7
-# 编辑或新建 blacklist-nouveau.conf 文件
-[root@zj ~]# vim /usr/lib/modprobe.d/blacklist-nouveau.conf
-blacklist nouveau
-options nouveau modeset=0
-
-# 执行如下命令并重启系统使内核生效
-[root@zj ~]# dracut -f
-[root@zj ~]# shutdown -ry 0
-
-
-# ubuntu 
-# vi /etc/modprobe.d/blacklist.conf 最后一行加入
-blacklist nouveau
-# update-initramfs -u
-# reboot
-</code></pre>
-<h3 id="gpu驱动内存常驻模式">GPU驱动内存常驻模式</h3>
-<pre><code class="language-shell"># nvidia-smi -pm 1
-</code></pre>
-<h3 id="gpu加载数量和err检查">GPU加载数量和ERR检查</h3>
-<pre><code class="language-shell"># 以下两个命令显示的GPU卡数量需要保持一致，可用于判断是否有GPU离线
-# lspci | grep -i nvidia 
-# nvidia-smi
-
-# 检查输出中是否包含ERR错误字样，可用于实现健康检查
-</code></pre>
-<h3 id="gpu常用性能指标获取">GPU常用性能指标获取</h3>
-<pre><code class="language-shell"># nvidia-smi \
-&gt;  --query-gpu=memory.total,memory.used,memory.free,utilization.memory,utilization.gpu,temperature.gpu,fan.speed \
-&gt;  --format=csv,noheader,nounits
-
-# nvidia-smi --help-query-gpu   // 查看可用的查询参数
-</code></pre>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[理解OAuth 2.0的基本流程]]></title>
-        <id>https://esp0x.github.io/post/li-jie-oauth-20-de-ji-ben-liu-cheng/</id>
-        <link href="https://esp0x.github.io/post/li-jie-oauth-20-de-ji-ben-liu-cheng/">
-        </link>
-        <updated>2021-02-04T01:00:32.000Z</updated>
-        <content type="html"><![CDATA[<h3 id="快递员场景">快递员场景</h3>
-<p>需求：有没有一种办法，让快递员能够自由出入小区，又不用知道小区居民的密码，而且他的唯一权限就是送货，其他需要密码的场合，他都没有权限？</p>
-<h3 id="授权机制的设计">授权机制的设计</h3>
-<p>第一步，门禁系统的密码输入器下面，增加一个按钮，叫做&quot;获取授权&quot;。快递员需要首先按这个按钮，去申请授权。</p>
-<p>第二步，他按下按钮以后，屋主（也就是我）的手机就会跳出对话框：有人正在要求授权。系统还会显示该快递员的姓名、工号和所属的快递公司。</p>
-<p>我确认请求属实，就点击按钮，告诉门禁系统，我同意给予他进入小区的授权。</p>
-<p>第三步，门禁系统得到我的确认以后，向快递员显示一个进入小区的令牌（access token）。令牌就是类似密码的一串数字，只在短期内（比如七天）有效。</p>
-<p>第四步，快递员向门禁系统输入令牌，进入小区。</p>
-<p>有人可能会问，为什么不是远程为快递员开门，而要为他单独生成一个令牌？这是因为快递员可能每天都会来送货，第二天他还可以复用这个令牌。另外，有的小区有多重门禁，快递员可以使用同一个令牌通过它们。</p>
-<h3 id="转换理解">转换理解</h3>
-<p>所以，OAuth就是一种授权机制，数据的所有者告诉系统，同意授权第三方应用进入系统，获取这些数据。系统从而产生一个短期的进入令牌（Token），用于替代密码，以供第三方使用。</p>
-<h3 id="关于token">关于Token</h3>
-<p>只需要记住三点：1、令牌的有效期是有限的，为了安全；2、令牌的权限范围一般很小；3、令牌可以被撤销；</p>
-<h3 id="参考文献">参考文献</h3>
-<p>http://www.ruanyifeng.com/blog/2019/04/oauth_design.html</p>
 ]]></content>
     </entry>
 </feed>
