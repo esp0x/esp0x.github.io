@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://esp0x.github.io</id>
     <title>Grey</title>
-    <updated>2021-06-08T07:08:53.996Z</updated>
+    <updated>2021-06-23T03:47:47.050Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://esp0x.github.io"/>
     <link rel="self" href="https://esp0x.github.io/atom.xml"/>
@@ -10,6 +10,16 @@
     <logo>https://esp0x.github.io/images/avatar.png</logo>
     <icon>https://esp0x.github.io/favicon.ico</icon>
     <rights>All rights reserved 2021, Grey</rights>
+    <entry>
+        <title type="html"><![CDATA[如何避免在第一次SSH登陆时输入yes提示符]]></title>
+        <id>https://esp0x.github.io/post/ru-he-bi-mian-zai-di-yi-ci-ssh-deng-lu-shi-shu-ru-yes-ti-shi-fu/</id>
+        <link href="https://esp0x.github.io/post/ru-he-bi-mian-zai-di-yi-ci-ssh-deng-lu-shi-shu-ru-yes-ti-shi-fu/">
+        </link>
+        <updated>2021-06-23T03:46:19.000Z</updated>
+        <content type="html"><![CDATA[<pre><code class="language-shell">echo &quot;StrictHostKeyChecking no&quot; &gt;~/.ssh/config
+</code></pre>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[K8s-Pod简单介绍]]></title>
         <id>https://esp0x.github.io/post/k8s-pod-jian-dan-jie-shao/</id>
@@ -479,37 +489,6 @@ nmap -A 192.168.1.0/24   # all
 <h3 id="使用脚本">使用脚本</h3>
 <pre><code class="language-shell">nmap --script &lt;脚本名称&gt; 192.168.1.0/24
 </code></pre>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[XFS文件系统修复流程]]></title>
-        <id>https://esp0x.github.io/post/xfs-wen-jian-xi-tong-xiu-fu-liu-cheng/</id>
-        <link href="https://esp0x.github.io/post/xfs-wen-jian-xi-tong-xiu-fu-liu-cheng/">
-        </link>
-        <updated>2021-03-22T02:34:29.000Z</updated>
-        <content type="html"><![CDATA[<h3 id="详细流程如下">详细流程如下：</h3>
-<p>1.使用 xfs_repair -n 执行文件系统错误检测，和 fsck -n 类似；<br>
-2.使用 xfs_repair 尝试进行修复；<br>
-3.当遇见无法正常挂载文件系统时，需要使用强制模式 -L 模式进行修复，会丢失部分数据，可以先对metadata进行模拟修复测试：</p>
-<ul>
-<li>xfs_metadump [partition] /path/to/file.metadump                                  # 对需要修复的分区进行dump</li>
-<li>xfs_mdrestore /path/to/file.metadump /path/to/file.img                         # 生成img文件</li>
-<li>losetup --show --find /path/to/file.img                                                    # 使用lostup工具将数据放到/dev/loop0</li>
-<li>xfs_repair -L /dev/loop0                                                                        # 尝试模拟修复</li>
-<li>mount /dev/loop0 /mnt</li>
-<li>check the damage</li>
-<li>(note, this is an image of file system layout, but not the actual data)</li>
-</ul>
-<p>4.拷贝真实数据，并对拷贝的数据进行修复：</p>
-<ul>
-<li>ddrescue -f -n [partition] /path/to/rescued.img rescue.log                      # 这需要一个比原分区大小更大的磁盘</li>
-<li>ddrescue -d -f -r3 [partition] /path/to/rescued.img rescue.log</li>
-<li>losetup --show --find /path/to/rescued.img</li>
-<li>xfs_repair -L /dev/loop0</li>
-<li>mount /dev/loop0 /mnt</li>
-<li>check the damage</li>
-</ul>
-<p>5.如果真实环境缺少这样的备份分区，那么直接使用xfs_repair -L模式进行强制修复。</p>
 ]]></content>
     </entry>
 </feed>
