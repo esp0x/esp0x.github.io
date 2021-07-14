@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://esp0x.github.io</id>
     <title>Grey</title>
-    <updated>2021-06-23T03:47:47.050Z</updated>
+    <updated>2021-07-14T01:26:39.231Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://esp0x.github.io"/>
     <link rel="self" href="https://esp0x.github.io/atom.xml"/>
@@ -10,6 +10,101 @@
     <logo>https://esp0x.github.io/images/avatar.png</logo>
     <icon>https://esp0x.github.io/favicon.ico</icon>
     <rights>All rights reserved 2021, Grey</rights>
+    <entry>
+        <title type="html"><![CDATA[Centos 7/8 使用chrony进行时间同步配置]]></title>
+        <id>https://esp0x.github.io/post/centos-78-shi-yong-chrony-jin-xing-shi-jian-tong-bu-pei-zhi/</id>
+        <link href="https://esp0x.github.io/post/centos-78-shi-yong-chrony-jin-xing-shi-jian-tong-bu-pei-zhi/">
+        </link>
+        <updated>2021-07-14T01:25:52.000Z</updated>
+        <content type="html"><![CDATA[<h3 id="1-安装">1. 安装</h3>
+<pre><code class="language-shell"># yum -y install chrony
+# systemctl enable chronyd
+# systemctl start chronyd
+</code></pre>
+<h3 id="2配置">2.配置</h3>
+<pre><code class="language-shell"># vi /etc/chrony.conf
+
+# 使用 pool.ntp.org 项目中的公共服务器。以server开，理论上想添加多少时间服务器都可以。
+# Use public servers from the pool.ntp.org project.
+# Please consider joining the pool (http://www.pool.ntp.org/join.html).
+server 0.centos.pool.ntp.org iburst
+server 1.centos.pool.ntp.org iburst
+server 2.centos.pool.ntp.org iburst
+server 3.centos.pool.ntp.org iburst
+
+# 根据实际时间计算出服务器增减时间的比率，然后记录到一个文件中，在系统重启后为系统做出最佳时间补偿调整。
+# Record the rate at which the system clock gains/losses time.
+driftfile /var/lib/chrony/drift
+
+# 如果系统时钟的偏移量大于1秒，则允许系统时钟在前三次更新中步进。
+# Allow the system clock to be stepped in the first three updates if its offset is larger than 1 second.
+makestep 1.0 3
+
+# 启用实时时钟（RTC）的内核同步。
+# Enable kernel synchronization of the real-time clock (RTC).
+rtcsync
+
+# 通过使用 hwtimestamp 指令启用硬件时间戳
+# Enable hardware timestamping on all interfaces that support it.
+#hwtimestamp *
+
+# Increase the minimum number of selectable sources required to adjust the system clock.
+#minsources 2
+
+# 指定 NTP 客户端地址，以允许或拒绝连接到扮演时钟服务器的机器
+# Allow NTP client access from local network.
+#allow 192.168.0.0/16
+
+# Serve time even if not synchronized to a time source.
+#local stratum 10
+
+# 指定包含 NTP 身份验证密钥的文件。
+# Specify file containing keys for NTP authentication.
+#keyfile /etc/chrony.keys
+
+# 指定日志文件的目录。
+# Specify directory for log files.
+logdir /var/log/chrony
+
+# 选择日志文件要记录的信息。
+# Select which information is logged.
+#log measurements statistics tracking
+</code></pre>
+<h3 id="3手工同步">3.手工同步</h3>
+<pre><code class="language-shell"># 查看 ntp_servers
+chronyc sources -v
+
+# 查看 ntp_servers 状态
+chronyc sourcestats -v
+
+# 查看 ntp_servers 是否在线
+chronyc activity -v
+
+# 查看 ntp 详细信息
+chronyc tracking -v
+
+# 手工进行同步
+chronyc -a makestep
+</code></pre>
+<h3 id="4修改时区">4.修改时区</h3>
+<pre><code class="language-shell"># 查看日期时间、时区及 NTP 状态
+timedatectl
+
+# 查看时区列表
+timedatectl list-timezones
+timedatectl list-timezones |  grep  -E &quot;Asia/S.*&quot;
+
+# 修改时区
+timedatectl set-timezone Asia/Shanghai
+
+# 修改日期时间（可以只修改其中一个）
+timedatectl set-time &quot;2019-09-19 15:50:20&quot;
+
+# 开启 NTP
+timedatectl set-ntp true/flase
+</code></pre>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[如何避免在第一次SSH登陆时输入yes提示符]]></title>
         <id>https://esp0x.github.io/post/ru-he-bi-mian-zai-di-yi-ci-ssh-deng-lu-shi-shu-ru-yes-ti-shi-fu/</id>
@@ -425,69 +520,6 @@ docker run -d -p 3000:3000 \
 5. 删除配置文件：rm -f /etc/mdadm.conf
 
 6. 更新/etc/fstab
-</code></pre>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[Nmap工具常用使用场景]]></title>
-        <id>https://esp0x.github.io/post/nmap-gong-ju-chang-yong-shi-yong-chang-jing/</id>
-        <link href="https://esp0x.github.io/post/nmap-gong-ju-chang-yong-shi-yong-chang-jing/">
-        </link>
-        <updated>2021-03-29T05:50:49.000Z</updated>
-        <content type="html"><![CDATA[<h3 id="主机发现">主机发现</h3>
-<pre><code class="language-shell">以192.168.1.0/24举例
-
-nmap -PE 192.168.1.0/24  # icmp
-namp -PO 192.168.1.0/24  # ip
-nmap -PS 192.168.1.0/24  # tcp syn
-nmap -PA 192.168.1.0/24  # tcp ack
-nmap -PU 192.168.1.0/24  # udp
-nmap -PY 192.168.1.0/24  # sctp
-</code></pre>
-<h3 id="端口扫描">端口扫描</h3>
-<pre><code class="language-shell">1.SYN Scanning
-nmap -sS 192.168.1.0/24  # 仅发送SYN，返回SYN/ACK应答表示端口开启，返回RST表示端口关闭
-
-2.TCP Scanning
-nmap -sT 192.168.1.0/24  # 建立完整的TCP连接，表示端口开启，否则表示关闭
-
-3.UDP Scanning
-nmap -sU 192.168.1.0/24  # UDP，无应答，表示端口开启；返回&quot;Port Unreachable&quot;信息，表示关闭
-
-4.FIN Scanning
-nmap -sF 192.168.1.0/24  # 在TCP数据包中重置FIN标志位，无应答，表示开启；返回RST，表示端口关闭
-
-5.NULL Scanning
-nmap -sN 192.168.1.0/24  # 在TCP数据包中不包含任何标志位，无应答，表示开启；返回RST，表示端口关闭
-
-6.Xmas Scanning
-nmap -sX 192.168.1.0/24  # 在TCP数据包中重置FIN、RST、PUSH标志位，无应答，表示开启；返回RST，表示端口关闭
-
-7.IDLE Scanning
-nmap -sI 172.16.1.1 192.168.1.0/24  
-# 利用僵尸主机进行扫描，假设僵尸IP为172.16.1.1，当僵尸机返回序列ID增加数量为2时，表示开启，为1时关闭
-
-8.指定端口扫描
-nmap -p 80,443 192.168.1.0/24  # 可以指定多个端口
-
-9.扫描常见的100个端口
-nmap -F 192.168.1.0/24  # 快速模式
-
-10.使用协议名进行扫描
-nmap -p http 192.168.1.0/24
-nmap -p smtp 192.168.1.0/24
-
-11.扫描常用端口
-nmap --top-ports &lt;端口数量&gt; 192.168.1.0/24
-
-</code></pre>
-<h3 id="操作系统指纹识别">操作系统指纹识别</h3>
-<pre><code class="language-shell">nmap -O 192.168.1.0/24   # os
-nmap -sV 192.168.1.0/24  # service version
-nmap -A 192.168.1.0/24   # all
-</code></pre>
-<h3 id="使用脚本">使用脚本</h3>
-<pre><code class="language-shell">nmap --script &lt;脚本名称&gt; 192.168.1.0/24
 </code></pre>
 ]]></content>
     </entry>

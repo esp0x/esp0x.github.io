@@ -4,7 +4,7 @@
 <meta name="description" content="" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<title>Linux | Grey</title>
+<title>Centos 7/8 使用chrony进行时间同步配置 | Grey</title>
 
 <link rel="shortcut icon" href="https://esp0x.github.io/favicon.ico?v=1626225995427">
 
@@ -33,11 +33,11 @@
 <!--<script src="media/scripts/index.js"></script>-->
 
 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.css">
 </head>
 <body>
 <div class="main gt-bg-theme-color-first">
-    <div class="main-content">
-        <style>
+    <style>
     /* 导航栏样式 */
     .navbar {
         position: relative;
@@ -198,120 +198,129 @@
         }
     }
 </script>
-        <div class="current-tag-container">
-            <h2 class="title gt-c-content-color-first">
-                #Linux
-            </h2>
+    <div class="post-container">
+        <div class="post-detail gt-bg-theme-color-second">
+            <article class="gt-post-content">
+                <h2 class="post-title">
+                    Centos 7/8 使用chrony进行时间同步配置
+                </h2>
+                <div class="post-info">
+                    <time class="post-time gt-c-content-color-first">
+                        · 2021-07-14 ·
+                    </time>
+                    
+                        <a href="https://esp0x.github.io/tag/U7XkBZwyl/" class="post-tags">
+                            # Linux
+                        </a>
+                    
+                </div>
+                <div class="post-content">
+                    <h3 id="1-安装">1. 安装</h3>
+<pre><code class="language-shell"># yum -y install chrony
+# systemctl enable chronyd
+# systemctl start chronyd
+</code></pre>
+<h3 id="2配置">2.配置</h3>
+<pre><code class="language-shell"># vi /etc/chrony.conf
+
+# 使用 pool.ntp.org 项目中的公共服务器。以server开，理论上想添加多少时间服务器都可以。
+# Use public servers from the pool.ntp.org project.
+# Please consider joining the pool (http://www.pool.ntp.org/join.html).
+server 0.centos.pool.ntp.org iburst
+server 1.centos.pool.ntp.org iburst
+server 2.centos.pool.ntp.org iburst
+server 3.centos.pool.ntp.org iburst
+
+# 根据实际时间计算出服务器增减时间的比率，然后记录到一个文件中，在系统重启后为系统做出最佳时间补偿调整。
+# Record the rate at which the system clock gains/losses time.
+driftfile /var/lib/chrony/drift
+
+# 如果系统时钟的偏移量大于1秒，则允许系统时钟在前三次更新中步进。
+# Allow the system clock to be stepped in the first three updates if its offset is larger than 1 second.
+makestep 1.0 3
+
+# 启用实时时钟（RTC）的内核同步。
+# Enable kernel synchronization of the real-time clock (RTC).
+rtcsync
+
+# 通过使用 hwtimestamp 指令启用硬件时间戳
+# Enable hardware timestamping on all interfaces that support it.
+#hwtimestamp *
+
+# Increase the minimum number of selectable sources required to adjust the system clock.
+#minsources 2
+
+# 指定 NTP 客户端地址，以允许或拒绝连接到扮演时钟服务器的机器
+# Allow NTP client access from local network.
+#allow 192.168.0.0/16
+
+# Serve time even if not synchronized to a time source.
+#local stratum 10
+
+# 指定包含 NTP 身份验证密钥的文件。
+# Specify file containing keys for NTP authentication.
+#keyfile /etc/chrony.keys
+
+# 指定日志文件的目录。
+# Specify directory for log files.
+logdir /var/log/chrony
+
+# 选择日志文件要记录的信息。
+# Select which information is logged.
+#log measurements statistics tracking
+</code></pre>
+<h3 id="3手工同步">3.手工同步</h3>
+<pre><code class="language-shell"># 查看 ntp_servers
+chronyc sources -v
+
+# 查看 ntp_servers 状态
+chronyc sourcestats -v
+
+# 查看 ntp_servers 是否在线
+chronyc activity -v
+
+# 查看 ntp 详细信息
+chronyc tracking -v
+
+# 手工进行同步
+chronyc -a makestep
+</code></pre>
+<h3 id="4修改时区">4.修改时区</h3>
+<pre><code class="language-shell"># 查看日期时间、时区及 NTP 状态
+timedatectl
+
+# 查看时区列表
+timedatectl list-timezones
+timedatectl list-timezones |  grep  -E &quot;Asia/S.*&quot;
+
+# 修改时区
+timedatectl set-timezone Asia/Shanghai
+
+# 修改日期时间（可以只修改其中一个）
+timedatectl set-time &quot;2019-09-19 15:50:20&quot;
+
+# 开启 NTP
+timedatectl set-ntp true/flase
+</code></pre>
+
+                </div>
+            </article>
         </div>
-        <div class="post-list-container">
-    <div class="post-inner">
+
         
-            <div class="post gt-bg-theme-color-second">
-                <div class="post-left">
-                    <div>
-                        
-                        <a href="https://esp0x.github.io/post/centos-78-shi-yong-chrony-jin-xing-shi-jian-tong-bu-pei-zhi/">
-                            <span class="post-title gt-c-content-color-first">Centos 7/8 使用chrony进行时间同步配置</span>
-                        </a>
-                    </div>
-                    <div class="gt-post-content post-abstract gt-c-content-color-second">
-                        
-                    </div>
-                    <div class="post-info">
-                        <time class="post-time gt-c-content-color-first">
-                            发布于 · 2021-07-14 ·
-                        </time>
-                        
-                            <a href="https://esp0x.github.io/tag/U7XkBZwyl/" class="post-tag">
-                                # Linux
-                            </a>
-                        
-                    </div>
-                </div>
-                
+            <div class="next-post">
+                <div class="next gt-c-content-color-first">下一篇</div>
+                <a href="https://esp0x.github.io/post/ru-he-bi-mian-zai-di-yi-ci-ssh-deng-lu-shi-shu-ru-yes-ti-shi-fu/" class="post-title gt-a-link">
+                    如何避免在第一次SSH登陆时输入yes提示符
+                </a>
             </div>
         
-            <div class="post gt-bg-theme-color-second">
-                <div class="post-left">
-                    <div>
-                        
-                        <a href="https://esp0x.github.io/post/ru-he-bi-mian-zai-di-yi-ci-ssh-deng-lu-shi-shu-ru-yes-ti-shi-fu/">
-                            <span class="post-title gt-c-content-color-first">如何避免在第一次SSH登陆时输入yes提示符</span>
-                        </a>
-                    </div>
-                    <div class="gt-post-content post-abstract gt-c-content-color-second">
-                        
-                    </div>
-                    <div class="post-info">
-                        <time class="post-time gt-c-content-color-first">
-                            发布于 · 2021-06-23 ·
-                        </time>
-                        
-                            <a href="https://esp0x.github.io/tag/U7XkBZwyl/" class="post-tag">
-                                # Linux
-                            </a>
-                        
-                    </div>
-                </div>
-                
-            </div>
+
         
-            <div class="post gt-bg-theme-color-second">
-                <div class="post-left">
-                    <div>
-                        
-                        <a href="https://esp0x.github.io/post/ru-he-chai-chu-linux-ruan-raid-she-bei/">
-                            <span class="post-title gt-c-content-color-first">如何拆除Linux软Raid设备</span>
-                        </a>
-                    </div>
-                    <div class="gt-post-content post-abstract gt-c-content-color-second">
-                        
-                    </div>
-                    <div class="post-info">
-                        <time class="post-time gt-c-content-color-first">
-                            发布于 · 2021-04-20 ·
-                        </time>
-                        
-                            <a href="https://esp0x.github.io/tag/U7XkBZwyl/" class="post-tag">
-                                # Linux
-                            </a>
-                        
-                    </div>
-                </div>
-                
-            </div>
+
         
-            <div class="post gt-bg-theme-color-second">
-                <div class="post-left">
-                    <div>
-                        
-                        <a href="https://esp0x.github.io/post/xfs-wen-jian-xi-tong-xiu-fu-liu-cheng/">
-                            <span class="post-title gt-c-content-color-first">XFS文件系统修复流程</span>
-                        </a>
-                    </div>
-                    <div class="gt-post-content post-abstract gt-c-content-color-second">
-                        
-                    </div>
-                    <div class="post-info">
-                        <time class="post-time gt-c-content-color-first">
-                            发布于 · 2021-03-22 ·
-                        </time>
-                        
-                            <a href="https://esp0x.github.io/tag/U7XkBZwyl/" class="post-tag">
-                                # Linux
-                            </a>
-                        
-                    </div>
-                </div>
-                
-            </div>
+
         
-    </div>
-</div>
-        <div class="pagination-container">
-    
-    
-</div>
 
         <div class="site-footer gt-c-content-color-first">
     <div class="slogan gt-c-content-color-first">温故而知新</div>
