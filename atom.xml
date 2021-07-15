@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://esp0x.github.io</id>
     <title>Esp0x</title>
-    <updated>2021-07-15T02:03:15.954Z</updated>
+    <updated>2021-07-15T02:55:12.511Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://esp0x.github.io"/>
     <link rel="self" href="https://esp0x.github.io/atom.xml"/>
@@ -10,6 +10,59 @@
     <logo>https://esp0x.github.io/images/avatar.png</logo>
     <icon>https://esp0x.github.io/favicon.ico</icon>
     <rights>All rights reserved 2021, Esp0x</rights>
+    <entry>
+        <title type="html"><![CDATA[Sublist3r子域名扫描工具使用说明]]></title>
+        <id>https://esp0x.github.io/post/sublist3r-zi-yu-ming-sao-miao-gong-ju-shi-yong-shuo-ming/</id>
+        <link href="https://esp0x.github.io/post/sublist3r-zi-yu-ming-sao-miao-gong-ju-shi-yong-shuo-ming/">
+        </link>
+        <updated>2021-07-15T02:54:45.000Z</updated>
+        <content type="html"><![CDATA[<h3 id="安装方式">安装方式</h3>
+<pre><code class="language-shell">// 源码使用
+# git clone https://github.com/aboul3la/Sublist3r.git
+# cd Sublist3r
+# pip install -r requirements.txt
+
+// Kali Linux安装
+# apt update
+# apt install sublist3r
+# sublist3r --help
+</code></pre>
+<h3 id="工具帮助信息">工具帮助信息</h3>
+<pre><code class="language-shell">usage: sublist3r.py [-h] -d DOMAIN [-b [BRUTEFORCE]] [-p PORTS] [-v [VERBOSE]] [-t THREADS] [-e ENGINES] [-o OUTPUT] [-n]
+
+OPTIONS:
+  -h, --help            show this help message and exit
+  -d DOMAIN, --domain DOMAIN
+                        Domain name to enumerate it's subdomains
+  -b [BRUTEFORCE], --bruteforce [BRUTEFORCE]
+                        Enable the subbrute bruteforce module
+  -p PORTS, --ports PORTS
+                        Scan the found subdomains against specified tcp ports
+  -v [VERBOSE], --verbose [VERBOSE]
+                        Enable Verbosity and display results in realtime
+  -t THREADS, --threads THREADS
+                        Number of threads to use for subbrute bruteforce
+  -e ENGINES, --engines ENGINES
+                        Specify a comma-separated list of search engines
+  -o OUTPUT, --output OUTPUT
+                        Save the results to text file
+  -n, --no-color        Output without color
+
+Example: python3 /usr/lib/python3/dist-packages/sublist3r.py -d google.com
+</code></pre>
+<h3 id="使用场景">使用场景</h3>
+<pre><code class="language-shell">// 扫描子域名
+# sublist3r -d qq.com
+
+// 扫描子域名，并显示开放了80和443端口的子域名
+# sublist3r -d qq.com -p 80, 443
+
+// 输出到文件
+# sublist3r -d qq.com -o filename.txt
+
+</code></pre>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[SubDomainBrute.py工具的简单使用说明]]></title>
         <id>https://esp0x.github.io/post/subdomainbrutepy-gong-ju-de-jian-dan-shi-yong-shuo-ming/</id>
@@ -489,60 +542,6 @@ ansible-playbook tags_always.yml --tags &quot;packages&quot;
 tagged，即执行所有被打标签的任务
 untagged，即执行所有未被打标签的任务
 all，所有任务
-</code></pre>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[Prometheus-使用prometheus监控主机docker容器运行状态]]></title>
-        <id>https://esp0x.github.io/post/shi-yong-prometheus-jian-kong-zhu-ji-docker-rong-qi-yun-xing-zhuang-tai/</id>
-        <link href="https://esp0x.github.io/post/shi-yong-prometheus-jian-kong-zhu-ji-docker-rong-qi-yun-xing-zhuang-tai/">
-        </link>
-        <updated>2021-06-07T08:27:03.000Z</updated>
-        <content type="html"><![CDATA[<h3 id="部署方式容器化部署">部署方式：容器化部署</h3>
-<h4 id="部署流程">部署流程：</h4>
-<pre><code class="language-shell"># 运行node-exporter监控主机基本信息，访问9100端口进行验证
-docker run -d --name node \
-	-p 9100:9100 \
-	-v /proc:/host/proc \
-	-v /sys:/host/sys \
-	-v /:/rootfs \
-	--net=host prom/node-exporter \
-	--path.procfs /host/proc \
-	--path.sysfs /host/sys \
-	--collector.filesystem.ignored-mount-points &quot;^/(sys|proc|dev|host|etc)($|/)&quot;
-
-# 运行cAdvisor监控容器运行状态，访问8080端口进行验证
-docker run -v /:/rootfs:ro \
-	-v /var/run:/var/run/:rw \
-	-v /sys:/sys:ro \
-	-v /var/lib/docker:/var/lib/docker:ro \
-	-p 8080:8080 \
-	--detach=true \
-	--name=cadvisor \
-	--net=host google/cadvisor
-
-# 在监控主节点上部署prometheus server，客户节点无需安装
-docker run -d -p 9090:9090 --name prometheus --net=host prom/prometheus
-# 将容器中的配置文件拷贝到宿主，进行修改
-docker cp prometheus:/etc/prometheus/prometheus.yml ./
-# 修改static_configs，指向所有客户节点的9100和8080端口获取数据
-vim prometheus.yml
-
-# 配置更新完成后，删除原prometheus server容器
-docker rm prometheus -f
-# 重新将本地配置文件映射到容器中，访问9090端口进行验证
-docker run -d -p 9090:9090 --name prometheus --net=host -v /root/prometheus.yml:/etc/prometheus/prometheus.yml prom/prometheus
-
-# 部署grafana图形化界面，访问3000端口进行验证
-mkdir grafana-storage
-chmod 777 -R grafana-storage/
-docker run -d -p 3000:3000 \
-	--name grafana \
-	-v /root/grafana-storage:/var/lib/grafana \
-	-e &quot;GF_SECURITY_ADMIN_PASSWORD=123456&quot; grafana/grafana
-	
-# grafana模板，打开grafana.com, 点击dashborads，根据数据源和类型选择合适的模板
-
 </code></pre>
 ]]></content>
     </entry>
