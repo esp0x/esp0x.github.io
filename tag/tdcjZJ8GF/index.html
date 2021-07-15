@@ -4,7 +4,7 @@
 <meta name="description" content="" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<title>K8s-Pod简单介绍 | Esp0x</title>
+<title>安全工具 | Esp0x</title>
 
 <link rel="shortcut icon" href="https://esp0x.github.io/favicon.ico?v=1626314591380">
 
@@ -33,11 +33,11 @@
 <!--<script src="media/scripts/index.js"></script>-->
 
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.css">
 </head>
 <body>
 <div class="main gt-bg-theme-color-first">
-    <style>
+    <div class="main-content">
+        <style>
     /* 导航栏样式 */
     .navbar {
         position: relative;
@@ -198,157 +198,49 @@
         }
     }
 </script>
-    <div class="post-container">
-        <div class="post-detail gt-bg-theme-color-second">
-            <article class="gt-post-content">
-                <h2 class="post-title">
-                    K8s-Pod简单介绍
-                </h2>
-                <div class="post-info">
-                    <time class="post-time gt-c-content-color-first">
-                        · 2021-06-08 ·
-                    </time>
-                    
-                        <a href="https://esp0x.github.io/tag/wZhxXn6g4/" class="post-tags">
-                            # Kubernetes
-                        </a>
-                    
-                </div>
-                <div class="post-content">
-                    <h3 id="概念">概念</h3>
-<h5 id="在kubernetes集群中pod是所有业务类型的基础也是k8s管理的最小单位级它是一个或多个容器的组合-这些容器共享存储-网络和命名空间以及如何运行的规范-在pod中所有容器都被同一安排和调度并运行在共享的上下文中-对于具体应用而言pod是它们的逻辑主机pod包含业务相关的多个应用容器">在Kubernetes集群中，Pod是所有业务类型的基础，也是K8S管理的最小单位级，它是一个或多个容器的组合。这些容器共享存储、网络和命名空间，以及如何运行的规范。在Pod中，所有容器都被同一安排和调度，并运行在共享的上下文中。对于具体应用而言，Pod是它们的逻辑主机，Pod包含业务相关的多个应用容器。</h5>
-<h3 id="两个注意点">两个注意点</h3>
-<pre><code class="language-python">1.网络:
-  每一个Pod都会被指派一个唯一的Ip地址，在Pod中的每一个容器共享网络命名空间，包括Ip地址和网络端口。在同一个Pod中的容器可以同locahost进行互相通信。当Pod中的容器需要与Pod外的实体进行通信时，则需要通过端口等共享的网络资源。
-
-2.存储:
-  Pod能够被指定共享存储卷的集合，在Pod中所有的容器能够访问共享存储卷，允许这些容器共享数据。存储卷也允许在一个Pod持久化数据，以防止其中的容器需要被重启。
-</code></pre>
-<h3 id="pod的生命周期">Pod的生命周期</h3>
-<pre><code class="language-shel">一共有4种状态：
-
-1. Pending：APIserver已经创建该server，但pod中有一个或多个容器的镜像还未创建，可能在下载中；
-2. Running：Pod中的所有容器都已创建，且至少有一个容器处于运行状态，正在启动或重启状态；
-3. Failed：Pod内所有容器都已退出，其中至少有一个容器退出失败；
-4. Unknown：由于某种原因无法获取Pod的状态比如网络问题；
-</code></pre>
-<h3 id="pod的重启策略">Pod的重启策略</h3>
-<pre><code class="language-py">重启策略对同一个Pod中的所有容器起作用，容器的重启由Node上的kubelet执行，支持三种策略，在配置文件中通过restartPolicy字段设置：
-1. Always：只要退出就会重启
-2. OnFailure：只有在失败退出时，才会重启
-3. Never：只要退出，就不再重启
-
-注意，这里的重启是指在Pod的宿主Node上进行本地重启，而不是调度到其它Node上。
-</code></pre>
-<h3 id="健康检查">健康检查</h3>
-<pre><code class="language-shell"># 两种探针类型：
-一、LivenessProbe探针：  判断容器是否存活（running）
-1.ExecAction，在容器内部执行一个命令，状态返回码为0，表示健康，示例：
-apiVersion: v1
-kind: Pod
-metadata:
- name: liveness
-spec:
-  containers:
-  - name: liveness
-    image: liveness
-    args: 
-    - /bin/sh
-    - -c
-    - echo ok &gt; /tmp/healthy: sleep 10; rm - rf /tmp/healthy; sleep 600
-    livenessProbe:
-      exec:
-        command:
-        - cat
-        - /tmp/health
-    initialDelaySeconds: 15
-    timeoutSeconds: 1
-    
-2.TcpAction，通过IP和PORT，如果能够和容器建立连接则表示容器健康，示例：
-apiVersion: v1
-kind: Pod
-metadata:
- name: pod-with-healthcheck
-spec:
-  containers:
-  - name: nginx
-    image: nginx
-    ports:
-    - containerPort: 80
-    livenessProbe:
-      tcpSocket:
-        port: 80
-    initialDelaySeconds: 15
-    timeoutSeconds: 1
-3.HttpGetAction，发送get请求，返回码在200-400之间表示健康， 示例：
-apiVersion: v1
-kind: Pod
-metadata:
- name: pod-with-healthcheck
-spec:
-  containers:
-  - name: nginx
-    image: nginx
-    ports:
-    - containerPort: 80
-    livenessProbe:
-      httpGet:
-        path: /_status/healthz  //请求路径
-        port: 80
-    initialDelaySeconds: 15
-    timeoutSeconds: 1
-    
-二、ReadinessProbe探针： 用于判断容器是否启动完成（ready）
-</code></pre>
-<h3 id="pod的调度">Pod的调度</h3>
-<pre><code class="language-shell"># 定向调度，nodeSelector
-1.首先通过kubectl给node打上标签：
-格式： kubectl label nodes &lt;node-name&gt; &lt;label-key&gt;=&lt;label-value&gt;
-kubectl label nodes node1 zone=north
-
-2.在pod定义里选择某个node
-apiVersion: v1
-kind: Pod
-metadata:
-name: pod-with-healthcheck
-spec:
-containers:
-- name: nginx
-  image: nginx
-  ports:
-  - containerPort: 80
-nodeSelector:
-  zone: north
-
-# 亲和性和非亲和性
-一、Node affinity（节点亲和性）
-1. requiredDuringSchedulingIgnoredDuringExecution：
-可认为一种强制限制，如果 Node 的标签发生了变化导致其没有符合 Pod 的调度要求节点，那么pod调度就会失败。
-2.preferredDuringSchedulingIgnoredDuringExecution：
-软限或偏好，同样如果 Node 的标签发生了变化导致其不再符合 pod 的调度要求，pod 依然会调度运行。
-
-二、Pod Affinity（Pod亲和性）
-    podAffinity用于调度pod可以和哪些pod部署在同一拓扑结构之下。而podAntiAffinity相反，其用于规定pod不可以和哪些pod部署在同一拓扑结构下。通过pod affinity与anti-affinity来解决pod和pod之间的关系。
-</code></pre>
-
-                </div>
-            </article>
+        <div class="current-tag-container">
+            <h2 class="title gt-c-content-color-first">
+                #安全工具
+            </h2>
         </div>
-
+        <div class="post-list-container">
+    <div class="post-inner">
         
-            <div class="next-post">
-                <div class="next gt-c-content-color-first">下一篇</div>
-                <a href="https://esp0x.github.io/post/namespace-ji-ben-zhi-shi/" class="post-title gt-a-link">
-                    K8s-Namespace基本知识
-                </a>
+            <div class="post gt-bg-theme-color-second">
+                <div class="post-left">
+                    <div>
+                        
+                        <a href="https://esp0x.github.io/post/subdomainbrutepy-gong-ju-de-jian-dan-shi-yong-shuo-ming/">
+                            <span class="post-title gt-c-content-color-first">SubDomainBrute.py工具的简单使用说明</span>
+                        </a>
+                    </div>
+                    <div class="gt-post-content post-abstract gt-c-content-color-second">
+                        
+                    </div>
+                    <div class="post-info">
+                        <time class="post-time gt-c-content-color-first">
+                            发布于 · 2021-07-15 ·
+                        </time>
+                        
+                            <a href="https://esp0x.github.io/tag/tdcjZJ8GF/" class="post-tag">
+                                # 安全工具
+                            </a>
+                        
+                            <a href="https://esp0x.github.io/tag/a5GDIyqF3/" class="post-tag">
+                                # 信息安全
+                            </a>
+                        
+                    </div>
+                </div>
+                
             </div>
         
-
-        
-
-        
-
-        
+    </div>
+</div>
+        <div class="pagination-container">
+    
+    
+</div>
 
         <div class="site-footer gt-c-content-color-first">
     <div class="slogan gt-c-content-color-first">温故而知新</div>

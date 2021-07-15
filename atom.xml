@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://esp0x.github.io</id>
     <title>Esp0x</title>
-    <updated>2021-07-15T00:15:18.571Z</updated>
+    <updated>2021-07-15T02:03:15.954Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://esp0x.github.io"/>
     <link rel="self" href="https://esp0x.github.io/atom.xml"/>
@@ -10,6 +10,54 @@
     <logo>https://esp0x.github.io/images/avatar.png</logo>
     <icon>https://esp0x.github.io/favicon.ico</icon>
     <rights>All rights reserved 2021, Esp0x</rights>
+    <entry>
+        <title type="html"><![CDATA[SubDomainBrute.py工具的简单使用说明]]></title>
+        <id>https://esp0x.github.io/post/subdomainbrutepy-gong-ju-de-jian-dan-shi-yong-shuo-ming/</id>
+        <link href="https://esp0x.github.io/post/subdomainbrutepy-gong-ju-de-jian-dan-shi-yong-shuo-ming/">
+        </link>
+        <updated>2021-07-15T02:02:42.000Z</updated>
+        <content type="html"><![CDATA[<h3 id="安装方法">安装方法</h3>
+<pre><code class="language-shell"># git clone https://github.com/lijiejie/subDomainsBrute.git
+
+// python3 用户
+# pip3 install aiodns
+// python2 用户
+# pip install dnspython gevent
+
+// 字典路径
+# cd subDomainsBrute/dict
+# ls
+dns_servers.txt  next_sub_full.txt  next_sub.txt  subnames_all_5_letters.txt  subnames_full.txt  subnames.txt
+</code></pre>
+<h3 id="工具帮助说明">工具帮助说明</h3>
+<pre><code class="language-shell">Usage: subDomainsBrute.py [options] target.com
+
+Options:
+  --version             show program's version number and exit
+  -h, --help            show this help message and exit
+  -f FILE               File contains new line delimited subs, default is
+                        subnames.txt.
+  --full                Full scan, NAMES FILE subnames_full.txt will be used
+                        to brute
+  -i, --ignore-intranet
+                        Ignore domains pointed to private IPs
+  -w, --wildcard        Force scan after wildcard test fail
+  -t THREADS, --threads=THREADS
+                        Num of scan threads, 200 by default
+  -p PROCESS, --process=PROCESS
+                        Num of scan Process, 6 by default
+  -o OUTPUT, --output=OUTPUT
+                        Output file name. default is {target}.txt
+</code></pre>
+<h3 id="使用场景">使用场景</h3>
+<pre><code class="language-shell">// 简单扫描
+# python3 subDomainsBrute.py qq.com
+
+// 全量扫描,full参数会使用字典路径下的subnames_full.txt
+# python3 subDoaminBrute.py --full qq.com
+</code></pre>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Centos 7/8 使用chrony进行时间同步配置]]></title>
         <id>https://esp0x.github.io/post/centos-78-shi-yong-chrony-jin-xing-shi-jian-tong-bu-pei-zhi/</id>
@@ -495,31 +543,6 @@ docker run -d -p 3000:3000 \
 	
 # grafana模板，打开grafana.com, 点击dashborads，根据数据源和类型选择合适的模板
 
-</code></pre>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[如何拆除Linux软Raid设备]]></title>
-        <id>https://esp0x.github.io/post/ru-he-chai-chu-linux-ruan-raid-she-bei/</id>
-        <link href="https://esp0x.github.io/post/ru-he-chai-chu-linux-ruan-raid-she-bei/">
-        </link>
-        <updated>2021-04-20T08:11:37.000Z</updated>
-        <content type="html"><![CDATA[<pre><code class="language-shell">1. 卸载设备
-# umount /dev/md0
-
-2. 停止raid设备
-# mdadm -S /dev/md0  // 停止raid设备
-
-3. 查看属于raid组的设备名称
-# blkid 
-
-4. 从raid组中删除硬盘
-# mdadm --misc --zero-superblock /dev/xxx
-
-以下操作可选：
-5. 删除配置文件：rm -f /etc/mdadm.conf
-
-6. 更新/etc/fstab
 </code></pre>
 ]]></content>
     </entry>
