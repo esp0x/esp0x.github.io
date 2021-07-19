@@ -8,7 +8,7 @@
 <meta name="keywords" content="信息安全">
 <meta name="description" content="温故而知新">
 <meta name="theme-color" content="#000">
-<title>nc命令使用 | Esp0x</title>
+<title>CMSmap使用简单说明 | Esp0x</title>
 <link rel="shortcut icon" href="/favicon.ico?v=1626672860420">
 <link rel="stylesheet" href="/styles/main.css">
 <link rel="stylesheet" href="/media/css/muse.css">
@@ -29,8 +29,8 @@
 
 
 
-  <meta name="description" content="nc命令使用" />
-  <meta name="keywords" content="工具使用" />
+  <meta name="description" content="CMSmap使用简单说明" />
+  <meta name="keywords" content="安全工具,信息安全" />
 </head>
 
 <body>
@@ -218,9 +218,17 @@
 <ul>
 <li>
 <ul>
-<li><a href="#%E7%AB%AF%E5%8F%A3%E6%89%AB%E6%8F%8F">端口扫描</a></li>
-<li><a href="#%E7%9B%91%E5%90%AC%E7%AB%AF%E5%8F%A3">监听端口</a></li>
-<li><a href="#%E4%BC%A0%E8%BE%93%E6%96%87%E4%BB%B6">传输文件</a></li>
+<li><a href="#%E5%AE%89%E8%A3%85">安装</a></li>
+<li><a href="#%E5%8A%9F%E8%83%BD%E7%AE%80%E4%BB%8B">功能简介</a>
+<ul>
+<li><a href="#1-%E6%A3%80%E6%B5%8B%E7%9B%AE%E6%A0%87%E7%BD%91%E7%AB%99%E7%9A%84cms%E7%B1%BB%E5%9E%8B%E6%94%AF%E6%8C%81wordpress-joomla-drupal%E7%AD%89%E6%8F%92%E4%BB%B6">1. 检测目标网站的CMS类型，支持wordpress、joomla、drupal等插件</a></li>
+<li><a href="#2-%E6%94%AF%E6%8C%81%E5%A4%9A%E7%BA%BF%E7%A8%8B%E6%89%AB%E6%8F%8F">2. 支持多线程扫描</a></li>
+<li><a href="#3-%E9%9B%86%E6%88%90%E4%BA%86%E6%9A%B4%E5%8A%9B%E7%A0%B4%E8%A7%A3%E6%A8%A1%E5%9D%97">3. 集成了暴力破解模块</a></li>
+<li><a href="#4-%E5%88%A9%E7%94%A8exploit-db%E6%95%B0%E6%8D%AE%E5%BA%93%E8%BF%9B%E8%A1%8C%E6%BC%8F%E6%B4%9E%E6%8F%92%E4%BB%B6%E7%9A%84%E6%A3%80%E6%B5%8B">4. 利用exploit-db数据库进行漏洞插件的检测</a></li>
+</ul>
+</li>
+<li><a href="#%E5%B8%AE%E5%8A%A9%E4%BF%A1%E6%81%AF">帮助信息</a></li>
+<li><a href="#%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF">使用场景</a></li>
 </ul>
 </li>
 </ul>
@@ -490,8 +498,8 @@
           <div class="section bg-color post post-page">
             <header class="post-header">
   <h1 class="post-title">
-    <a class="post-title-link" href="https://esp0x.github.io/post/nc-ming-ling-shi-yong/">
-      nc命令使用
+    <a class="post-title-link" href="https://esp0x.github.io/post/cmsmap-shi-yong-jian-dan-shuo-ming/">
+      CMSmap使用简单说明
     </a>
   </h1>
   <div class="post-meta">
@@ -499,7 +507,7 @@
     <span class="meta-item pc-show">
       <i class="fa fa-calendar-o"></i>
       <span>发布于</span>
-      <span>2021-02-03</span>
+      <span>2021-07-19</span>
       <span class="post-meta-divider pc-show">|</span>
     </span>
     
@@ -508,8 +516,14 @@
       <span class="pc-show">分类于</span>
       
       
-      <a href="https://esp0x.github.io/tag/ETGdbG1UX/">
-        <span>工具使用</span>
+      <a href="https://esp0x.github.io/tag/tdcjZJ8GF/">
+        <span>安全工具</span>
+      </a>、
+      
+      
+      
+      <a href="https://esp0x.github.io/tag/a5GDIyqF3/">
+        <span>信息安全</span>
       </a>
       
       
@@ -518,17 +532,17 @@
     
     <span class="meta-item">
       <i class="fa fa-clock-o"></i>
-      <span>1分钟</span>
+      <span>3分钟</span>
     </span>
     <span class="meta-item">
       <span class="post-meta-divider">|</span>
       <i class="fa fa-file-word-o"></i>
-      <span>94<span class="pc-show">字数</span></span>
+      <span>491<span class="pc-show">字数</span></span>
     </span>
     
     
     
-    <span id="/post/nc-ming-ling-shi-yong/" data-flag-title="nc命令使用" class="meta-item pc-show leancloud_visitors">
+    <span id="/post/cmsmap-shi-yong-jian-dan-shuo-ming/" data-flag-title="CMSmap使用简单说明" class="meta-item pc-show leancloud_visitors">
       <span class="post-meta-divider">|</span>
       <i class="fa fa-eye"></i>
       <span>浏览量：<span class="leancloud-visitors-count"></span></span>
@@ -537,22 +551,73 @@
   </div>
 </header>
             <div class="post-body next-md-body" id="post_body">
-              <h3 id="端口扫描">端口扫描</h3>
-<pre><code class="language-shell"># nc -vz -w 5 127.0.0.1 1-1024   // 扫描本地1-1024端口范围
+              <h3 id="安装">安装</h3>
+<pre><code class="language-shell">git clone https://github.com/Dionach/CMSmap
+cd CMSmap
+pip3 install .
 </code></pre>
-<h3 id="监听端口">监听端口</h3>
-<pre><code class="language-shell"># nc -l 8000     // 监听TCP端口
-# nc -ul 9999    // 监听UDP端口
-# nc -vuz 127.0.0.1 9999   // 测试本地UDP端口
-</code></pre>
-<h3 id="传输文件">传输文件</h3>
-<pre><code class="language-shell">1.上传
-# nc -l 9999 &gt; filename
-# nc 127.0.0.1 9999 &lt; source
+<h3 id="功能简介">功能简介</h3>
+<h4 id="1-检测目标网站的cms类型支持wordpress-joomla-drupal等插件">1. 检测目标网站的CMS类型，支持wordpress、joomla、drupal等插件</h4>
+<h4 id="2-支持多线程扫描">2. 支持多线程扫描</h4>
+<h4 id="3-集成了暴力破解模块">3. 集成了暴力破解模块</h4>
+<h4 id="4-利用exploit-db数据库进行漏洞插件的检测">4. 利用exploit-db数据库进行漏洞插件的检测</h4>
+<h3 id="帮助信息">帮助信息</h3>
+<pre><code class="language-shell">usage: cmsmap [-f W/J/D] [-F] [-t] [-a] [-H] [-i] [-o] [-E] [-d] [-u] [-p]
+              [-x] [-k] [-w] [-v] [-h] [-D] [-U W/J/D]
+              [target]
 
-2.下载
-# nc -l 9999 &lt; filename
-# nc 127.0.0.1 9999 &gt; target
+CMSmap tool v1.0 - Simple CMS Scanner
+Author: Mike Manzotti
+
+Scan:
+  target                target URL (e.g. 'https://example.com:8080/')
+  -f W/J/D, --force W/J/D
+                        force scan (W)ordpress, (J)oomla or (D)rupal
+  -F, --fullscan        full scan using large plugin lists. False positives and slow!
+  -t , --threads        number of threads (Default 5)
+  -a , --agent          set custom user-agent
+  -H , --header         add custom header (e.g. 'Authorization: Basic ABCD...')
+  -i , --input          scan multiple targets listed in a given file
+  -o , --output         save output in a file
+  -E, --noedb           enumerate plugins without searching exploits
+  -c, --nocleanurls     disable clean urls for Drupal only
+  -s, --nosslcheck      don't validate the server's certificate
+  -d, --dictattack      run low intense dictionary attack during scanning (5 attempts per user)
+
+Brute-Force:
+  -u , --usr            username or username file
+  -p , --psw            password or password file
+  -x, --noxmlrpc        brute forcing WordPress without XML-RPC
+
+Post Exploitation:
+  -k , --crack          password hashes file (Require hashcat installed. For WordPress and Joomla only)
+  -w , --wordlist       wordlist file
+
+Others:
+  -v, --verbose         verbose mode (Default false)
+  -h, --help            show this help message and exit
+  -D, --default         rum CMSmap with default options
+  -U, --update          use (C)MSmap, (P)lugins or (PC) for both
+
+Examples:
+  cmsmap.py https://example.com
+  cmsmap.py https://example.com -f W -F --noedb -d
+  cmsmap.py https://example.com -i targets.txt -o output.txt
+  cmsmap.py https://example.com -u admin -p passwords.txt
+  cmsmap.py -k hashes.txt -w passwords.txt
+</code></pre>
+<h3 id="使用场景">使用场景</h3>
+<pre><code class="language-shell">// 默认参数执行，第一次执行会下载很多插件
+# ./cmsmap.py http://www.wordpress.com
+
+// 使用admin用户进行暴力破解，后面-v和-o不是必须的
+# ./cmsmap.py http://www.wordpress.com -u admin -p &lt;字典路径&gt; -v -o &lt;结果保持的路径&gt;
+
+// 同时扫描多个目标
+# ./cmsmap.py http://www.wordpress.com -i &lt;目标文件路径&gt; -u admin -p &lt;字典路径&gt; -v -o &lt;结果保持的路径&gt;
+
+// 注意：子弹和目标文件都是一行一个
+// 其他使用方法待后续更新......
 </code></pre>
 
             </div>
@@ -564,7 +629,7 @@
     </li>
     <li class="post-copyright-link">
       <strong>本文链接：</strong>
-      <a href="https://esp0x.github.io/post/nc-ming-ling-shi-yong/" title="nc命令使用">https://esp0x.github.io/post/nc-ming-ling-shi-yong/</a>
+      <a href="https://esp0x.github.io/post/cmsmap-shi-yong-jian-dan-shuo-ming/" title="CMSmap使用简单说明">https://esp0x.github.io/post/cmsmap-shi-yong-jian-dan-shuo-ming/</a>
     </li>
     <li class="post-copyright-license">
       <strong>版权声明： </strong>
@@ -573,21 +638,19 @@
   </ul>
   <div class="tags">
     
-      <a href="https://esp0x.github.io/tag/ETGdbG1UX/"># 工具使用</a>
+      <a href="https://esp0x.github.io/tag/tdcjZJ8GF/"># 安全工具</a>
+    
+      <a href="https://esp0x.github.io/tag/a5GDIyqF3/"># 信息安全</a>
     
   </div>
   <div class="nav">
     <div class="nav-prev">
       
-        <i class="fa fa-chevron-left"></i>
-        <a class="nav-pc-next" title="Nginx配置文件详解" href="https://esp0x.github.io/post/nginx-pei-zhi-wen-jian-xiang-jie/">Nginx配置文件详解</a class="nav-pc-next">
-        <a class="nav-mobile-prev" title="Nginx配置文件详解" href="https://esp0x.github.io/post/nginx-pei-zhi-wen-jian-xiang-jie/">上一篇</a>
-      
     </div>
     <div class="nav-next">
       
-        <a class="nav-pc-next" title="StorCLI工具使用说明" href="https://esp0x.github.io/post/storcli-gong-ju-shi-yong-shuo-ming/">StorCLI工具使用说明</a>
-        <a class="nav-mobile-next" title="StorCLI工具使用说明" href="https://esp0x.github.io/post/storcli-gong-ju-shi-yong-shuo-ming/">下一篇</a>
+        <a class="nav-pc-next" title="MSF中使用枚举模块进行各种服务登陆的破解" href="https://esp0x.github.io/post/msf-zhong-shi-yong-mei-ju-mo-kuai-jin-xing-ge-chong-fu-wu-deng-lu-de-po-jie/">MSF中使用枚举模块进行各种服务登陆的破解</a>
+        <a class="nav-mobile-next" title="MSF中使用枚举模块进行各种服务登陆的破解" href="https://esp0x.github.io/post/msf-zhong-shi-yong-mei-ju-mo-kuai-jin-xing-ge-chong-fu-wu-deng-lu-de-po-jie/">下一篇</a>
         <i class="fa fa-chevron-right"></i>
       
     </div>

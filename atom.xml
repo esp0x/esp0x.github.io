@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://esp0x.github.io</id>
     <title>Esp0x</title>
-    <updated>2021-07-16T04:42:05.287Z</updated>
+    <updated>2021-07-19T05:34:29.425Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://esp0x.github.io"/>
     <link rel="self" href="https://esp0x.github.io/atom.xml"/>
@@ -10,6 +10,82 @@
     <logo>https://esp0x.github.io/images/avatar.png</logo>
     <icon>https://esp0x.github.io/favicon.ico</icon>
     <rights>All rights reserved 2021, Esp0x</rights>
+    <entry>
+        <title type="html"><![CDATA[CMSmap使用简单说明]]></title>
+        <id>https://esp0x.github.io/post/cmsmap-shi-yong-jian-dan-shuo-ming/</id>
+        <link href="https://esp0x.github.io/post/cmsmap-shi-yong-jian-dan-shuo-ming/">
+        </link>
+        <updated>2021-07-19T05:31:40.000Z</updated>
+        <content type="html"><![CDATA[<h3 id="安装">安装</h3>
+<pre><code class="language-shell">git clone https://github.com/Dionach/CMSmap
+cd CMSmap
+pip3 install .
+</code></pre>
+<h3 id="功能简介">功能简介</h3>
+<h4 id="1-检测目标网站的cms类型支持wordpress-joomla-drupal等插件">1. 检测目标网站的CMS类型，支持wordpress、joomla、drupal等插件</h4>
+<h4 id="2-支持多线程扫描">2. 支持多线程扫描</h4>
+<h4 id="3-集成了暴力破解模块">3. 集成了暴力破解模块</h4>
+<h4 id="4-利用exploit-db数据库进行漏洞插件的检测">4. 利用exploit-db数据库进行漏洞插件的检测</h4>
+<h3 id="帮助信息">帮助信息</h3>
+<pre><code class="language-shell">usage: cmsmap [-f W/J/D] [-F] [-t] [-a] [-H] [-i] [-o] [-E] [-d] [-u] [-p]
+              [-x] [-k] [-w] [-v] [-h] [-D] [-U W/J/D]
+              [target]
+
+CMSmap tool v1.0 - Simple CMS Scanner
+Author: Mike Manzotti
+
+Scan:
+  target                target URL (e.g. 'https://example.com:8080/')
+  -f W/J/D, --force W/J/D
+                        force scan (W)ordpress, (J)oomla or (D)rupal
+  -F, --fullscan        full scan using large plugin lists. False positives and slow!
+  -t , --threads        number of threads (Default 5)
+  -a , --agent          set custom user-agent
+  -H , --header         add custom header (e.g. 'Authorization: Basic ABCD...')
+  -i , --input          scan multiple targets listed in a given file
+  -o , --output         save output in a file
+  -E, --noedb           enumerate plugins without searching exploits
+  -c, --nocleanurls     disable clean urls for Drupal only
+  -s, --nosslcheck      don't validate the server's certificate
+  -d, --dictattack      run low intense dictionary attack during scanning (5 attempts per user)
+
+Brute-Force:
+  -u , --usr            username or username file
+  -p , --psw            password or password file
+  -x, --noxmlrpc        brute forcing WordPress without XML-RPC
+
+Post Exploitation:
+  -k , --crack          password hashes file (Require hashcat installed. For WordPress and Joomla only)
+  -w , --wordlist       wordlist file
+
+Others:
+  -v, --verbose         verbose mode (Default false)
+  -h, --help            show this help message and exit
+  -D, --default         rum CMSmap with default options
+  -U, --update          use (C)MSmap, (P)lugins or (PC) for both
+
+Examples:
+  cmsmap.py https://example.com
+  cmsmap.py https://example.com -f W -F --noedb -d
+  cmsmap.py https://example.com -i targets.txt -o output.txt
+  cmsmap.py https://example.com -u admin -p passwords.txt
+  cmsmap.py -k hashes.txt -w passwords.txt
+</code></pre>
+<h3 id="使用场景">使用场景</h3>
+<pre><code class="language-shell">// 默认参数执行，第一次执行会下载很多插件
+# ./cmsmap.py http://www.wordpress.com
+
+// 使用admin用户进行暴力破解，后面-v和-o不是必须的
+# ./cmsmap.py http://www.wordpress.com -u admin -p &lt;字典路径&gt; -v -o &lt;结果保持的路径&gt;
+
+// 同时扫描多个目标
+# ./cmsmap.py http://www.wordpress.com -i &lt;目标文件路径&gt; -u admin -p &lt;字典路径&gt; -v -o &lt;结果保持的路径&gt;
+
+// 注意：子弹和目标文件都是一行一个
+// 其他使用方法待后续更新......
+</code></pre>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[MSF中使用枚举模块进行各种服务登陆的破解]]></title>
         <id>https://esp0x.github.io/post/msf-zhong-shi-yong-mei-ju-mo-kuai-jin-xing-ge-chong-fu-wu-deng-lu-de-po-jie/</id>
@@ -524,38 +600,6 @@ minikube start
 # 查看集群信息
 kubectl cluster-info
 
-</code></pre>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[Ansible-Playbook中使用copy来传输文件]]></title>
-        <id>https://esp0x.github.io/post/playbook-zhong-shi-yong-copy-lai-chuan-shu-wen-jian/</id>
-        <link href="https://esp0x.github.io/post/playbook-zhong-shi-yong-copy-lai-chuan-shu-wen-jian/">
-        </link>
-        <updated>2021-06-07T09:27:30.000Z</updated>
-        <content type="html"><![CDATA[<h3 id="基本配置示例">基本配置示例</h3>
-<pre><code class="language-shell">- hosts: all
-    vars: 
-      wss_url: http://10.77.10.125:8545 
-    tasks:
-      - name: &quot;推送配置文件&quot;
-        template: src=/home/fm/ops/scripts/default.yaml dest=/etc/bee/default.yaml
-      - name: &quot;send all scripts&quot;
-        copy:
-          src: '{{ item.src }}'
-          dest: /tmp/
-          owner: root
-          group: root
-          mode: 755
-        with_items:
-          - { src: '/home/fm/ops/scripts/start05.sh' }
-          - { src: '/home/fm/ops/scripts/stop.sh' }
-  
- 
-# 使用{{ item.src }}读取with_items中的数组元素，访问需要拷贝的每一个文件即可。
-
-# 检查语法
-ansible-playbook --syntax-check example.yaml
 </code></pre>
 ]]></content>
     </entry>
