@@ -8,7 +8,7 @@
 <meta name="keywords" content="信息安全">
 <meta name="description" content="温故而知新">
 <meta name="theme-color" content="#000">
-<title>Mysql主从复制原理 | Esp0x</title>
+<title>Esp0x</title>
 <link rel="shortcut icon" href="/favicon.ico?v=1626741028710">
 <link rel="stylesheet" href="/styles/main.css">
 <link rel="stylesheet" href="/media/css/muse.css">
@@ -29,8 +29,6 @@
 
 
 
-  <meta name="description" content="Mysql主从复制原理" />
-  <meta name="keywords" content="mysql" />
 </head>
 
 <body>
@@ -66,7 +64,7 @@
             
               
             
-            <li class="nav-item ">
+            <li class="nav-item nav-item-active">
               
               
                 <a href="/" target="_self">
@@ -158,24 +156,8 @@
     <div
       class="section-layout muse bg-color">
       <div class="section-layout-wrapper">
-        
-
-<div class="sidebar">
-  
-    <div class="sidebar-box box-shadow-wrapper  right-motion" id="sidebar">
-      
-        <div class="post-list-sidebar">
-          <div class="sidebar-title">
-            <span id="tocSideBar" class="sidebar-title-item sidebar-title-active">文章目录</span>
-            <span id="metaSideBar" class="sidebar-title-item">站点概览</span>
-          </div>
-        </div>
-      
-      <div class="sidebar-body muse" id="sidebar_body">
-        
-          
-            <div class="post-side-meta" id="post_side_meta">
-              
+        <div id="sidebarMeta" class="sidebar">
+    
 <div class="sidebar-wrapper box-shadow-wrapper ">
   <div class="sidebar-item">
     <img class="site-author-image right-motion" src="/images/avatar.png"/>
@@ -208,296 +190,27 @@
 
 
 </div>
-            </div>
-            <div class="post-toc sidebar-body-active" id="post_toc" style="opacity: 1;">
-              <div class="toc-box right-motion">
-  <div class="toc-wrapper auto-number auto"
-    id="toc_wrapper">
-    <ul class="markdownIt-TOC">
-<li>
-<ul>
-<li>
-<ul>
-<li><a href="#%E5%8E%9F%E7%90%86%E5%9B%BE%E5%A6%82%E4%B8%8B">原理图如下：</a></li>
-</ul>
-</li>
-<li><a href="#%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6%E6%B5%81%E7%A8%8B%E8%AF%A6%E8%A7%A3">主从复制流程详解：</a></li>
-<li><a href="#%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6%E5%BD%A2%E5%BC%8F">主从复制形式：</a></li>
-<li><a href="#%E4%B8%BB%E4%BB%8E%E5%90%8C%E6%AD%A5%E5%BB%B6%E6%97%B6%E5%88%86%E6%9E%90">主从同步延时分析：</a></li>
-<li><a href="#%E5%BB%B6%E6%97%B6%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95">延时解决办法：</a></li>
-<li><a href="#57%E7%89%88%E6%9C%AC%E5%90%8E%E7%9A%84%E5%B9%B6%E8%A1%8C%E5%A4%8D%E5%88%B6%E7%AD%96%E7%95%A5">5.7版本后的并行复制策略</a><br>
-*
-<ul>
-<li><a href="#redo-log%E7%9A%84%E4%B8%A4%E9%98%B6%E6%AE%B5%E6%8F%90%E4%BA%A4">Redo log的两阶段提交</a></li>
-<li><a href="#%E5%B9%B6%E8%A1%8C%E5%A4%8D%E5%88%B6%E7%9A%84%E6%80%9D%E6%83%B3">并行复制的思想</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-
-  </div>
 </div>
-
 <script>
-
-  let lastTop = 0, lList = [], hList = [], postBody, lastIndex = -1;
-  let active = 'active-show', activeClass = 'active-current';
-  let tocWrapper = document.querySelector('#toc_wrapper');
-  let tocContent = tocWrapper.children[0];
-  let autoNumber = tocWrapper && tocWrapper.classList.contains('auto-number');
-
-  function addTocNumber(elem, deep) {
-    if (!elem) {
-      return;
-    }
-    let prop = elem.__proto__;
-
-    if (prop === HTMLUListElement.prototype) {
-      for (let i = 0; i < elem.children.length; i++) {
-        addTocNumber(elem.children[i], deep + (i + 1) + '.');
+  let sidebarMeta = document.querySelector('#sidebarMeta');
+  let scheme = 'muse';
+  let sidebarWrapper = document.querySelector('.sidebar-wrapper');
+  if (sidebarMeta && (scheme === 'pisces' || scheme === 'gemini')) {
+    document.addEventListener('scroll', function(e) {
+      if (document.scrollingElement.scrollTop > parseInt(sidebarMeta.style.marginTop) + 10) {
+        sidebarWrapper.classList.add('home-sidebar-fixed')
+      } else {
+        sidebarWrapper.classList.remove('home-sidebar-fixed')
       }
-    } else if (prop === HTMLLIElement.prototype) {
-      // 保存li元素
-      if (elem.children[0].__proto__ === HTMLAnchorElement.prototype) {
-        lList.push(elem);
-      }
-      for (let i = 0; i < elem.children.length; i++) {
-        let cur = elem.children[i];
-        if (cur.__proto__ === HTMLAnchorElement.prototype) {
-          if (autoNumber) {
-            cur.text = deep + ' ' + cur.text;
-          }
-        } else if (cur.__proto__ === HTMLUListElement.prototype) {
-          addTocNumber(cur, deep);
-        }
-      }
-    }
-  }
-
-  function removeParentActiveClass() {
-    let parents = tocContent.querySelectorAll('.' + active)
-    parents.forEach(function (elem) {
-      elem.classList.remove(active);
     });
   }
-
-  function addActiveClass(index) {
-    if (index >= 0 && index < hList.length) {
-      lList[index].classList.add(activeClass);
-    }
-  }
-
-  function removeActiveClass(index) {
-    if (index >= 0 && index < hList.length) {
-      lList[index].classList.remove(activeClass);
-    }
-  }
-
-  function addActiveLiElemment(elem, parent) {
-    if (!elem || elem === parent) {
-      return;
-    } else {
-      if (elem.__proto__ === HTMLLIElement.prototype) {
-        elem.classList.add(active);
-      }
-      addActiveLiElemment(elem.parentElement, parent);
-    }
-  }
-
-  function showToc() {
-    if (tocWrapper) {
-      postBody = document.querySelector('#post_body');
-      for (let i = 0; i < postBody.children.length; i++) {
-        if (postBody.children[i].__proto__ === HTMLHeadingElement.prototype) {
-          hList.push(postBody.children[i]);
-        }
-      }
-      if (tocWrapper.classList.contains('compress')) {
-        tocContent.classList.add('closed');
-      } else if (tocWrapper.classList.contains('no_compress')) {
-        tocContent.classList.add('expanded');
-      } else {
-        if (hList.length > 10) {
-          active = 'active-hidden'
-          tocContent.classList.add('closed');
-        } else {
-          tocContent.classList.add('expanded');
-        }
-      }
-    }
-  }
-
-  (function () {
-    // 处理不是从#一级标题开始目录
-    if (tocContent.children.length === 1 && tocContent.children[0].__proto__ === HTMLLIElement.prototype) {
-      let con = tocContent.children[0].children[0];
-      tocContent.innerHTML = con.innerHTML;
-    }
-    let markdownItTOC = document.querySelector('.markdownIt-TOC');
-    let innerHeight = window.innerHeight;
-    markdownItTOC.style = `max-height: ${innerHeight - 80 > 0 ? innerHeight - 80 : innerHeight}px`
-    addTocNumber(tocContent, '');
-  })();
-
-  document.addEventListener('scroll', function (e) {
-    if (lList.length <= 0) {
-      return;
-    }
-    let scrollTop = document.scrollingElement.scrollTop + 10;
-    let dir;
-
-    if (lastTop - scrollTop > 0) {
-      dir = 'up';
-    } else {
-      dir = 'down';
-    }
-
-    lastTop = scrollTop;
-    if (scrollTop <= 0) {
-      if (lastIndex >= 0 && lastIndex < hList.length) {
-        lList[lastIndex].classList.remove(activeClass);
-      }
-      return;
-    }
-
-    let current = 0, hasFind = false;
-    for (let i = 0; i < hList.length; i++) {
-      if (hList[i].offsetTop > scrollTop) {
-        current = i;
-        hasFind = true;
-        break;
-      }
-    }
-    if (!hasFind && scrollTop > lList[lList.length - 1].offsetTop) {
-      current = hList.length - 1;
-    } else {
-      current--;
-    }
-    if (dir === 'down') {
-      if (current > lastIndex) {
-        addActiveClass(current);
-        removeActiveClass(lastIndex)
-        lastIndex = current;
-        removeParentActiveClass();
-        lList[current] && addActiveLiElemment(lList[current].parentElement, tocContent);
-      }
-    } else {
-      if (current < lastIndex) {
-        addActiveClass(current);
-        removeActiveClass(lastIndex);
-        lastIndex = current;
-        removeParentActiveClass();
-        lList[current] && addActiveLiElemment(lList[current].parentElement, tocContent);
-      }
-    }
-  });
-
-
-  window.addEventListener('load', function () {
-    showToc();
-    document.querySelector('#sidebar').style = 'display: block;';
-    tocWrapper.classList.add('toc-active');
-    setTimeout(function () {
-      if ("createEvent" in document) {
-        let evt = document.createEvent("HTMLEvents");
-        evt.initEvent("scroll", false, true);
-        document.dispatchEvent(evt);
-      }
-      else {
-        document.fireEvent("scroll");
-      }
-    }, 500)
-  })
-
-</script>
-            </div>
-          
-        
-      </div>
-    </div>
-  
-</div>
-<script>
-  const SIDEBAR_TITLE_ACTIVE = 'sidebar-title-active';
-  const SIDEBAR_BODY_ACTIVE = 'sidebar-body-active';
-  const SLIDE_UP_IN = 'slide-up-in';
-
-  let sidebar = document.querySelector('#sidebar'),
-  tocSideBar = document.querySelector('#tocSideBar'),
-  metaSideBar = document.querySelector('#metaSideBar'),
-  postToc = document.querySelector('#post_toc'),
-  postSiteMeta = document.querySelector('#post_side_meta'),
-  sidebarTitle = document.querySelector('.sidebar-title'),
-  sidebarBody = document.querySelector('#sidebar_body');
-
-  tocSideBar && tocSideBar.addEventListener('click', (e) => {
-    toggleSidebar(e);
-  });
-
-  metaSideBar && metaSideBar.addEventListener('click', (e) => {
-    toggleSidebar(e);
-  });
-
-  function toggleSidebar(e) {
-    let currentTitle = document.querySelector("."+SIDEBAR_TITLE_ACTIVE);
-    if (currentTitle == e.srcElement) {
-      return ;
-    }
-    let current, showElement, hideElement;
-    if (e.srcElement == metaSideBar) {
-      showElement = postSiteMeta;
-      hideElement = postToc;
-    } else if (e.srcElement == tocSideBar){
-      showElement = postToc;
-      hideElement = postSiteMeta;
-    }
-    currentTitle.classList.remove(SIDEBAR_TITLE_ACTIVE);
-    e.srcElement.classList.add(SIDEBAR_TITLE_ACTIVE);
-
-    window.Velocity(hideElement, 'stop');
-    window.Velocity(hideElement, 'transition.slideUpOut', {
-      display: 'none',
-      duration: 200,
-      complete: function () {
-        window.Velocity(showElement, 'transition.slideDownIn', {
-          duration: 200
-        });
-      }
-    })
-    hideElement.classList.remove(SIDEBAR_BODY_ACTIVE);
-    showElement.classList.add(SIDEBAR_BODY_ACTIVE);
-  }
-
-  postToc && postToc.addEventListener('transitionend', function() {
-    this.classList.remove(SLIDE_UP_IN);
-  });
-
-  if (sidebarBody) {
-    if (sidebarBody.classList.contains('pisces') || sidebarBody.classList.contains('gemini')) {
-      let hasFix = false;
-      let scrollEl = document.querySelector('.main-continer');
-      let limitTop = document.querySelector('#nav_ul').children.length * 42 + 162;
-      window.addEventListener('scroll', function(e) {
-        if (document.scrollingElement.scrollTop >= limitTop) {
-          if (!hasFix) {
-            sidebar.classList.add('sidebar-fixed');
-            hasFix = true;
-          }
-        } else {
-          if (hasFix) {
-            sidebar.classList.remove('sidebar-fixed');
-            hasFix = false;
-          }
-        }
-      });
-    }
-  }
-  
-</script>
-        <div class="section-box box-shadow-wrapper">
-          <div class="section bg-color post post-page">
-            <header class="post-header">
+  </script>
+        <div class="section-box muse">
+          <section class="section bg-color posts-expand slide-down-in">
+            
+  <article class="post-list-box bg-color post box-shadow-wrapper">
+    <div class="article-wrapper bg-color">
+      <header class="post-header">
   <h1 class="post-title">
     <a class="post-title-link" href="https://esp0x.github.io/post/mysql-zhu-cong-fu-zhi-yuan-li/">
       Mysql主从复制原理
@@ -535,147 +248,71 @@
       <span>922<span class="pc-show">字数</span></span>
     </span>
     
-    
-    
-    <span id="/post/mysql-zhu-cong-fu-zhi-yuan-li/" data-flag-title="Mysql主从复制原理" class="meta-item pc-show leancloud_visitors">
-      <span class="post-meta-divider">|</span>
-      <i class="fa fa-eye"></i>
-      <span>浏览量：<span class="leancloud-visitors-count"></span></span>
-    </span>
-    
   </div>
 </header>
-            <div class="post-body next-md-body" id="post_body">
-              <h3 id="原理图如下">原理图如下：</h3>
-<figure data-type="image" tabindex="1"><img src="https://esp0x.github.io/post-images/1610671157156.png" alt="" loading="lazy"></figure>
-<h2 id="主从复制流程详解">主从复制流程详解：</h2>
-<ol>
-<li>master库发生数据改变时，会将改变写入binglog日志；</li>
-<li>slave库会在一定时间间隔内对master的binlog进行检测以确定是否发生改变，如果发生改变，则开始一个IO thread请求master二进制事件；</li>
-<li>同时，master为每一个过来请求的IO thread开启一个dump线程，用于将二进制事件发送给IO thread，slave的IO thread将此二进制事件写入本地relay log（中继日志）中，并开启SQL thread从中继日志中读取二进制日志，在本地进行重放（replay），从而使得本地数据与master保持一致；最后IO thread和SQL thread进入睡眠状态，等待下次唤醒。</li>
-</ol>
-<h2 id="主从复制形式">主从复制形式：</h2>
-<ol>
-<li>主从</li>
-<li>主主</li>
-<li>一主多从</li>
-<li>多主一从</li>
-<li>联级复制</li>
-</ol>
-<h2 id="主从同步延时分析">主从同步延时分析：</h2>
-<ol>
-<li>master对所有DDL和DML产生的日志都写入binlog，由于是顺序写，所以效率很高；反之，slave的SQL thread进行relay log的重放时，DML和DDL的IO是随机的，不是顺序，所以成本较高，这里会增加一部分延时；</li>
-<li>由于SQL thread是单线程的，当master的并发较高时，过多的DML可能会导致slave的SQL thread来不及处理，这里会增加一部分延时；</li>
-<li>slave中有部分SQL产生了锁等待，这种情况就是slave有一些读请求与重放请求产生了锁冲突导致的，也会增加延时；</li>
-<li>slave在充当读库角色的时候，如果查询访问压力过大，会消耗部分系统资源，影响同步效率；</li>
-<li>大事务执行，即当master有大事务执行时，比如执行了10分钟，binlog写入必须要等待事务处理完毕，那么slave开始进行同步的时候就已经延时10分钟了；</li>
-</ol>
-<h2 id="延时解决办法">延时解决办法：</h2>
-<ol>
-<li>业务层实现读写分离，一主多从，主写从读，分散压力；</li>
-<li>业务层和数据库层之间加入缓存策略，降低直接对数据库的读压力；频繁写的场景不适合加缓存，会导致缓存命中降低；</li>
-<li>升级硬件；</li>
-<li>MTS问题，即多线程的slave，从5.6版本开始支持，针对不同粒度（库、表、行）设置并行同步；</li>
-</ol>
-<h2 id="57版本后的并行复制策略">5.7版本后的并行复制策略</h2>
-<h4 id="redo-log的两阶段提交">Redo log的两阶段提交</h4>
-<ul>
-<li>先写redo，再写binlog：假设在redo写完，binlog还没有写完的时候，Mysql进程异常重启，这时仍然能够通过redo log恢复数据，但由于binlog没有这条记录，所以之后备份日志的时候，binlog是缺失这条记录的，以后需要用binlog恢复数据时，就会缺少一条数据的更新；</li>
-<li>先写binlog，再写redo log：如果binlog写完后crash，由于redo log还没写，崩溃恢复后这个事务无效，但是binlog有记录，以后用这个binlog恢复数据时，就会多出一条更新记录；</li>
-<li>二阶段提交：使用二阶段提交时，会综合redo和binlog的状态进行处理，如果写入binlog之前crash，那么由于redo处于prepare阶段，只需要对当前事务进行回滚即可；如果写入binlog之后crash，那么由于redo处于prepare阶段，只需要对当前事务进行提交即可。</li>
-</ul>
-<h4 id="并行复制的思想">并行复制的思想</h4>
-<ol>
-<li>同时处于prepare状态的事务，在备库执行是可以并行的；</li>
-<li>处于prepare状态的事务，与处于commit状态的事务之间，在备库执行也是可以并行的；</li>
-<li>binlog_group_commit_sync_delay参数，表示延迟多少微妙后才调用fsync；</li>
-<li>binlog_group_commit_sync_no_delay_count参数，表示累积多少次以后才调用fsync；</li>
-</ol>
-
-            </div>
-            <div class="post-footer">
-  <ul class="post-copyright">
-    <li class="post-copyright-author">
-      <strong>本文作者：</strong>
-      jiffies@live.com
-    </li>
-    <li class="post-copyright-link">
-      <strong>本文链接：</strong>
-      <a href="https://esp0x.github.io/post/mysql-zhu-cong-fu-zhi-yuan-li/" title="Mysql主从复制原理">https://esp0x.github.io/post/mysql-zhu-cong-fu-zhi-yuan-li/</a>
-    </li>
-    <li class="post-copyright-license">
-      <strong>版权声明： </strong>
-      本博客所有文章除特别声明外，均采用<a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i> BY-NC-SA</a> 许可协议。转载请注明出处！
-    </li>
-  </ul>
-  <div class="tags">
-    
-      <a href="https://esp0x.github.io/tag/lEg5TWDNv/"># mysql</a>
-    
-  </div>
-  <div class="nav">
-    <div class="nav-prev">
+      <div class="post-body">
+        
+        
+          
+        
+        
+        <div class="post-button text-center">
+          <a class="btn" href="https://esp0x.github.io/post/mysql-zhu-cong-fu-zhi-yuan-li/" rel="contents">
+            阅读全文 »
+          </a>
+        </div>
+        
+      </div>
       
-        <i class="fa fa-chevron-left"></i>
-        <a class="nav-pc-next" title="Mysql分库分表策略" href="https://esp0x.github.io/post/mysql-fen-ku-fen-biao-ce-lue/">Mysql分库分表策略</a class="nav-pc-next">
-        <a class="nav-mobile-prev" title="Mysql分库分表策略" href="https://esp0x.github.io/post/mysql-fen-ku-fen-biao-ce-lue/">上一篇</a>
+        <footer class="post-footer">
+          <div class="post-eof"></div>
+        </footer>
       
     </div>
-    <div class="nav-next">
-      
-    </div>
-  </div>
-</div>
+  </article>
+  
             
-  <script src="https://cdn.jsdelivr.net/npm/valine@1.4.4/dist/Valine.min.js"></script>
-<div id="vcomments" style="padding: 10px 0px 0px 0px"></div>
-
-<style>
-  .v .veditor {
-    min-height: 10rem;
-    background-image: url('https://upimage.alexhchu.com/2020/04/21/47eda59424daa.gif');
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: right;
-    background-color: rgba(255, 255, 255, 0);
-    resize: none;
-  }
-
-  .v .vwrap {
-    border: 1px solid #000 !important;
-  }
-
-  .v .vbtn {
-    padding: .4rem 1.2rem !important;
-    border-color: #fff !important;
-    background-color: #49b1f5 !important;
-    color: #fff !important;
-    font-size: .7rem !important;
-  }
-
-  .v .vcards .vcard .vh .vmeta .vat {
-    padding: 0 .8rem !important;
-    border: 1px solid #00c4b6 !important;
-    border-radius: 5px !important;
-    color: #00c4b6 !important;
-  }
-</style>
-<script>
-  new Valine({
-    el: '#vcomments',
-    appId: '',
-    appKey: '',
-    avatar: 'identicon',
-    placeholder: '',
-    pageSize: '',
-    lang: 'zh-cn',
-    visitor: 'true' === 'true',
-    highlight: 'true' === 'true',
-    avatarForce: 'true' === 'false',
-  });
-</script>
-
-          </div>
+            
+<div class="page bg-color">
+  <ul class="pagination-ul">
+    
+      <li class="pagination-dir">
+        <a href="https://esp0x.github.io/page/3/">
+          <i class="fa fa-angle-left"></i>
+        </a>
+      </li>
+    
+    
+      
+        <li class="pagination-li ">
+            <a href="/page/../">
+              1
+            </a>
+        </li>
+      
+        <li class="pagination-li ">
+            <a href="/page/2">
+              2
+            </a>
+        </li>
+      
+        <li class="pagination-li ">
+            <a href="/page/3">
+              3
+            </a>
+        </li>
+      
+        <li class="pagination-li pagination-active">
+            <a href="/page/4">
+              4
+            </a>
+        </li>
+      
+    
+    
+  </ul>
+</div>
+          </section>
         </div>
       </div>
     </div>
@@ -3693,5 +3330,6 @@ sync_binlog 的默认值是0，像操作系统刷其他文件的机制一样，M
 
 
 <script src=" /media/js/cool.js"></script>
+
 
 </html>

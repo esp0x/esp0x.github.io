@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://esp0x.github.io</id>
     <title>Esp0x</title>
-    <updated>2021-07-19T08:01:39.421Z</updated>
+    <updated>2021-07-20T00:30:31.076Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://esp0x.github.io"/>
     <link rel="self" href="https://esp0x.github.io/atom.xml"/>
@@ -10,6 +10,85 @@
     <logo>https://esp0x.github.io/images/avatar.png</logo>
     <icon>https://esp0x.github.io/favicon.ico</icon>
     <rights>All rights reserved 2021, Esp0x</rights>
+    <entry>
+        <title type="html"><![CDATA[使用cheetah快速破解一句话木马]]></title>
+        <id>https://esp0x.github.io/post/shi-yong-cheetah-kuai-su-po-jie-yi-ju-hua-mu-ma/</id>
+        <link href="https://esp0x.github.io/post/shi-yong-cheetah-kuai-su-po-jie-yi-ju-hua-mu-ma/">
+        </link>
+        <updated>2021-07-20T00:30:04.000Z</updated>
+        <content type="html"><![CDATA[<h3 id="项目地址">项目地址</h3>
+<h4 id="httpsgithubcomsunnyelfcheetah">https://github.com/sunnyelf/cheetah</h4>
+<h3 id="功能特点">功能特点</h3>
+<pre><code class="language-shell">速度极快
+支持批量爆破
+自动伪造请求
+自动探测web服务设置相关参数
+支持读取和去重超大密码字典文件
+支持python 2.x和3.x
+目前支持php，jsp，asp，aspx类型的webshell
+</code></pre>
+<h3 id="帮助信息">帮助信息</h3>
+<pre><code class="language-shell">_________________________________________________  ______              _____         ______ __________ /_ _____ _____ __ /_______ ____  /_ _  ___/__ __ \_  _ \_  _ \_  __/_  __ \ __  __ \
+/ /__  _  / / //  __// __// /_ / /_/ / _ / / /
+\___/  / / /_/ \___/ \___/ \__/  \____/  / / /_/  /_/                               /_/ a very fast brute force webshell password tool.
+
+usage: cheetah.py [-h] [-i] [-v] [-c] [-up] [-r] [-w] [-s] [-n] [-u] [-b]  [-p [file [file ...]]] 可选参数:
+  -h, --help            显示帮助信息并退出
+  -i, --info            显示程序信息并退出
+  -v, --verbose         启用详细输出模式(默认禁用)
+  -c, --clear           去重字典文件(默认禁用)
+  -up, --update         更新cheetah
+  -r , --request        指定请求方式(默认POST方式)
+  -w , --webshell       指定webshell类型(默认自动探测)
+  -s , --server         指定web服务器名称(默认自动探测)
+  -n , --number         指定一次请求参数的数量(默认自动设置)
+  -u , --url            指定webshell url地址
+  -b , --url-file       指定批量webshell urls文件
+  -p [file [file ...]]  指定多个字典文件(默认使用pwd.list)
+</code></pre>
+<h3 id="项目结构">项目结构</h3>
+<pre><code class="language-shell">cheetah:
+│  .codeclimate.yml
+│  .gitignore
+│  .travis.yml
+│  cheetah.py              mian program
+│  LICENSE
+│  README.md
+│  README_zh.md
+│  update.py               update module
+│
+├─data 
+│      big_shell_pwd.7z   big shell password file
+│      pwd.list           default shell password file
+│      url.list           default batch webshell urls file
+│      user-agent.list    user agent file
+│
+└─images
+        1.png
+        2.png
+        3.png
+        4.png
+        logo.jpg
+</code></pre>
+<h3 id="使用场景">使用场景</h3>
+<pre><code class="language-shell">  # 使用示例:
+  # 测试单个地址
+  python cheetah.py -u http://orz/orz.php
+  
+  # 使用post方法，限制单次请求的参数数量为1000，并显示详细信息
+  python cheetah.py -u http://orz/orz.jsp -r post -n 1000 -v
+  
+  # 使用get方法，指定字典文件并去重
+  python cheetah.py -u http://orz/orz.asp -r get -c -p pwd.list
+  
+  # 指定服务类型
+  python cheetah.py -u http://orz/orz -w aspx -s apache -n 1000
+  
+  # 同时破解多个地址
+  python cheetah.py -b url.list -c -p pwd1.list pwd2.list -v 
+</code></pre>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[CMSmap使用简单说明]]></title>
         <id>https://esp0x.github.io/post/cmsmap-shi-yong-jian-dan-shuo-ming/</id>
@@ -561,46 +640,6 @@ kubectl config set-context --current --namespace=kube-system
 </code></pre>
 <h3 id="关于namespace是否隔离网络">关于Namespace是否隔离网络</h3>
 <h5 id="一般情况下默认是不会隔离网络流量的除非对某个namespace设置了安全策略">一般情况下，默认是不会隔离网络流量的，除非对某个namespace设置了安全策略。</h5>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[K8s-使用Minikube搭建本地学习环境]]></title>
-        <id>https://esp0x.github.io/post/shi-yong-minikube-da-jian-ben-di-xue-xi-huan-jing/</id>
-        <link href="https://esp0x.github.io/post/shi-yong-minikube-da-jian-ben-di-xue-xi-huan-jing/">
-        </link>
-        <updated>2021-06-08T07:02:59.000Z</updated>
-        <content type="html"><![CDATA[<h3 id="安装kubectl">安装kubectl</h3>
-<pre><code class="language-shell"># 注意：安装方法推荐参考官方网站，安装方式随着版本变更会发生变动
-# 下载二进制文件
-curl -LO &quot;https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl&quot;
-# 下载校验文件
-curl -LO &quot;https://dl.k8s.io/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256&quot;
-# 检查下载文件和校验文件是否匹配
-echo &quot;$(&lt;kubectl.sha256) kubectl&quot; | sha256sum --check
-# 安装二进制文件
-sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
-# 检查安装是否成功
-kubectl version --client
-</code></pre>
-<h3 id="安装minikube">安装Minikube</h3>
-<pre><code class="language-shell"># 下载二进制文件
-curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
-# 安装二进制文件
-sudo install minikube-linux-amd64 /usr/local/bin/minikube
-# 启动集群，启动之前需要确保系统中有容器运行时，比如docker，kvm，否则集群启动失败
-minikube start
-
-# 若出现：The &quot;docker&quot; driver should not be used with root privileges.
-# 将当前具有sudo权限的用户添加到docker组即可
-sudo usermod -aG docker &lt;username&gt;
-# 激活组的配置，这步必须
-newgrp docker
-# 再次启动
-minikube start
-# 查看集群信息
-kubectl cluster-info
-
-</code></pre>
 ]]></content>
     </entry>
 </feed>
