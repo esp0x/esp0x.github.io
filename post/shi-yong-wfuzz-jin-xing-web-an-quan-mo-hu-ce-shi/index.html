@@ -8,7 +8,7 @@
 <meta name="keywords" content="信息安全">
 <meta name="description" content="温故而知新">
 <meta name="theme-color" content="#000">
-<title>CMSmap使用简单说明 | Esp0x</title>
+<title>使用wfuzz进行web安全模糊测试 | Esp0x</title>
 <link rel="shortcut icon" href="/favicon.ico?v=1626889983382">
 <link rel="stylesheet" href="/styles/main.css">
 <link rel="stylesheet" href="/media/css/muse.css">
@@ -29,7 +29,7 @@
 
 
 
-  <meta name="description" content="CMSmap使用简单说明" />
+  <meta name="description" content="使用wfuzz进行web安全模糊测试" />
   <meta name="keywords" content="安全工具,信息安全" />
 </head>
 
@@ -218,17 +218,20 @@
 <ul>
 <li>
 <ul>
-<li><a href="#%E5%AE%89%E8%A3%85">安装</a></li>
-<li><a href="#%E5%8A%9F%E8%83%BD%E7%AE%80%E4%BB%8B">功能简介</a>
-<ul>
-<li><a href="#1-%E6%A3%80%E6%B5%8B%E7%9B%AE%E6%A0%87%E7%BD%91%E7%AB%99%E7%9A%84cms%E7%B1%BB%E5%9E%8B%E6%94%AF%E6%8C%81wordpress-joomla-drupal%E7%AD%89%E6%8F%92%E4%BB%B6">1. 检测目标网站的CMS类型，支持wordpress、joomla、drupal等插件</a></li>
-<li><a href="#2-%E6%94%AF%E6%8C%81%E5%A4%9A%E7%BA%BF%E7%A8%8B%E6%89%AB%E6%8F%8F">2. 支持多线程扫描</a></li>
-<li><a href="#3-%E9%9B%86%E6%88%90%E4%BA%86%E6%9A%B4%E5%8A%9B%E7%A0%B4%E8%A7%A3%E6%A8%A1%E5%9D%97">3. 集成了暴力破解模块</a></li>
-<li><a href="#4-%E5%88%A9%E7%94%A8exploit-db%E6%95%B0%E6%8D%AE%E5%BA%93%E8%BF%9B%E8%A1%8C%E6%BC%8F%E6%B4%9E%E6%8F%92%E4%BB%B6%E7%9A%84%E6%A3%80%E6%B5%8B">4. 利用exploit-db数据库进行漏洞插件的检测</a></li>
-</ul>
-</li>
+<li><a href="#%E5%AE%89%E8%A3%85%E6%96%B9%E6%B3%95">安装方法</a></li>
 <li><a href="#%E5%B8%AE%E5%8A%A9%E4%BF%A1%E6%81%AF">帮助信息</a></li>
-<li><a href="#%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF">使用场景</a></li>
+<li><a href="#%E5%9F%BA%E6%9C%AC%E8%BF%87%E6%BB%A4%E5%9C%BA%E6%99%AF">基本过滤场景</a></li>
+<li><a href="#%E7%88%86%E7%A0%B4%E6%96%87%E4%BB%B6%E5%92%8C%E7%9B%AE%E5%BD%95">爆破文件和目录</a></li>
+<li><a href="#%E7%BA%AF%E6%95%B0%E5%AD%97%E9%81%8D%E5%8E%86%E6%9E%9A%E4%B8%BE%E5%8F%82%E6%95%B0">纯数字遍历枚举参数</a></li>
+<li><a href="#post%E8%AF%B7%E6%B1%82%E6%B5%8B%E8%AF%95">POST请求测试</a></li>
+<li><a href="#%E6%90%BA%E5%B8%A6cookie%E8%BF%9B%E8%A1%8C%E6%B5%8B%E8%AF%95">携带Cookie进行测试</a></li>
+<li><a href="#%E6%8C%87%E5%AE%9Ahttp%E8%AF%B7%E6%B1%82%E6%96%B9%E6%B3%95">指定HTTP请求方法</a></li>
+<li><a href="#%E4%BD%BF%E7%94%A8%E4%BB%A3%E7%90%86">使用代理</a></li>
+<li><a href="#%E8%AE%A4%E8%AF%81">认证</a></li>
+<li><a href="#%E9%80%92%E5%BD%92%E6%B5%8B%E8%AF%95">递归测试</a></li>
+<li><a href="#%E5%B9%B6%E5%8F%91%E5%92%8C%E8%AF%B7%E6%B1%82%E9%97%B4%E9%9A%94">并发和请求间隔</a></li>
+<li><a href="#%E4%BF%9D%E5%AD%98%E7%BB%93%E6%9E%9C">保存结果</a></li>
+<li><a href="#%E5%85%B6%E4%BB%96%E9%AB%98%E7%BA%A7%E7%94%A8%E6%B3%95">其他高级用法</a></li>
 </ul>
 </li>
 </ul>
@@ -498,8 +501,8 @@
           <div class="section bg-color post post-page">
             <header class="post-header">
   <h1 class="post-title">
-    <a class="post-title-link" href="https://esp0x.github.io/post/cmsmap-shi-yong-jian-dan-shuo-ming/">
-      CMSmap使用简单说明
+    <a class="post-title-link" href="https://esp0x.github.io/post/shi-yong-wfuzz-jin-xing-web-an-quan-mo-hu-ce-shi/">
+      使用wfuzz进行web安全模糊测试
     </a>
   </h1>
   <div class="post-meta">
@@ -507,7 +510,7 @@
     <span class="meta-item pc-show">
       <i class="fa fa-calendar-o"></i>
       <span>发布于</span>
-      <span>2021-07-19</span>
+      <span>2021-07-22</span>
       <span class="post-meta-divider pc-show">|</span>
     </span>
     
@@ -537,12 +540,12 @@
     <span class="meta-item">
       <span class="post-meta-divider">|</span>
       <i class="fa fa-file-word-o"></i>
-      <span>491<span class="pc-show">字数</span></span>
+      <span>658<span class="pc-show">字数</span></span>
     </span>
     
     
     
-    <span id="/post/cmsmap-shi-yong-jian-dan-shuo-ming/" data-flag-title="CMSmap使用简单说明" class="meta-item pc-show leancloud_visitors">
+    <span id="/post/shi-yong-wfuzz-jin-xing-web-an-quan-mo-hu-ce-shi/" data-flag-title="使用wfuzz进行web安全模糊测试" class="meta-item pc-show leancloud_visitors">
       <span class="post-meta-divider">|</span>
       <i class="fa fa-eye"></i>
       <span>浏览量：<span class="leancloud-visitors-count"></span></span>
@@ -551,73 +554,90 @@
   </div>
 </header>
             <div class="post-body next-md-body" id="post_body">
-              <h3 id="安装">安装</h3>
-<pre><code class="language-shell">git clone https://github.com/Dionach/CMSmap
-cd CMSmap
-pip3 install .
+              <h3 id="安装方法">安装方法</h3>
+<pre><code class="language-shell"># pip install wfuzz	
 </code></pre>
-<h3 id="功能简介">功能简介</h3>
-<h4 id="1-检测目标网站的cms类型支持wordpress-joomla-drupal等插件">1. 检测目标网站的CMS类型，支持wordpress、joomla、drupal等插件</h4>
-<h4 id="2-支持多线程扫描">2. 支持多线程扫描</h4>
-<h4 id="3-集成了暴力破解模块">3. 集成了暴力破解模块</h4>
-<h4 id="4-利用exploit-db数据库进行漏洞插件的检测">4. 利用exploit-db数据库进行漏洞插件的检测</h4>
 <h3 id="帮助信息">帮助信息</h3>
-<pre><code class="language-shell">usage: cmsmap [-f W/J/D] [-F] [-t] [-a] [-H] [-i] [-o] [-E] [-d] [-u] [-p]
-              [-x] [-k] [-w] [-v] [-h] [-D] [-U W/J/D]
-              [target]
+<pre><code class="language-shell">wfuzz -w 字典 地址
+wfuzz -w words.txt https://www.example.com/FUZZ    // 这里FUZZ是用于替换字典内容的变量，固定写法
 
-CMSmap tool v1.0 - Simple CMS Scanner
-Author: Mike Manzotti
+# 使用字典文件
+wfuzz -z file --zP fn=wordlist https://www.example.com/FUZZ
+# 简写为下面这中
+wfuzz -z file,wordlist https://www.example.com/FUZZ   
 
-Scan:
-  target                target URL (e.g. 'https://example.com:8080/')
-  -f W/J/D, --force W/J/D
-                        force scan (W)ordpress, (J)oomla or (D)rupal
-  -F, --fullscan        full scan using large plugin lists. False positives and slow!
-  -t , --threads        number of threads (Default 5)
-  -a , --agent          set custom user-agent
-  -H , --header         add custom header (e.g. 'Authorization: Basic ABCD...')
-  -i , --input          scan multiple targets listed in a given file
-  -o , --output         save output in a file
-  -E, --noedb           enumerate plugins without searching exploits
-  -c, --nocleanurls     disable clean urls for Drupal only
-  -s, --nosslcheck      don't validate the server's certificate
-  -d, --dictattack      run low intense dictionary attack during scanning (5 attempts per user)
+# 指定多个字典，-z和-w参数都可以支持多个字典
+wfuzz -w wordlist1 -w wordlist2 -w wordlist3 URL/FUZZ/FUZ2Z.FUZ3Z    // 后面的变量也是固定写法
 
-Brute-Force:
-  -u , --usr            username or username file
-  -p , --psw            password or password file
-  -x, --noxmlrpc        brute forcing WordPress without XML-RPC
-
-Post Exploitation:
-  -k , --crack          password hashes file (Require hashcat installed. For WordPress and Joomla only)
-  -w , --wordlist       wordlist file
-
-Others:
-  -v, --verbose         verbose mode (Default false)
-  -h, --help            show this help message and exit
-  -D, --default         rum CMSmap with default options
-  -U, --update          use (C)MSmap, (P)lugins or (PC) for both
-
-Examples:
-  cmsmap.py https://example.com
-  cmsmap.py https://example.com -f W -F --noedb -d
-  cmsmap.py https://example.com -i targets.txt -o output.txt
-  cmsmap.py https://example.com -u admin -p passwords.txt
-  cmsmap.py -k hashes.txt -w passwords.txt
+# 命令的返回值：
+编号、响应状态码、响应报文行数、响应报文字数、响应报文正字符数、Payload
 </code></pre>
-<h3 id="使用场景">使用场景</h3>
-<pre><code class="language-shell">// 默认参数执行，第一次执行会下载很多插件
-# ./cmsmap.py http://www.wordpress.com
+<h3 id="基本过滤场景">基本过滤场景</h3>
+<pre><code class="language-shell"># 根据某些返回状态码进行过滤输出，比如不要显示404的结果
+wfuzz -w wordlist --hc 404 http://www.example.com/FUZZ
+# 过滤多个状态码
+wfuzz -w wordlist --hc 404,403 http://www.example.com/FUZZ
 
-// 使用admin用户进行暴力破解，后面-v和-o不是必须的
-# ./cmsmap.py http://www.wordpress.com -u admin -p &lt;字典路径&gt; -v -o &lt;结果保持的路径&gt;
+# 使用状态码过滤后，往往结果还是很多，那么可以根据输出结果，对返回的报文字数、行数、字符数进行过滤
+# --hl 过滤报文行数
+# --hw 过滤字数
+# --hh 过滤字符数
+</code></pre>
+<h3 id="爆破文件和目录">爆破文件和目录</h3>
+<pre><code class="language-shell"># wfuzz -w wordlist URL/FUZZ.php
 
-// 同时扫描多个目标
-# ./cmsmap.py http://www.wordpress.com -i &lt;目标文件路径&gt; -u admin -p &lt;字典路径&gt; -v -o &lt;结果保持的路径&gt;
+# wfuzz -w wordlist URL/FUZZ
+</code></pre>
+<h3 id="纯数字遍历枚举参数">纯数字遍历枚举参数</h3>
+<pre><code class="language-shell"># wfuzz -z range,000-999 URL/some.php?uid=FUZZ
+</code></pre>
+<h3 id="post请求测试">POST请求测试</h3>
+<pre><code class="language-shell"># 对于没有验证码的登陆爆破，可以使用bp截取数据包，获取传输数据的格式
+# 比如为：username=&amp;password=
+wfuzz -w userlist -w passwdlist -d &quot;username=FUZZ&amp;password=FUZZ&quot; URL/login.php
+</code></pre>
+<h3 id="携带cookie进行测试">携带Cookie进行测试</h3>
+<pre><code class="language-shell"># 使用-b参数指定cookie，每个kv需要一个-b参数
+wfuzz -z file,wordlist -b cookie1=value1 -b cookie2=value2 URL/FUZZ
+</code></pre>
+<h3 id="指定http请求方法">指定HTTP请求方法</h3>
+<pre><code class="language-shell">wfuzz -z,list,GET-HEAD-POST-TRACE-OPTIONS -X FUZZ URL
 
-// 注意：子弹和目标文件都是一行一个
-// 其他使用方法待后续更新......
+# 这里使用list模块，每个方法会传到FUZZ变量中进行测试
+# 列表成员必须以-分割才能识别
+</code></pre>
+<h3 id="使用代理">使用代理</h3>
+<pre><code class="language-shell">wfuzz -w wordlist -p proxtHost:proxyPort:TYPE URL/FUZZ
+</code></pre>
+<h3 id="认证">认证</h3>
+<pre><code class="language-shell"># 三种认证方式
+# --basic
+# --ntml
+# --digest
+wfuzz -z,list,&quot;username-password&quot; --basic FUZZ:FUZZ URL
+</code></pre>
+<h3 id="递归测试">递归测试</h3>
+<pre><code class="language-shell"># 简单说就是找到匹配字典的路径后，在这个路径下再寻找符合字典的东东
+# -R 后面是递归的次数
+wfuzz -z list,&quot;admin-login.php-test-dorabox&quot; -R 1 http://127.0.0.1/FUZZ
+</code></pre>
+<h3 id="并发和请求间隔">并发和请求间隔</h3>
+<pre><code class="language-shell">-t 设置并发请求数，可以用于测试竞态条件
+-s 设置每次HTTP请求之间的间隔
+</code></pre>
+<h3 id="保存结果">保存结果</h3>
+<pre><code class="language-shell"># 支持的格式
+raw       | `Raw` output format
+json      | Results in `json` format
+csv       | `CSV` printer ftw
+magictree | Prints results in `magictree` format
+html      | Prints results in `html` format
+
+# 使用-f参数，文件路径,文件格式
+wfuzz -f outfile,json -w wordlist URL/FUZZ
+</code></pre>
+<h3 id="其他高级用法">其他高级用法</h3>
+<pre><code class="language-shell">... 未完待续 ...
 </code></pre>
 
             </div>
@@ -629,7 +649,7 @@ Examples:
     </li>
     <li class="post-copyright-link">
       <strong>本文链接：</strong>
-      <a href="https://esp0x.github.io/post/cmsmap-shi-yong-jian-dan-shuo-ming/" title="CMSmap使用简单说明">https://esp0x.github.io/post/cmsmap-shi-yong-jian-dan-shuo-ming/</a>
+      <a href="https://esp0x.github.io/post/shi-yong-wfuzz-jin-xing-web-an-quan-mo-hu-ce-shi/" title="使用wfuzz进行web安全模糊测试">https://esp0x.github.io/post/shi-yong-wfuzz-jin-xing-web-an-quan-mo-hu-ce-shi/</a>
     </li>
     <li class="post-copyright-license">
       <strong>版权声明： </strong>
@@ -646,15 +666,11 @@ Examples:
   <div class="nav">
     <div class="nav-prev">
       
-        <i class="fa fa-chevron-left"></i>
-        <a class="nav-pc-next" title="使用cheetah快速破解一句话木马" href="https://esp0x.github.io/post/shi-yong-cheetah-kuai-su-po-jie-yi-ju-hua-mu-ma/">使用cheetah快速破解一句话木马</a class="nav-pc-next">
-        <a class="nav-mobile-prev" title="使用cheetah快速破解一句话木马" href="https://esp0x.github.io/post/shi-yong-cheetah-kuai-su-po-jie-yi-ju-hua-mu-ma/">上一篇</a>
-      
     </div>
     <div class="nav-next">
       
-        <a class="nav-pc-next" title="MSF中使用枚举模块进行各种服务登陆的破解" href="https://esp0x.github.io/post/msf-zhong-shi-yong-mei-ju-mo-kuai-jin-xing-ge-chong-fu-wu-deng-lu-de-po-jie/">MSF中使用枚举模块进行各种服务登陆的破解</a>
-        <a class="nav-mobile-next" title="MSF中使用枚举模块进行各种服务登陆的破解" href="https://esp0x.github.io/post/msf-zhong-shi-yong-mei-ju-mo-kuai-jin-xing-ge-chong-fu-wu-deng-lu-de-po-jie/">下一篇</a>
+        <a class="nav-pc-next" title="使用cheetah快速破解一句话木马" href="https://esp0x.github.io/post/shi-yong-cheetah-kuai-su-po-jie-yi-ju-hua-mu-ma/">使用cheetah快速破解一句话木马</a>
+        <a class="nav-mobile-next" title="使用cheetah快速破解一句话木马" href="https://esp0x.github.io/post/shi-yong-cheetah-kuai-su-po-jie-yi-ju-hua-mu-ma/">下一篇</a>
         <i class="fa fa-chevron-right"></i>
       
     </div>

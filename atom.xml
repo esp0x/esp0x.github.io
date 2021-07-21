@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://esp0x.github.io</id>
     <title>Esp0x</title>
-    <updated>2021-07-20T00:30:31.076Z</updated>
+    <updated>2021-07-21T17:53:07.446Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://esp0x.github.io"/>
     <link rel="self" href="https://esp0x.github.io/atom.xml"/>
@@ -10,6 +10,99 @@
     <logo>https://esp0x.github.io/images/avatar.png</logo>
     <icon>https://esp0x.github.io/favicon.ico</icon>
     <rights>All rights reserved 2021, Esp0x</rights>
+    <entry>
+        <title type="html"><![CDATA[使用wfuzz进行web安全模糊测试]]></title>
+        <id>https://esp0x.github.io/post/shi-yong-wfuzz-jin-xing-web-an-quan-mo-hu-ce-shi/</id>
+        <link href="https://esp0x.github.io/post/shi-yong-wfuzz-jin-xing-web-an-quan-mo-hu-ce-shi/">
+        </link>
+        <updated>2021-07-21T17:52:29.000Z</updated>
+        <content type="html"><![CDATA[<h3 id="安装方法">安装方法</h3>
+<pre><code class="language-shell"># pip install wfuzz	
+</code></pre>
+<h3 id="帮助信息">帮助信息</h3>
+<pre><code class="language-shell">wfuzz -w 字典 地址
+wfuzz -w words.txt https://www.example.com/FUZZ    // 这里FUZZ是用于替换字典内容的变量，固定写法
+
+# 使用字典文件
+wfuzz -z file --zP fn=wordlist https://www.example.com/FUZZ
+# 简写为下面这中
+wfuzz -z file,wordlist https://www.example.com/FUZZ   
+
+# 指定多个字典，-z和-w参数都可以支持多个字典
+wfuzz -w wordlist1 -w wordlist2 -w wordlist3 URL/FUZZ/FUZ2Z.FUZ3Z    // 后面的变量也是固定写法
+
+# 命令的返回值：
+编号、响应状态码、响应报文行数、响应报文字数、响应报文正字符数、Payload
+</code></pre>
+<h3 id="基本过滤场景">基本过滤场景</h3>
+<pre><code class="language-shell"># 根据某些返回状态码进行过滤输出，比如不要显示404的结果
+wfuzz -w wordlist --hc 404 http://www.example.com/FUZZ
+# 过滤多个状态码
+wfuzz -w wordlist --hc 404,403 http://www.example.com/FUZZ
+
+# 使用状态码过滤后，往往结果还是很多，那么可以根据输出结果，对返回的报文字数、行数、字符数进行过滤
+# --hl 过滤报文行数
+# --hw 过滤字数
+# --hh 过滤字符数
+</code></pre>
+<h3 id="爆破文件和目录">爆破文件和目录</h3>
+<pre><code class="language-shell"># wfuzz -w wordlist URL/FUZZ.php
+
+# wfuzz -w wordlist URL/FUZZ
+</code></pre>
+<h3 id="纯数字遍历枚举参数">纯数字遍历枚举参数</h3>
+<pre><code class="language-shell"># wfuzz -z range,000-999 URL/some.php?uid=FUZZ
+</code></pre>
+<h3 id="post请求测试">POST请求测试</h3>
+<pre><code class="language-shell"># 对于没有验证码的登陆爆破，可以使用bp截取数据包，获取传输数据的格式
+# 比如为：username=&amp;password=
+wfuzz -w userlist -w passwdlist -d &quot;username=FUZZ&amp;password=FUZZ&quot; URL/login.php
+</code></pre>
+<h3 id="携带cookie进行测试">携带Cookie进行测试</h3>
+<pre><code class="language-shell"># 使用-b参数指定cookie，每个kv需要一个-b参数
+wfuzz -z file,wordlist -b cookie1=value1 -b cookie2=value2 URL/FUZZ
+</code></pre>
+<h3 id="指定http请求方法">指定HTTP请求方法</h3>
+<pre><code class="language-shell">wfuzz -z,list,GET-HEAD-POST-TRACE-OPTIONS -X FUZZ URL
+
+# 这里使用list模块，每个方法会传到FUZZ变量中进行测试
+# 列表成员必须以-分割才能识别
+</code></pre>
+<h3 id="使用代理">使用代理</h3>
+<pre><code class="language-shell">wfuzz -w wordlist -p proxtHost:proxyPort:TYPE URL/FUZZ
+</code></pre>
+<h3 id="认证">认证</h3>
+<pre><code class="language-shell"># 三种认证方式
+# --basic
+# --ntml
+# --digest
+wfuzz -z,list,&quot;username-password&quot; --basic FUZZ:FUZZ URL
+</code></pre>
+<h3 id="递归测试">递归测试</h3>
+<pre><code class="language-shell"># 简单说就是找到匹配字典的路径后，在这个路径下再寻找符合字典的东东
+# -R 后面是递归的次数
+wfuzz -z list,&quot;admin-login.php-test-dorabox&quot; -R 1 http://127.0.0.1/FUZZ
+</code></pre>
+<h3 id="并发和请求间隔">并发和请求间隔</h3>
+<pre><code class="language-shell">-t 设置并发请求数，可以用于测试竞态条件
+-s 设置每次HTTP请求之间的间隔
+</code></pre>
+<h3 id="保存结果">保存结果</h3>
+<pre><code class="language-shell"># 支持的格式
+raw       | `Raw` output format
+json      | Results in `json` format
+csv       | `CSV` printer ftw
+magictree | Prints results in `magictree` format
+html      | Prints results in `html` format
+
+# 使用-f参数，文件路径,文件格式
+wfuzz -f outfile,json -w wordlist URL/FUZZ
+</code></pre>
+<h3 id="其他高级用法">其他高级用法</h3>
+<pre><code class="language-shell">... 未完待续 ...
+</code></pre>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[使用cheetah快速破解一句话木马]]></title>
         <id>https://esp0x.github.io/post/shi-yong-cheetah-kuai-su-po-jie-yi-ju-hua-mu-ma/</id>
@@ -591,55 +684,6 @@ nodeSelector:
 二、Pod Affinity（Pod亲和性）
     podAffinity用于调度pod可以和哪些pod部署在同一拓扑结构之下。而podAntiAffinity相反，其用于规定pod不可以和哪些pod部署在同一拓扑结构下。通过pod affinity与anti-affinity来解决pod和pod之间的关系。
 </code></pre>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[K8s-Namespace基本知识]]></title>
-        <id>https://esp0x.github.io/post/namespace-ji-ben-zhi-shi/</id>
-        <link href="https://esp0x.github.io/post/namespace-ji-ben-zhi-shi/">
-        </link>
-        <updated>2021-06-08T07:03:54.000Z</updated>
-        <content type="html"><![CDATA[<h3 id="名词解释">名词解释</h3>
-<h5 id="namespace是对一组资源和对象的抽象集合比如可用来将系统内部的对象划分为不同的项目或用户组-常见的podsservicesrc和deployments等都是属于某一个namespace的默认是default而nodepersistentvolumns等则不属于任何namespace">Namespace是对一组资源和对象的抽象集合，比如可用来将系统内部的对象划分为不同的项目或用户组。常见的pods，services，rc和deployments等都是属于某一个namespace的（默认是default），而node，persistentVolumns等则不属于任何namespace。</h5>
-<h3 id="namespace相关操作">Namespace相关操作</h3>
-<pre><code class="language-shell">kubectl可以通过–namespace或者-n选项指定namespace。如果不指定，默认为default。查看操作下,也可以通过设置–all-namespace=true来查看所有namespace下的资源。
-
-# 查询ns
-$ kubectl get namespaces
-NAME          STATUS    AGE
-default       Active    11d
-kube-system   Active    11d
-
-# 查询哪些资源位于namespace中
-kubectl api-resources --namespaced=true
-# 查看哪些资源不在命令空间
-kubectl api-resources --namespaced=false
-
-# 指定ns查询对应ns中的资源情况
-kubectl get pods -n kube-system
-
-# 创建
-# 1.命令行直接创建
-$ kubectl create namespace new-namespace
-
-# 2.通过文件创建
-$ cat my-namespace.yaml
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: new-namespace
-
-$ kubectl create -f ./my-namespace.yaml
-
-# 删除，即删除该ns下所有资源
-# 注意：default和kube-system命名空间不能删除
-$ kubectl delete namespaces new-namespace
-
-# 切换ns
-kubectl config set-context --current --namespace=kube-system
-</code></pre>
-<h3 id="关于namespace是否隔离网络">关于Namespace是否隔离网络</h3>
-<h5 id="一般情况下默认是不会隔离网络流量的除非对某个namespace设置了安全策略">一般情况下，默认是不会隔离网络流量的，除非对某个namespace设置了安全策略。</h5>
 ]]></content>
     </entry>
 </feed>
