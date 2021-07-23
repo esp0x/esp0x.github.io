@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://esp0x.github.io</id>
     <title>Esp0x</title>
-    <updated>2021-07-21T17:53:07.446Z</updated>
+    <updated>2021-07-23T01:25:21.816Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://esp0x.github.io"/>
     <link rel="self" href="https://esp0x.github.io/atom.xml"/>
@@ -10,6 +10,70 @@
     <logo>https://esp0x.github.io/images/avatar.png</logo>
     <icon>https://esp0x.github.io/favicon.ico</icon>
     <rights>All rights reserved 2021, Esp0x</rights>
+    <entry>
+        <title type="html"><![CDATA[使用Fail2Ban防御SSH暴力破解攻击]]></title>
+        <id>https://esp0x.github.io/post/shi-yong-fail2ban-fang-yu-ssh-bao-li-po-jie-gong-ji/</id>
+        <link href="https://esp0x.github.io/post/shi-yong-fail2ban-fang-yu-ssh-bao-li-po-jie-gong-ji/">
+        </link>
+        <updated>2021-07-23T01:24:45.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="安装">安装</h2>
+<pre><code class="language-shell"># sudo apt install fail2ban
+# sudo systemctl enable fail2ban
+</code></pre>
+<h2 id="详细配置">详细配置</h2>
+<pre><code class="language-shell">$ ls -alps /etc/fail2ban/
+total 84
+ 4 drwxr-xr-x   6 root root  4096 Jul 22 18:16 ./
+12 drwxr-xr-x 135 root root 12288 Jul 22 18:04 ../
+ 4 drwxr-xr-x   2 root root  4096 Jul 22 18:04 action.d/
+ 4 -rw-r--r--   1 root root  2817 Jan 11  2020 fail2ban.conf
+ 4 drwxr-xr-x   2 root root  4096 Mar  2  2020 fail2ban.d/
+ 4 drwxr-xr-x   3 root root  4096 Jul 22 18:04 filter.d/
+28 -rw-r--r--   1 root root 25738 Jul 22 18:14 jail.conf
+ 4 drwxr-xr-x   2 root root  4096 Jul 22 18:04 jail.d/
+ 4 -rw-r--r--   1 root root   139 Jul 22 18:16 jail.local
+ 4 -rw-r--r--   1 root root   645 Jan 11  2020 paths-arch.conf
+ 4 -rw-r--r--   1 root root  2827 Jan 11  2020 paths-common.conf
+ 4 -rw-r--r--   1 root root   573 Jan 11  2020 paths-debian.conf
+ 4 -rw-r--r--   1 root root   738 Jan 11  2020 paths-opensuse.conf
+
+# 默认情况下，fail2ban会使用jail.conf作为配置文件，但是一般不推荐
+# 推荐的方式是，创建.local配置
+
+$ sudo vi /etc/fail2ban/jail.local
+[sshd]
+enabled = true
+port = ssh
+filter = sshd                            // 查询的字段
+logpath = /var/log/auth.log              // fail2ban会查询这个文件中sshd关键字
+maxretry = 3
+findtime = 300                           // 失败尝试的间隔
+bantime = 3600                           // ban的时间
+ignoreip = 127.0.0.1
+
+$ sudo systemctl restart fail2ban.service
+$ sudo fail2ban-client status
+$ sudo fail2ban-client status sshd
+</code></pre>
+<h2 id="测试">测试</h2>
+<pre><code class="language-shell">$ ssh root@ip // 尝试输入错误的密码，并重复登陆几次
+
+$ ssh root@ip // 尝试次数到后，应当能够看到再次连接时，不会再出现密码提示，而是直接拒绝连接或连接超时
+
+# 查询被ban的ip信息
+$ sudo fail2ban-client status sshd
+Status for the jail: sshd
+|- Filter
+|  |- Currently failed:	0
+|  |- Total failed:	3
+|  `- File list:	/var/log/auth.log
+`- Actions
+   |- Currently banned:	1
+   |- Total banned:	1
+   `- Banned IP list:	192.168.80.1
+</code></pre>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[使用wfuzz进行web安全模糊测试]]></title>
         <id>https://esp0x.github.io/post/shi-yong-wfuzz-jin-xing-web-an-quan-mo-hu-ce-shi/</id>
@@ -560,129 +624,6 @@ timedatectl set-ntp true/flase
         </link>
         <updated>2021-06-23T03:46:19.000Z</updated>
         <content type="html"><![CDATA[<pre><code class="language-shell">echo &quot;StrictHostKeyChecking no&quot; &gt;~/.ssh/config
-</code></pre>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[K8s-Pod简单介绍]]></title>
-        <id>https://esp0x.github.io/post/k8s-pod-jian-dan-jie-shao/</id>
-        <link href="https://esp0x.github.io/post/k8s-pod-jian-dan-jie-shao/">
-        </link>
-        <updated>2021-06-08T07:06:03.000Z</updated>
-        <content type="html"><![CDATA[<h3 id="概念">概念</h3>
-<h5 id="在kubernetes集群中pod是所有业务类型的基础也是k8s管理的最小单位级它是一个或多个容器的组合-这些容器共享存储-网络和命名空间以及如何运行的规范-在pod中所有容器都被同一安排和调度并运行在共享的上下文中-对于具体应用而言pod是它们的逻辑主机pod包含业务相关的多个应用容器">在Kubernetes集群中，Pod是所有业务类型的基础，也是K8S管理的最小单位级，它是一个或多个容器的组合。这些容器共享存储、网络和命名空间，以及如何运行的规范。在Pod中，所有容器都被同一安排和调度，并运行在共享的上下文中。对于具体应用而言，Pod是它们的逻辑主机，Pod包含业务相关的多个应用容器。</h5>
-<h3 id="两个注意点">两个注意点</h3>
-<pre><code class="language-python">1.网络:
-  每一个Pod都会被指派一个唯一的Ip地址，在Pod中的每一个容器共享网络命名空间，包括Ip地址和网络端口。在同一个Pod中的容器可以同locahost进行互相通信。当Pod中的容器需要与Pod外的实体进行通信时，则需要通过端口等共享的网络资源。
-
-2.存储:
-  Pod能够被指定共享存储卷的集合，在Pod中所有的容器能够访问共享存储卷，允许这些容器共享数据。存储卷也允许在一个Pod持久化数据，以防止其中的容器需要被重启。
-</code></pre>
-<h3 id="pod的生命周期">Pod的生命周期</h3>
-<pre><code class="language-shel">一共有4种状态：
-
-1. Pending：APIserver已经创建该server，但pod中有一个或多个容器的镜像还未创建，可能在下载中；
-2. Running：Pod中的所有容器都已创建，且至少有一个容器处于运行状态，正在启动或重启状态；
-3. Failed：Pod内所有容器都已退出，其中至少有一个容器退出失败；
-4. Unknown：由于某种原因无法获取Pod的状态比如网络问题；
-</code></pre>
-<h3 id="pod的重启策略">Pod的重启策略</h3>
-<pre><code class="language-py">重启策略对同一个Pod中的所有容器起作用，容器的重启由Node上的kubelet执行，支持三种策略，在配置文件中通过restartPolicy字段设置：
-1. Always：只要退出就会重启
-2. OnFailure：只有在失败退出时，才会重启
-3. Never：只要退出，就不再重启
-
-注意，这里的重启是指在Pod的宿主Node上进行本地重启，而不是调度到其它Node上。
-</code></pre>
-<h3 id="健康检查">健康检查</h3>
-<pre><code class="language-shell"># 两种探针类型：
-一、LivenessProbe探针：  判断容器是否存活（running）
-1.ExecAction，在容器内部执行一个命令，状态返回码为0，表示健康，示例：
-apiVersion: v1
-kind: Pod
-metadata:
- name: liveness
-spec:
-  containers:
-  - name: liveness
-    image: liveness
-    args: 
-    - /bin/sh
-    - -c
-    - echo ok &gt; /tmp/healthy: sleep 10; rm - rf /tmp/healthy; sleep 600
-    livenessProbe:
-      exec:
-        command:
-        - cat
-        - /tmp/health
-    initialDelaySeconds: 15
-    timeoutSeconds: 1
-    
-2.TcpAction，通过IP和PORT，如果能够和容器建立连接则表示容器健康，示例：
-apiVersion: v1
-kind: Pod
-metadata:
- name: pod-with-healthcheck
-spec:
-  containers:
-  - name: nginx
-    image: nginx
-    ports:
-    - containerPort: 80
-    livenessProbe:
-      tcpSocket:
-        port: 80
-    initialDelaySeconds: 15
-    timeoutSeconds: 1
-3.HttpGetAction，发送get请求，返回码在200-400之间表示健康， 示例：
-apiVersion: v1
-kind: Pod
-metadata:
- name: pod-with-healthcheck
-spec:
-  containers:
-  - name: nginx
-    image: nginx
-    ports:
-    - containerPort: 80
-    livenessProbe:
-      httpGet:
-        path: /_status/healthz  //请求路径
-        port: 80
-    initialDelaySeconds: 15
-    timeoutSeconds: 1
-    
-二、ReadinessProbe探针： 用于判断容器是否启动完成（ready）
-</code></pre>
-<h3 id="pod的调度">Pod的调度</h3>
-<pre><code class="language-shell"># 定向调度，nodeSelector
-1.首先通过kubectl给node打上标签：
-格式： kubectl label nodes &lt;node-name&gt; &lt;label-key&gt;=&lt;label-value&gt;
-kubectl label nodes node1 zone=north
-
-2.在pod定义里选择某个node
-apiVersion: v1
-kind: Pod
-metadata:
-name: pod-with-healthcheck
-spec:
-containers:
-- name: nginx
-  image: nginx
-  ports:
-  - containerPort: 80
-nodeSelector:
-  zone: north
-
-# 亲和性和非亲和性
-一、Node affinity（节点亲和性）
-1. requiredDuringSchedulingIgnoredDuringExecution：
-可认为一种强制限制，如果 Node 的标签发生了变化导致其没有符合 Pod 的调度要求节点，那么pod调度就会失败。
-2.preferredDuringSchedulingIgnoredDuringExecution：
-软限或偏好，同样如果 Node 的标签发生了变化导致其不再符合 pod 的调度要求，pod 依然会调度运行。
-
-二、Pod Affinity（Pod亲和性）
-    podAffinity用于调度pod可以和哪些pod部署在同一拓扑结构之下。而podAntiAffinity相反，其用于规定pod不可以和哪些pod部署在同一拓扑结构下。通过pod affinity与anti-affinity来解决pod和pod之间的关系。
 </code></pre>
 ]]></content>
     </entry>
