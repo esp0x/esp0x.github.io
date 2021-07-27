@@ -2133,11 +2133,11 @@ pre > span.copy-code:hover {
       color: #222;
       border-bottom-color: #222;
     }.nav-item a {
-        color: #555;
+        color: #212529;
       }
       .nav-item-active a {
-        color: #555;
-        border-bottom: 1px solid #555 !important;
+        color: #212529;
+        border-bottom: 1px solid #212529 !important;
       }.nav-item a:hover {
         color: #222;
         border-bottom: 1px solid #222 !important;
