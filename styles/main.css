@@ -2071,10 +2071,10 @@ pre > span.copy-code:hover {
 .bg-color .bg-color {
       background: transparent !important;
     }body {
-      background-color: #eee;
+      background-color: #f8f9fa;
     }
     .nav-toggle .line {
-      background-color: #eee !important;
+      background-color: #f8f9fa !important;
     }.header {
         width: 960px;
         margin: 0 auto;
@@ -2094,7 +2094,7 @@ pre > span.copy-code:hover {
       border-bottom-color: #c0eb75;
     }
     .archive-timeline-box::after, .tag-timeline-wrapper::after {
-      background: #eeeeee26;
+      background: #eeeeee7f;
     }h1, h2, h3, h4, h5, h6 {
       color: #FFF;
     }
@@ -2110,12 +2110,12 @@ pre > span.copy-code:hover {
     .node-title::before {
       background-color: #FFF;
     }a {
-      color: #555;
+      color: #f8f9fa;
     }
     
     .next-md-body a, .friends-box a  {
-      color: #555;
-      border-bottom: 1px solid #555;
+      color: #f8f9fa;
+      border-bottom: 1px solid #f8f9fa;
     }a:hover {
       color: #222;
     }
@@ -2132,21 +2132,17 @@ pre > span.copy-code:hover {
     .next-md-body a:hover, .friends-box a:hover {
       color: #222;
       border-bottom-color: #222;
-    }.nav-item a {
-        color: #212529;
-      }
-      .nav-item-active a {
-        color: #212529;
-        border-bottom: 1px solid #212529 !important;
+    }
+      .nav-item a {
+        color:  #212529;
       }.nav-item a:hover {
         color: #222;
-        border-bottom: 1px solid #222 !important;
       }.nav-item-active {
-      background: #f9f9f926;
+      background: #f9f9f97f;
     }
 
     .nav-item:hover {
-      background: #f9f9f926;
+      background: #f9f9f97f;
       color: rgba(0, 0, 0, 0.98);
     }.site-author-image {
       border-radius: 50%;
@@ -2190,7 +2186,7 @@ pre > span.copy-code:hover {
       color: #fc6423;
       border-bottom-color: #fc6423;
     }.bg-color {
-      background-color: #ffffff26;
+      background-color: #2125297f;
     }
       .site-meta {
         background: #000 !important;
@@ -2199,13 +2195,15 @@ pre > span.copy-code:hover {
         background: #000 !important;
       }
     .brand {
-      background: #00000026;
+      background: #0000007f;
     }
     .main-title, .brand {
       color: #FFF !important;
     }
     .mist .site-title i {
-      background: #FFFFFF26;
+      background: #FFFFFF7f;
+    }.box-shadow-wrapper {
+      box-shadow: none !important;
     }body {
       cursor: default;
     }a {
