@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://esp0x.github.io</id>
     <title>Esp0x</title>
-    <updated>2021-07-31T03:08:35.519Z</updated>
+    <updated>2021-07-31T05:53:55.132Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://esp0x.github.io"/>
     <link rel="self" href="https://esp0x.github.io/atom.xml"/>
@@ -10,6 +10,32 @@
     <logo>https://esp0x.github.io/images/avatar.png</logo>
     <icon>https://esp0x.github.io/favicon.ico</icon>
     <rights>All rights reserved 2021, Esp0x</rights>
+    <entry>
+        <title type="html"><![CDATA[Nginx解析漏洞]]></title>
+        <id>https://esp0x.github.io/post/nginx-jie-xi-lou-dong/</id>
+        <link href="https://esp0x.github.io/post/nginx-jie-xi-lou-dong/">
+        </link>
+        <updated>2021-07-31T05:53:19.000Z</updated>
+        <content type="html"><![CDATA[<h3 id="描述">描述</h3>
+<pre><code class="language-shell">任意文件名后加/xxxx.php(xxxx可以任意)，可以将文件作为php解析。
+
+利用方法：
+1. 制作一个图片木马，jpg的，如a.jpg
+2. 上传后，访问a.jpg/lcx.php，然后菜刀连，就可以了
+</code></pre>
+<h3 id="漏洞原因">漏洞原因</h3>
+<h5 id="1-对于一个不存在的路径ajpglcxphpapache的做法是先判断这个文件是否存在而nginx会直接将php后缀的文件交给php处理原因一">1.  对于一个不存在的路径：a.jpg/lcx.php，Apache的做法是先判断这个文件是否存在，而Nginx会直接将php后缀的文件交给PHP处理（原因一）；</h5>
+<h5 id="2-配置项cigfix_pathinfo1路径修复选项php看到不存在的路径会往前找ajpglcxphp不存在则找到ajpg并将该文件作为可执行文件执行原因二">2.  配置项cig.fix_pathinfo=1，路径修复选项，PHP看到不存在的路径会往前找，a.jpg/lcx.php不存在，则找到a.jpg，并将该文件作为可执行文件执行（原因二）；</h5>
+<h5 id="3-配置项php-fpmconf中有securitylimit_exetensions不配置的话默认就可以执行这是原因三">3.  配置项php-fpm.conf中有security.limit_exetensions（不配置的话，默认就可以执行，这是原因三）；</h5>
+<h3 id="解决方案">解决方案</h3>
+<h5 id="1-设置securitylimit_extensionsphp-这样只有php文件才被解析">1. 设置security.limit_extensions=.php ，这样只有php文件才被解析</h5>
+<h5 id="2-升级到高版本上述参数默认为限制执行">2. 升级到高版本，上述参数默认为限制执行</h5>
+<h3 id="参考文档">参考文档</h3>
+<pre><code class="language-shell">https://www.cnblogs.com/lcxblogs/p/13596239.html
+https://www.cnblogs.com/wjw-zm/p/11802669.html
+</code></pre>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Apache未知扩展名解析漏洞]]></title>
         <id>https://esp0x.github.io/post/apache-wei-zhi-kuo-zhan-ming-jie-xi-lou-dong/</id>
@@ -549,101 +575,6 @@ Options:
 
 // 全量扫描,full参数会使用字典路径下的subnames_full.txt
 # python3 subDoaminBrute.py --full qq.com
-</code></pre>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[Centos 7/8 使用chrony进行时间同步配置]]></title>
-        <id>https://esp0x.github.io/post/centos-78-shi-yong-chrony-jin-xing-shi-jian-tong-bu-pei-zhi/</id>
-        <link href="https://esp0x.github.io/post/centos-78-shi-yong-chrony-jin-xing-shi-jian-tong-bu-pei-zhi/">
-        </link>
-        <updated>2021-07-14T01:25:52.000Z</updated>
-        <content type="html"><![CDATA[<h3 id="1-安装">1. 安装</h3>
-<pre><code class="language-shell"># yum -y install chrony
-# systemctl enable chronyd
-# systemctl start chronyd
-</code></pre>
-<h3 id="2配置">2.配置</h3>
-<pre><code class="language-shell"># vi /etc/chrony.conf
-
-# 使用 pool.ntp.org 项目中的公共服务器。以server开，理论上想添加多少时间服务器都可以。
-# Use public servers from the pool.ntp.org project.
-# Please consider joining the pool (http://www.pool.ntp.org/join.html).
-server 0.centos.pool.ntp.org iburst
-server 1.centos.pool.ntp.org iburst
-server 2.centos.pool.ntp.org iburst
-server 3.centos.pool.ntp.org iburst
-
-# 根据实际时间计算出服务器增减时间的比率，然后记录到一个文件中，在系统重启后为系统做出最佳时间补偿调整。
-# Record the rate at which the system clock gains/losses time.
-driftfile /var/lib/chrony/drift
-
-# 如果系统时钟的偏移量大于1秒，则允许系统时钟在前三次更新中步进。
-# Allow the system clock to be stepped in the first three updates if its offset is larger than 1 second.
-makestep 1.0 3
-
-# 启用实时时钟（RTC）的内核同步。
-# Enable kernel synchronization of the real-time clock (RTC).
-rtcsync
-
-# 通过使用 hwtimestamp 指令启用硬件时间戳
-# Enable hardware timestamping on all interfaces that support it.
-#hwtimestamp *
-
-# Increase the minimum number of selectable sources required to adjust the system clock.
-#minsources 2
-
-# 指定 NTP 客户端地址，以允许或拒绝连接到扮演时钟服务器的机器
-# Allow NTP client access from local network.
-#allow 192.168.0.0/16
-
-# Serve time even if not synchronized to a time source.
-#local stratum 10
-
-# 指定包含 NTP 身份验证密钥的文件。
-# Specify file containing keys for NTP authentication.
-#keyfile /etc/chrony.keys
-
-# 指定日志文件的目录。
-# Specify directory for log files.
-logdir /var/log/chrony
-
-# 选择日志文件要记录的信息。
-# Select which information is logged.
-#log measurements statistics tracking
-</code></pre>
-<h3 id="3手工同步">3.手工同步</h3>
-<pre><code class="language-shell"># 查看 ntp_servers
-chronyc sources -v
-
-# 查看 ntp_servers 状态
-chronyc sourcestats -v
-
-# 查看 ntp_servers 是否在线
-chronyc activity -v
-
-# 查看 ntp 详细信息
-chronyc tracking -v
-
-# 手工进行同步
-chronyc -a makestep
-</code></pre>
-<h3 id="4修改时区">4.修改时区</h3>
-<pre><code class="language-shell"># 查看日期时间、时区及 NTP 状态
-timedatectl
-
-# 查看时区列表
-timedatectl list-timezones
-timedatectl list-timezones |  grep  -E &quot;Asia/S.*&quot;
-
-# 修改时区
-timedatectl set-timezone Asia/Shanghai
-
-# 修改日期时间（可以只修改其中一个）
-timedatectl set-time &quot;2019-09-19 15:50:20&quot;
-
-# 开启 NTP
-timedatectl set-ntp true/flase
 </code></pre>
 ]]></content>
     </entry>

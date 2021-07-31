@@ -8,7 +8,7 @@
 <meta name="keywords" content="信息安全">
 <meta name="description" content="温故而知新">
 <meta name="theme-color" content="#000">
-<title>使用Fail2Ban防御SSH暴力破解攻击 | Esp0x</title>
+<title>Nginx解析漏洞 | Esp0x</title>
 <link rel="shortcut icon" href="/favicon.ico?v=1627710827060">
 <link rel="stylesheet" href="/styles/main.css">
 <link rel="stylesheet" href="/media/css/mist.css">
@@ -29,8 +29,8 @@
 
 
 
-  <meta name="description" content="使用Fail2Ban防御SSH暴力破解攻击" />
-  <meta name="keywords" content="安全工具,信息安全" />
+  <meta name="description" content="Nginx解析漏洞" />
+  <meta name="keywords" content="Web安全,上传漏洞" />
 </head>
 
 <body>
@@ -220,9 +220,27 @@
     <ul class="markdownIt-TOC">
 <li>
 <ul>
-<li><a href="#%E5%AE%89%E8%A3%85">安装</a></li>
-<li><a href="#%E8%AF%A6%E7%BB%86%E9%85%8D%E7%BD%AE">详细配置</a></li>
-<li><a href="#%E6%B5%8B%E8%AF%95">测试</a></li>
+<li>
+<ul>
+<li><a href="#%E6%8F%8F%E8%BF%B0">描述</a></li>
+<li><a href="#%E6%BC%8F%E6%B4%9E%E5%8E%9F%E5%9B%A0">漏洞原因</a><br>
+*
+<ul>
+<li><a href="#1-%E5%AF%B9%E4%BA%8E%E4%B8%80%E4%B8%AA%E4%B8%8D%E5%AD%98%E5%9C%A8%E7%9A%84%E8%B7%AF%E5%BE%84ajpglcxphpapache%E7%9A%84%E5%81%9A%E6%B3%95%E6%98%AF%E5%85%88%E5%88%A4%E6%96%AD%E8%BF%99%E4%B8%AA%E6%96%87%E4%BB%B6%E6%98%AF%E5%90%A6%E5%AD%98%E5%9C%A8%E8%80%8Cnginx%E4%BC%9A%E7%9B%B4%E6%8E%A5%E5%B0%86php%E5%90%8E%E7%BC%80%E7%9A%84%E6%96%87%E4%BB%B6%E4%BA%A4%E7%BB%99php%E5%A4%84%E7%90%86%E5%8E%9F%E5%9B%A0%E4%B8%80">1.  对于一个不存在的路径：a.jpg/lcx.php，Apache的做法是先判断这个文件是否存在，而Nginx会直接将php后缀的文件交给PHP处理（原因一）；</a></li>
+<li><a href="#2-%E9%85%8D%E7%BD%AE%E9%A1%B9cigfix_pathinfo1%E8%B7%AF%E5%BE%84%E4%BF%AE%E5%A4%8D%E9%80%89%E9%A1%B9php%E7%9C%8B%E5%88%B0%E4%B8%8D%E5%AD%98%E5%9C%A8%E7%9A%84%E8%B7%AF%E5%BE%84%E4%BC%9A%E5%BE%80%E5%89%8D%E6%89%BEajpglcxphp%E4%B8%8D%E5%AD%98%E5%9C%A8%E5%88%99%E6%89%BE%E5%88%B0ajpg%E5%B9%B6%E5%B0%86%E8%AF%A5%E6%96%87%E4%BB%B6%E4%BD%9C%E4%B8%BA%E5%8F%AF%E6%89%A7%E8%A1%8C%E6%96%87%E4%BB%B6%E6%89%A7%E8%A1%8C%E5%8E%9F%E5%9B%A0%E4%BA%8C">2.  配置项cig.fix_pathinfo=1，路径修复选项，PHP看到不存在的路径会往前找，a.jpg/lcx.php不存在，则找到a.jpg，并将该文件作为可执行文件执行（原因二）；</a></li>
+<li><a href="#3-%E9%85%8D%E7%BD%AE%E9%A1%B9php-fpmconf%E4%B8%AD%E6%9C%89securitylimit_exetensions%E4%B8%8D%E9%85%8D%E7%BD%AE%E7%9A%84%E8%AF%9D%E9%BB%98%E8%AE%A4%E5%B0%B1%E5%8F%AF%E4%BB%A5%E6%89%A7%E8%A1%8C%E8%BF%99%E6%98%AF%E5%8E%9F%E5%9B%A0%E4%B8%89">3.  配置项php-fpm.conf中有security.limit_exetensions（不配置的话，默认就可以执行，这是原因三）；</a></li>
+</ul>
+</li>
+<li><a href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88">解决方案</a><br>
+*
+<ul>
+<li><a href="#1-%E8%AE%BE%E7%BD%AEsecuritylimit_extensionsphp-%E8%BF%99%E6%A0%B7%E5%8F%AA%E6%9C%89php%E6%96%87%E4%BB%B6%E6%89%8D%E8%A2%AB%E8%A7%A3%E6%9E%90">1. 设置security.limit_extensions=.php ，这样只有php文件才被解析</a></li>
+<li><a href="#2-%E5%8D%87%E7%BA%A7%E5%88%B0%E9%AB%98%E7%89%88%E6%9C%AC%E4%B8%8A%E8%BF%B0%E5%8F%82%E6%95%B0%E9%BB%98%E8%AE%A4%E4%B8%BA%E9%99%90%E5%88%B6%E6%89%A7%E8%A1%8C">2. 升级到高版本，上述参数默认为限制执行</a></li>
+</ul>
+</li>
+<li><a href="#%E5%8F%82%E8%80%83%E6%96%87%E6%A1%A3">参考文档</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -490,8 +508,8 @@
           <div class="section bg-color post post-page">
             <header class="post-header">
   <h1 class="post-title">
-    <a class="post-title-link" href="https://esp0x.github.io/post/shi-yong-fail2ban-fang-yu-ssh-bao-li-po-jie-gong-ji/">
-      使用Fail2Ban防御SSH暴力破解攻击
+    <a class="post-title-link" href="https://esp0x.github.io/post/nginx-jie-xi-lou-dong/">
+      Nginx解析漏洞
     </a>
   </h1>
   <div class="post-meta">
@@ -499,7 +517,7 @@
     <span class="meta-item pc-show">
       <i class="fa fa-calendar-o"></i>
       <span>发布于</span>
-      <span>2021-07-23</span>
+      <span>2021-07-31</span>
       <span class="post-meta-divider pc-show">|</span>
     </span>
     
@@ -508,14 +526,14 @@
       <span class="pc-show">分类于</span>
       
       
-      <a href="https://esp0x.github.io/tag/tdcjZJ8GF/">
-        <span>安全工具</span>
+      <a href="https://esp0x.github.io/tag/u2Xu3UP12/">
+        <span>Web安全</span>
       </a>、
       
       
       
-      <a href="https://esp0x.github.io/tag/a5GDIyqF3/">
-        <span>信息安全</span>
+      <a href="https://esp0x.github.io/tag/Iujze5_sw8/">
+        <span>上传漏洞</span>
       </a>
       
       
@@ -524,17 +542,17 @@
     
     <span class="meta-item">
       <i class="fa fa-clock-o"></i>
-      <span>3分钟</span>
+      <span>2分钟</span>
     </span>
     <span class="meta-item">
       <span class="post-meta-divider">|</span>
       <i class="fa fa-file-word-o"></i>
-      <span>408<span class="pc-show">字数</span></span>
+      <span>258<span class="pc-show">字数</span></span>
     </span>
     
     
     
-    <span id="/post/shi-yong-fail2ban-fang-yu-ssh-bao-li-po-jie-gong-ji/" data-flag-title="使用Fail2Ban防御SSH暴力破解攻击" class="meta-item pc-show leancloud_visitors">
+    <span id="/post/nginx-jie-xi-lou-dong/" data-flag-title="Nginx解析漏洞" class="meta-item pc-show leancloud_visitors">
       <span class="post-meta-divider">|</span>
       <i class="fa fa-eye"></i>
       <span>浏览量：<span class="leancloud-visitors-count"></span></span>
@@ -543,61 +561,23 @@
   </div>
 </header>
             <div class="post-body next-md-body" id="post_body">
-              <h2 id="安装">安装</h2>
-<pre><code class="language-shell"># sudo apt install fail2ban
-# sudo systemctl enable fail2ban
+              <h3 id="描述">描述</h3>
+<pre><code class="language-shell">任意文件名后加/xxxx.php(xxxx可以任意)，可以将文件作为php解析。
+
+利用方法：
+1. 制作一个图片木马，jpg的，如a.jpg
+2. 上传后，访问a.jpg/lcx.php，然后菜刀连，就可以了
 </code></pre>
-<h2 id="详细配置">详细配置</h2>
-<pre><code class="language-shell">$ ls -alps /etc/fail2ban/
-total 84
- 4 drwxr-xr-x   6 root root  4096 Jul 22 18:16 ./
-12 drwxr-xr-x 135 root root 12288 Jul 22 18:04 ../
- 4 drwxr-xr-x   2 root root  4096 Jul 22 18:04 action.d/
- 4 -rw-r--r--   1 root root  2817 Jan 11  2020 fail2ban.conf
- 4 drwxr-xr-x   2 root root  4096 Mar  2  2020 fail2ban.d/
- 4 drwxr-xr-x   3 root root  4096 Jul 22 18:04 filter.d/
-28 -rw-r--r--   1 root root 25738 Jul 22 18:14 jail.conf
- 4 drwxr-xr-x   2 root root  4096 Jul 22 18:04 jail.d/
- 4 -rw-r--r--   1 root root   139 Jul 22 18:16 jail.local
- 4 -rw-r--r--   1 root root   645 Jan 11  2020 paths-arch.conf
- 4 -rw-r--r--   1 root root  2827 Jan 11  2020 paths-common.conf
- 4 -rw-r--r--   1 root root   573 Jan 11  2020 paths-debian.conf
- 4 -rw-r--r--   1 root root   738 Jan 11  2020 paths-opensuse.conf
-
-# 默认情况下，fail2ban会使用jail.conf作为配置文件，但是一般不推荐
-# 推荐的方式是，创建.local配置
-
-$ sudo vi /etc/fail2ban/jail.local
-[sshd]
-enabled = true
-port = ssh
-filter = sshd                            // 查询的字段
-logpath = /var/log/auth.log              // fail2ban会查询这个文件中sshd关键字
-maxretry = 3
-findtime = 300                           // 失败尝试的间隔
-bantime = 3600                           // ban的时间
-ignoreip = 127.0.0.1
-
-$ sudo systemctl restart fail2ban.service
-$ sudo fail2ban-client status
-$ sudo fail2ban-client status sshd
-</code></pre>
-<h2 id="测试">测试</h2>
-<pre><code class="language-shell">$ ssh root@ip // 尝试输入错误的密码，并重复登陆几次
-
-$ ssh root@ip // 尝试次数到后，应当能够看到再次连接时，不会再出现密码提示，而是直接拒绝连接或连接超时
-
-# 查询被ban的ip信息
-$ sudo fail2ban-client status sshd
-Status for the jail: sshd
-|- Filter
-|  |- Currently failed:	0
-|  |- Total failed:	3
-|  `- File list:	/var/log/auth.log
-`- Actions
-   |- Currently banned:	1
-   |- Total banned:	1
-   `- Banned IP list:	192.168.80.1
+<h3 id="漏洞原因">漏洞原因</h3>
+<h5 id="1-对于一个不存在的路径ajpglcxphpapache的做法是先判断这个文件是否存在而nginx会直接将php后缀的文件交给php处理原因一">1.  对于一个不存在的路径：a.jpg/lcx.php，Apache的做法是先判断这个文件是否存在，而Nginx会直接将php后缀的文件交给PHP处理（原因一）；</h5>
+<h5 id="2-配置项cigfix_pathinfo1路径修复选项php看到不存在的路径会往前找ajpglcxphp不存在则找到ajpg并将该文件作为可执行文件执行原因二">2.  配置项cig.fix_pathinfo=1，路径修复选项，PHP看到不存在的路径会往前找，a.jpg/lcx.php不存在，则找到a.jpg，并将该文件作为可执行文件执行（原因二）；</h5>
+<h5 id="3-配置项php-fpmconf中有securitylimit_exetensions不配置的话默认就可以执行这是原因三">3.  配置项php-fpm.conf中有security.limit_exetensions（不配置的话，默认就可以执行，这是原因三）；</h5>
+<h3 id="解决方案">解决方案</h3>
+<h5 id="1-设置securitylimit_extensionsphp-这样只有php文件才被解析">1. 设置security.limit_extensions=.php ，这样只有php文件才被解析</h5>
+<h5 id="2-升级到高版本上述参数默认为限制执行">2. 升级到高版本，上述参数默认为限制执行</h5>
+<h3 id="参考文档">参考文档</h3>
+<pre><code class="language-shell">https://www.cnblogs.com/lcxblogs/p/13596239.html
+https://www.cnblogs.com/wjw-zm/p/11802669.html
 </code></pre>
 
             </div>
@@ -609,7 +589,7 @@ Status for the jail: sshd
     </li>
     <li class="post-copyright-link">
       <strong>本文链接：</strong>
-      <a href="https://esp0x.github.io/post/shi-yong-fail2ban-fang-yu-ssh-bao-li-po-jie-gong-ji/" title="使用Fail2Ban防御SSH暴力破解攻击">https://esp0x.github.io/post/shi-yong-fail2ban-fang-yu-ssh-bao-li-po-jie-gong-ji/</a>
+      <a href="https://esp0x.github.io/post/nginx-jie-xi-lou-dong/" title="Nginx解析漏洞">https://esp0x.github.io/post/nginx-jie-xi-lou-dong/</a>
     </li>
     <li class="post-copyright-license">
       <strong>版权声明： </strong>
@@ -618,23 +598,19 @@ Status for the jail: sshd
   </ul>
   <div class="tags">
     
-      <a href="https://esp0x.github.io/tag/tdcjZJ8GF/"># 安全工具</a>
+      <a href="https://esp0x.github.io/tag/u2Xu3UP12/"># Web安全</a>
     
-      <a href="https://esp0x.github.io/tag/a5GDIyqF3/"># 信息安全</a>
+      <a href="https://esp0x.github.io/tag/Iujze5_sw8/"># 上传漏洞</a>
     
   </div>
   <div class="nav">
     <div class="nav-prev">
       
-        <i class="fa fa-chevron-left"></i>
-        <a class="nav-pc-next" title="Apache未知扩展名解析漏洞" href="https://esp0x.github.io/post/apache-wei-zhi-kuo-zhan-ming-jie-xi-lou-dong/">Apache未知扩展名解析漏洞</a class="nav-pc-next">
-        <a class="nav-mobile-prev" title="Apache未知扩展名解析漏洞" href="https://esp0x.github.io/post/apache-wei-zhi-kuo-zhan-ming-jie-xi-lou-dong/">上一篇</a>
-      
     </div>
     <div class="nav-next">
       
-        <a class="nav-pc-next" title="使用wfuzz进行web安全模糊测试" href="https://esp0x.github.io/post/shi-yong-wfuzz-jin-xing-web-an-quan-mo-hu-ce-shi/">使用wfuzz进行web安全模糊测试</a>
-        <a class="nav-mobile-next" title="使用wfuzz进行web安全模糊测试" href="https://esp0x.github.io/post/shi-yong-wfuzz-jin-xing-web-an-quan-mo-hu-ce-shi/">下一篇</a>
+        <a class="nav-pc-next" title="Apache未知扩展名解析漏洞" href="https://esp0x.github.io/post/apache-wei-zhi-kuo-zhan-ming-jie-xi-lou-dong/">Apache未知扩展名解析漏洞</a>
+        <a class="nav-mobile-next" title="Apache未知扩展名解析漏洞" href="https://esp0x.github.io/post/apache-wei-zhi-kuo-zhan-ming-jie-xi-lou-dong/">下一篇</a>
         <i class="fa fa-chevron-right"></i>
       
     </div>
