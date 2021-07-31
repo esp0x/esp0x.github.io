@@ -8,7 +8,7 @@
 <meta name="keywords" content="信息安全">
 <meta name="description" content="温故而知新">
 <meta name="theme-color" content="#000">
-<title>Esp0x</title>
+<title>Apache未知扩展名解析漏洞 | Esp0x</title>
 <link rel="shortcut icon" href="/favicon.ico?v=1627697013816">
 <link rel="stylesheet" href="/styles/main.css">
 <link rel="stylesheet" href="/media/css/mist.css">
@@ -29,6 +29,8 @@
 
 
 
+  <meta name="description" content="Apache未知扩展名解析漏洞" />
+  <meta name="keywords" content="Web安全,上传漏洞" />
 </head>
 
 <body>
@@ -158,10 +160,26 @@
   <div class="main-continer">
     
     <div
-      class="section-layout bg-color mist">
+      class="section-layout mist bg-color">
       <div class="section-layout-wrapper">
-        <div id="sidebarMeta" class="sidebar">
-    
+        
+
+<div class="sidebar">
+  
+    <div class="sidebar-box box-shadow-wrapper  right-motion" id="sidebar">
+      
+        <div class="post-list-sidebar">
+          <div class="sidebar-title">
+            <span id="tocSideBar" class="sidebar-title-item sidebar-title-active">文章目录</span>
+            <span id="metaSideBar" class="sidebar-title-item">站点概览</span>
+          </div>
+        </div>
+      
+      <div class="sidebar-body mist" id="sidebar_body">
+        
+          
+            <div class="post-side-meta" id="post_side_meta">
+              
 <div class="sidebar-wrapper box-shadow-wrapper ">
   <div class="sidebar-item">
     <img class="site-author-image right-motion" src="/images/avatar.png"/>
@@ -194,298 +212,461 @@
 
 
 </div>
+            </div>
+            <div class="post-toc sidebar-body-active" id="post_toc" style="opacity: 1;">
+              <div class="toc-box right-motion">
+  <div class="toc-wrapper auto-number auto"
+    id="toc_wrapper">
+    <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#%E5%8E%9F%E7%90%86">原理：</a>
+<ul>
+<li><a href="#apache%E8%A7%A3%E6%9E%90%E6%96%87%E4%BB%B6%E7%9A%84%E8%A7%84%E5%88%99%E6%98%AF%E4%BB%8E%E5%8F%B3%E5%BE%80%E5%B7%A6%E4%BE%9D%E6%AC%A1%E8%A7%A3%E6%9E%90%E5%A6%82%E6%9E%9C%E9%81%87%E5%88%B0%E5%90%8E%E7%BC%80%E5%90%8D%E4%B8%BA%E4%B8%8D%E5%8F%AF%E8%AF%86%E5%88%AB%E7%9A%84%E5%B0%B1%E7%BB%A7%E7%BB%AD%E5%BE%80%E5%B7%A6%E5%88%A4%E6%96%AD%E6%AF%94%E5%A6%82-testphpowfrar-owf%E5%92%8Crar-%E8%BF%99%E4%B8%A4%E7%A7%8D%E5%90%8E%E7%BC%80%E6%98%AFapache%E4%B8%8D%E5%8F%AF%E8%AF%86%E5%88%AB%E8%A7%A3%E6%9E%90apache%E5%B0%B1%E4%BC%9A%E6%8A%8Awooyunphpowfrar%E8%A7%A3%E6%9E%90%E6%88%90php">Apache解析文件的规则是从右往左依次解析，如果遇到后缀名为不可识别的，就继续往左判断，比如 test.php.owf.rar “.owf”和”.rar” 这两种后缀是apache不可识别解析,apache就会把wooyun.php.owf.rar解析成php</a></li>
+</ul>
+</li>
+<li><a href="#poc">POC：</a></li>
+<li><a href="#%E9%94%99%E8%AF%AF%E9%85%8D%E7%BD%AE%E5%AF%BC%E8%87%B4%E7%9A%84%E6%BC%8F%E6%B4%9E">错误配置导致的漏洞</a>
+<ul>
+<li><a href="#1addhandler-php5-script-php-%E5%8F%AA%E8%A6%81%E6%96%87%E4%BB%B6%E5%90%8D%E9%87%8C%E5%8C%85%E5%90%ABphp-%E5%8D%B3%E4%BD%BF%E6%96%87%E4%BB%B6%E5%90%8D%E6%98%AF-test2phpjpg-%E4%B9%9F%E4%BC%9A%E4%BB%A5-php-%E6%9D%A5%E6%89%A7%E8%A1%8C">1.AddHandler php5-script .php  ：只要文件名里包含.php 即使文件名是 test2.php.jpg 也会以 php 来执行</a></li>
+<li><a href="#2addtype-applicationx-httpd-php-jpg-%E6%89%A9%E5%B1%95%E5%90%8D%E6%98%AFjpg%E4%BC%9A%E6%8C%89%E7%85%A7php%E6%9D%A5%E8%BF%9B%E8%A1%8C%E6%89%A7%E8%A1%8C">2.AddType application/x-httpd-php .jpg ：扩展名是jpg会按照php来进行执行</a></li>
+</ul>
+</li>
+<li><a href="#%E5%BD%B1%E5%93%8D%E7%89%88%E6%9C%AC%E5%92%8C%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83">影响版本和集成环境</a></li>
+<li><a href="#%E5%8F%82%E8%80%83%E6%96%87%E7%8C%AE">参考文献</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
 </div>
+
 <script>
-  let sidebarMeta = document.querySelector('#sidebarMeta');
-  let scheme = 'mist';
-  let sidebarWrapper = document.querySelector('.sidebar-wrapper');
-  if (sidebarMeta && (scheme === 'pisces' || scheme === 'gemini')) {
-    document.addEventListener('scroll', function(e) {
-      if (document.scrollingElement.scrollTop > parseInt(sidebarMeta.style.marginTop) + 10) {
-        sidebarWrapper.classList.add('home-sidebar-fixed')
-      } else {
-        sidebarWrapper.classList.remove('home-sidebar-fixed')
+
+  let lastTop = 0, lList = [], hList = [], postBody, lastIndex = -1;
+  let active = 'active-show', activeClass = 'active-current';
+  let tocWrapper = document.querySelector('#toc_wrapper');
+  let tocContent = tocWrapper.children[0];
+  let autoNumber = tocWrapper && tocWrapper.classList.contains('auto-number');
+
+  function addTocNumber(elem, deep) {
+    if (!elem) {
+      return;
+    }
+    let prop = elem.__proto__;
+
+    if (prop === HTMLUListElement.prototype) {
+      for (let i = 0; i < elem.children.length; i++) {
+        addTocNumber(elem.children[i], deep + (i + 1) + '.');
       }
+    } else if (prop === HTMLLIElement.prototype) {
+      // 保存li元素
+      if (elem.children[0].__proto__ === HTMLAnchorElement.prototype) {
+        lList.push(elem);
+      }
+      for (let i = 0; i < elem.children.length; i++) {
+        let cur = elem.children[i];
+        if (cur.__proto__ === HTMLAnchorElement.prototype) {
+          if (autoNumber) {
+            cur.text = deep + ' ' + cur.text;
+          }
+        } else if (cur.__proto__ === HTMLUListElement.prototype) {
+          addTocNumber(cur, deep);
+        }
+      }
+    }
+  }
+
+  function removeParentActiveClass() {
+    let parents = tocContent.querySelectorAll('.' + active)
+    parents.forEach(function (elem) {
+      elem.classList.remove(active);
     });
   }
-  </script>
-        <div class="section-box tag-line box-shadow-wrapper">
-          <section class="section tags-section posts-expand bg-color">
-            <div class="padding-wrapper">
-  <div class="tag-timeline-box">
-    <div class="tag-timeline-wrapper">
-      <div class="tag-timeline-title">
-        <h2>
-          信息安全
-          <small>标签</small>
-        </h2>
+
+  function addActiveClass(index) {
+    if (index >= 0 && index < hList.length) {
+      lList[index].classList.add(activeClass);
+    }
+  }
+
+  function removeActiveClass(index) {
+    if (index >= 0 && index < hList.length) {
+      lList[index].classList.remove(activeClass);
+    }
+  }
+
+  function addActiveLiElemment(elem, parent) {
+    if (!elem || elem === parent) {
+      return;
+    } else {
+      if (elem.__proto__ === HTMLLIElement.prototype) {
+        elem.classList.add(active);
+      }
+      addActiveLiElemment(elem.parentElement, parent);
+    }
+  }
+
+  function showToc() {
+    if (tocWrapper) {
+      postBody = document.querySelector('#post_body');
+      for (let i = 0; i < postBody.children.length; i++) {
+        if (postBody.children[i].__proto__ === HTMLHeadingElement.prototype) {
+          hList.push(postBody.children[i]);
+        }
+      }
+      if (tocWrapper.classList.contains('compress')) {
+        tocContent.classList.add('closed');
+      } else if (tocWrapper.classList.contains('no_compress')) {
+        tocContent.classList.add('expanded');
+      } else {
+        if (hList.length > 10) {
+          active = 'active-hidden'
+          tocContent.classList.add('closed');
+        } else {
+          tocContent.classList.add('expanded');
+        }
+      }
+    }
+  }
+
+  (function () {
+    // 处理不是从#一级标题开始目录
+    if (tocContent.children.length === 1 && tocContent.children[0].__proto__ === HTMLLIElement.prototype) {
+      let con = tocContent.children[0].children[0];
+      tocContent.innerHTML = con.innerHTML;
+    }
+    let markdownItTOC = document.querySelector('.markdownIt-TOC');
+    let innerHeight = window.innerHeight;
+    markdownItTOC.style = `max-height: ${innerHeight - 80 > 0 ? innerHeight - 80 : innerHeight}px`
+    addTocNumber(tocContent, '');
+  })();
+
+  document.addEventListener('scroll', function (e) {
+    if (lList.length <= 0) {
+      return;
+    }
+    let scrollTop = document.scrollingElement.scrollTop + 10;
+    let dir;
+
+    if (lastTop - scrollTop > 0) {
+      dir = 'up';
+    } else {
+      dir = 'down';
+    }
+
+    lastTop = scrollTop;
+    if (scrollTop <= 0) {
+      if (lastIndex >= 0 && lastIndex < hList.length) {
+        lList[lastIndex].classList.remove(activeClass);
+      }
+      return;
+    }
+
+    let current = 0, hasFind = false;
+    for (let i = 0; i < hList.length; i++) {
+      if (hList[i].offsetTop > scrollTop) {
+        current = i;
+        hasFind = true;
+        break;
+      }
+    }
+    if (!hasFind && scrollTop > lList[lList.length - 1].offsetTop) {
+      current = hList.length - 1;
+    } else {
+      current--;
+    }
+    if (dir === 'down') {
+      if (current > lastIndex) {
+        addActiveClass(current);
+        removeActiveClass(lastIndex)
+        lastIndex = current;
+        removeParentActiveClass();
+        lList[current] && addActiveLiElemment(lList[current].parentElement, tocContent);
+      }
+    } else {
+      if (current < lastIndex) {
+        addActiveClass(current);
+        removeActiveClass(lastIndex);
+        lastIndex = current;
+        removeParentActiveClass();
+        lList[current] && addActiveLiElemment(lList[current].parentElement, tocContent);
+      }
+    }
+  });
+
+
+  window.addEventListener('load', function () {
+    showToc();
+    document.querySelector('#sidebar').style = 'display: block;';
+    tocWrapper.classList.add('toc-active');
+    setTimeout(function () {
+      if ("createEvent" in document) {
+        let evt = document.createEvent("HTMLEvents");
+        evt.initEvent("scroll", false, true);
+        document.dispatchEvent(evt);
+      }
+      else {
+        document.fireEvent("scroll");
+      }
+    }, 500)
+  })
+
+</script>
+            </div>
+          
+        
       </div>
+    </div>
+  
+</div>
+<script>
+  const SIDEBAR_TITLE_ACTIVE = 'sidebar-title-active';
+  const SIDEBAR_BODY_ACTIVE = 'sidebar-body-active';
+  const SLIDE_UP_IN = 'slide-up-in';
+
+  let sidebar = document.querySelector('#sidebar'),
+  tocSideBar = document.querySelector('#tocSideBar'),
+  metaSideBar = document.querySelector('#metaSideBar'),
+  postToc = document.querySelector('#post_toc'),
+  postSiteMeta = document.querySelector('#post_side_meta'),
+  sidebarTitle = document.querySelector('.sidebar-title'),
+  sidebarBody = document.querySelector('#sidebar_body');
+
+  tocSideBar && tocSideBar.addEventListener('click', (e) => {
+    toggleSidebar(e);
+  });
+
+  metaSideBar && metaSideBar.addEventListener('click', (e) => {
+    toggleSidebar(e);
+  });
+
+  function toggleSidebar(e) {
+    let currentTitle = document.querySelector("."+SIDEBAR_TITLE_ACTIVE);
+    if (currentTitle == e.srcElement) {
+      return ;
+    }
+    let current, showElement, hideElement;
+    if (e.srcElement == metaSideBar) {
+      showElement = postSiteMeta;
+      hideElement = postToc;
+    } else if (e.srcElement == tocSideBar){
+      showElement = postToc;
+      hideElement = postSiteMeta;
+    }
+    currentTitle.classList.remove(SIDEBAR_TITLE_ACTIVE);
+    e.srcElement.classList.add(SIDEBAR_TITLE_ACTIVE);
+
+    window.Velocity(hideElement, 'stop');
+    window.Velocity(hideElement, 'transition.slideUpOut', {
+      display: 'none',
+      duration: 200,
+      complete: function () {
+        window.Velocity(showElement, 'transition.slideDownIn', {
+          duration: 200
+        });
+      }
+    })
+    hideElement.classList.remove(SIDEBAR_BODY_ACTIVE);
+    showElement.classList.add(SIDEBAR_BODY_ACTIVE);
+  }
+
+  postToc && postToc.addEventListener('transitionend', function() {
+    this.classList.remove(SLIDE_UP_IN);
+  });
+
+  if (sidebarBody) {
+    if (sidebarBody.classList.contains('pisces') || sidebarBody.classList.contains('gemini')) {
+      let hasFix = false;
+      let scrollEl = document.querySelector('.main-continer');
+      let limitTop = document.querySelector('#nav_ul').children.length * 42 + 162;
+      window.addEventListener('scroll', function(e) {
+        if (document.scrollingElement.scrollTop >= limitTop) {
+          if (!hasFix) {
+            sidebar.classList.add('sidebar-fixed');
+            hasFix = true;
+          }
+        } else {
+          if (hasFix) {
+            sidebar.classList.remove('sidebar-fixed');
+            hasFix = false;
+          }
+        }
+      });
+    }
+  }
+  
+</script>
+        <div class="section-box box-shadow-wrapper">
+          <div class="section bg-color post post-page">
+            <header class="post-header">
+  <h1 class="post-title">
+    <a class="post-title-link" href="https://esp0x.github.io/post/apache-wei-zhi-kuo-zhan-ming-jie-xi-lou-dong/">
+      Apache未知扩展名解析漏洞
+    </a>
+  </h1>
+  <div class="post-meta">
+    
+    <span class="meta-item pc-show">
+      <i class="fa fa-calendar-o"></i>
+      <span>发布于</span>
+      <span>2021-07-31</span>
+      <span class="post-meta-divider pc-show">|</span>
+    </span>
+    
+    <span class="meta-item">
+      <i class="fa fa-folder-o"></i>
+      <span class="pc-show">分类于</span>
+      
+      
+      <a href="https://esp0x.github.io/tag/u2Xu3UP12/">
+        <span>Web安全</span>
+      </a>、
       
       
       
-      
-      
-      
-      
-      
-      
-      
-      
-      <a href="https://esp0x.github.io/post/shi-yong-fail2ban-fang-yu-ssh-bao-li-po-jie-gong-ji/">
-        <div class="motion-warpper">
-          <div class="tag-post-node">
-            <h1>
-              07-23
-              <small>使用Fail2Ban防御SSH暴力破解攻击</small>
-            </h1>
-          </div>
-        </div>
+      <a href="https://esp0x.github.io/tag/Iujze5_sw8/">
+        <span>上传漏洞</span>
       </a>
       
       
-      
-      
-      
-      
-      
-      <a href="https://esp0x.github.io/post/shi-yong-wfuzz-jin-xing-web-an-quan-mo-hu-ce-shi/">
-        <div class="motion-warpper">
-          <div class="tag-post-node">
-            <h1>
-              07-22
-              <small>使用wfuzz进行web安全模糊测试</small>
-            </h1>
-          </div>
-        </div>
-      </a>
-      
-      
-      
-      
-      
-      
-      
-      <a href="https://esp0x.github.io/post/shi-yong-cheetah-kuai-su-po-jie-yi-ju-hua-mu-ma/">
-        <div class="motion-warpper">
-          <div class="tag-post-node">
-            <h1>
-              07-20
-              <small>使用cheetah快速破解一句话木马</small>
-            </h1>
-          </div>
-        </div>
-      </a>
-      
-      
-      
-      
-      
-      
-      
-      <a href="https://esp0x.github.io/post/cmsmap-shi-yong-jian-dan-shuo-ming/">
-        <div class="motion-warpper">
-          <div class="tag-post-node">
-            <h1>
-              07-19
-              <small>CMSmap使用简单说明</small>
-            </h1>
-          </div>
-        </div>
-      </a>
-      
-      
-      
-      
-      
-      
-      
-      <a href="https://esp0x.github.io/post/msf-zhong-shi-yong-mei-ju-mo-kuai-jin-xing-ge-chong-fu-wu-deng-lu-de-po-jie/">
-        <div class="motion-warpper">
-          <div class="tag-post-node">
-            <h1>
-              07-16
-              <small>MSF中使用枚举模块进行各种服务登陆的破解</small>
-            </h1>
-          </div>
-        </div>
-      </a>
-      
-      
-      
-      
-      
-      
-      
-      <a href="https://esp0x.github.io/post/hydra-bao-li-po-jie-gong-ju-jian-dan-shi-yong-shuo-ming/">
-        <div class="motion-warpper">
-          <div class="tag-post-node">
-            <h1>
-              07-16
-              <small>Hydra暴力破解工具简单使用说明</small>
-            </h1>
-          </div>
-        </div>
-      </a>
-      
-      
-      
-      
-      
-      
-      
-      <a href="https://esp0x.github.io/post/sublist3r-zi-yu-ming-sao-miao-gong-ju-shi-yong-shuo-ming/">
-        <div class="motion-warpper">
-          <div class="tag-post-node">
-            <h1>
-              07-15
-              <small>Sublist3r子域名扫描工具使用说明</small>
-            </h1>
-          </div>
-        </div>
-      </a>
-      
-      
-      
-      
-      
-      
-      
-      <a href="https://esp0x.github.io/post/subdomainbrutepy-gong-ju-de-jian-dan-shi-yong-shuo-ming/">
-        <div class="motion-warpper">
-          <div class="tag-post-node">
-            <h1>
-              07-15
-              <small>SubDomainBrute.py工具的简单使用说明</small>
-            </h1>
-          </div>
-        </div>
-      </a>
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      <a href="https://esp0x.github.io/post/li-jie-oauth-20-de-ji-ben-liu-cheng/">
-        <div class="motion-warpper">
-          <div class="tag-post-node">
-            <h1>
-              02-04
-              <small>理解OAuth 2.0的基本流程</small>
-            </h1>
-          </div>
-        </div>
-      </a>
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
+    </span>
+    <span class="post-meta-divider">|</span>
+    
+    <span class="meta-item">
+      <i class="fa fa-clock-o"></i>
+      <span>2分钟</span>
+    </span>
+    <span class="meta-item">
+      <span class="post-meta-divider">|</span>
+      <i class="fa fa-file-word-o"></i>
+      <span>225<span class="pc-show">字数</span></span>
+    </span>
+    
+    
+    
+    <span id="/post/apache-wei-zhi-kuo-zhan-ming-jie-xi-lou-dong/" data-flag-title="Apache未知扩展名解析漏洞" class="meta-item pc-show leancloud_visitors">
+      <span class="post-meta-divider">|</span>
+      <i class="fa fa-eye"></i>
+      <span>浏览量：<span class="leancloud-visitors-count"></span></span>
+    </span>
+    
+  </div>
+</header>
+            <div class="post-body next-md-body" id="post_body">
+              <h3 id="原理">原理：</h3>
+<h4 id="apache解析文件的规则是从右往左依次解析如果遇到后缀名为不可识别的就继续往左判断比如-testphpowfrar-owf和rar-这两种后缀是apache不可识别解析apache就会把wooyunphpowfrar解析成php">Apache解析文件的规则是从右往左依次解析，如果遇到后缀名为不可识别的，就继续往左判断，比如 test.php.owf.rar “.owf”和”.rar” 这两种后缀是apache不可识别解析,apache就会把wooyun.php.owf.rar解析成php</h4>
+<h3 id="poc">POC：</h3>
+<pre><code class="language-shell">www.xxxx.xxx.com/test.php.php123
+</code></pre>
+<h3 id="错误配置导致的漏洞">错误配置导致的漏洞</h3>
+<h4 id="1addhandler-php5-script-php-只要文件名里包含php-即使文件名是-test2phpjpg-也会以-php-来执行">1.AddHandler php5-script .php  ：只要文件名里包含.php 即使文件名是 test2.php.jpg 也会以 php 来执行</h4>
+<h4 id="2addtype-applicationx-httpd-php-jpg-扩展名是jpg会按照php来进行执行">2.AddType application/x-httpd-php .jpg ：扩展名是jpg会按照php来进行执行</h4>
+<h3 id="影响版本和集成环境">影响版本和集成环境</h3>
+<pre><code class="language-shell">WampServer2.0AllVersion(WampServer2.0i/Apache2.2.11)
+WampServer2.1AllVersion(WampServer2.1e-x32/Apache2.2.17)
+Wamp5AllVersion(Wamp5_1.7.4/Apache2.2.6)
+AppServ2.4AllVersion(AppServ-2.4.9/Apache2.0.59)
+AppServ2.5AllVersion(AppServ-2.5.10/Apache2.2.8)
+AppServ2.6AllVersion(AppServ-2.6.0/Apache2.2.8)
+
+Apache2.0.x&lt;=2.0.59
+Apache2.2.x&lt;=2.2.17
+</code></pre>
+<h3 id="参考文献">参考文献</h3>
+<pre><code class="language-shell">https://skewwg.github.io/2021/02/19/shang-chuan-lou-dong/
+</code></pre>
+
+            </div>
+            <div class="post-footer">
+  <ul class="post-copyright">
+    <li class="post-copyright-author">
+      <strong>本文作者：</strong>
+      jiffies@live.com
+    </li>
+    <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://esp0x.github.io/post/apache-wei-zhi-kuo-zhan-ming-jie-xi-lou-dong/" title="Apache未知扩展名解析漏洞">https://esp0x.github.io/post/apache-wei-zhi-kuo-zhan-ming-jie-xi-lou-dong/</a>
+    </li>
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong>
+      本博客所有文章除特别声明外，均采用<a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i> BY-NC-SA</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+  <div class="tags">
+    
+      <a href="https://esp0x.github.io/tag/u2Xu3UP12/"># Web安全</a>
+    
+      <a href="https://esp0x.github.io/tag/Iujze5_sw8/"># 上传漏洞</a>
+    
+  </div>
+  <div class="nav">
+    <div class="nav-prev">
+      
+    </div>
+    <div class="nav-next">
+      
+        <a class="nav-pc-next" title="使用Fail2Ban防御SSH暴力破解攻击" href="https://esp0x.github.io/post/shi-yong-fail2ban-fang-yu-ssh-bao-li-po-jie-gong-ji/">使用Fail2Ban防御SSH暴力破解攻击</a>
+        <a class="nav-mobile-next" title="使用Fail2Ban防御SSH暴力破解攻击" href="https://esp0x.github.io/post/shi-yong-fail2ban-fang-yu-ssh-bao-li-po-jie-gong-ji/">下一篇</a>
+        <i class="fa fa-chevron-right"></i>
       
     </div>
   </div>
 </div>
-          </section>
+            
+  <script src="https://cdn.jsdelivr.net/npm/valine@1.4.4/dist/Valine.min.js"></script>
+<div id="vcomments" style="padding: 10px 0px 0px 0px"></div>
+
+<style>
+  .v .veditor {
+    min-height: 10rem;
+    background-image: url('https://upimage.alexhchu.com/2020/04/21/47eda59424daa.gif');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: right;
+    background-color: rgba(255, 255, 255, 0);
+    resize: none;
+  }
+
+  .v .vwrap {
+    border: 1px solid #000 !important;
+  }
+
+  .v .vbtn {
+    padding: .4rem 1.2rem !important;
+    border-color: #fff !important;
+    background-color: #49b1f5 !important;
+    color: #fff !important;
+    font-size: .7rem !important;
+  }
+
+  .v .vcards .vcard .vh .vmeta .vat {
+    padding: 0 .8rem !important;
+    border: 1px solid #00c4b6 !important;
+    border-radius: 5px !important;
+    color: #00c4b6 !important;
+  }
+</style>
+<script>
+  new Valine({
+    el: '#vcomments',
+    appId: '',
+    appKey: '',
+    avatar: 'identicon',
+    placeholder: '',
+    pageSize: '',
+    lang: 'zh-cn',
+    visitor: 'true' === 'true',
+    highlight: 'true' === 'true',
+    avatarForce: 'true' === 'false',
+  });
+</script>
+
+          </div>
         </div>
       </div>
     </div>
@@ -1201,6 +1382,36 @@
   // 代码高亮
   hljs.initHighlightingOnLoad();
 
+</script>
+    <div class="light-box" id="light_box"></div>
+<script>
+  let imgs = document.querySelectorAll('.post-body img');
+  let lightBox = document.querySelector('#light_box');
+  lightBox.addEventListener('mousedown', (e) => {
+    e.preventDefault()
+  })
+  lightBox.addEventListener('mousewheel', (e) => {
+    e.preventDefault()
+  })
+  let width = window.innerWidth * 0.8;
+  lightBox.onclick = () => {
+    let img = lightBox.querySelector('img');
+    lightBox.style = '';
+    img && img.remove();
+  }
+  imgs.forEach(item => {
+    item.onclick = function (e) {
+      let lightImg = document.createElement('img');
+      lightImg.src = this.src;
+      lightBox.style = `height: 100%; opacity: 1; background-color: rgba(0, 0, 0, 0.5);cursor: zoom-out;`;
+      lightImg.style = `width: ${width}px; border: 1px solid #fff; border-radius: 2px;`;
+      lightImg.onclick = function () {
+        lightBox.style = '';
+        this.remove();
+      }
+      lightBox.append(lightImg);
+    }
+  })
 </script>
   </div>
 </body>
@@ -3651,6 +3862,5 @@ sync_binlog 的默认值是0，像操作系统刷其他文件的机制一样，M
 
 
 <script src=" /media/js/cool.js"></script>
-
 
 </html>

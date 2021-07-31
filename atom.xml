@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://esp0x.github.io</id>
     <title>Esp0x</title>
-    <updated>2021-07-27T05:34:02.736Z</updated>
+    <updated>2021-07-31T02:03:38.197Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://esp0x.github.io"/>
     <link rel="self" href="https://esp0x.github.io/atom.xml"/>
@@ -10,6 +10,36 @@
     <logo>https://esp0x.github.io/images/avatar.png</logo>
     <icon>https://esp0x.github.io/favicon.ico</icon>
     <rights>All rights reserved 2021, Esp0x</rights>
+    <entry>
+        <title type="html"><![CDATA[Apache未知扩展名解析漏洞]]></title>
+        <id>https://esp0x.github.io/post/apache-wei-zhi-kuo-zhan-ming-jie-xi-lou-dong/</id>
+        <link href="https://esp0x.github.io/post/apache-wei-zhi-kuo-zhan-ming-jie-xi-lou-dong/">
+        </link>
+        <updated>2021-07-31T02:02:58.000Z</updated>
+        <content type="html"><![CDATA[<h3 id="原理">原理：</h3>
+<h4 id="apache解析文件的规则是从右往左依次解析如果遇到后缀名为不可识别的就继续往左判断比如-testphpowfrar-owf和rar-这两种后缀是apache不可识别解析apache就会把wooyunphpowfrar解析成php">Apache解析文件的规则是从右往左依次解析，如果遇到后缀名为不可识别的，就继续往左判断，比如 test.php.owf.rar “.owf”和”.rar” 这两种后缀是apache不可识别解析,apache就会把wooyun.php.owf.rar解析成php</h4>
+<h3 id="poc">POC：</h3>
+<pre><code class="language-shell">www.xxxx.xxx.com/test.php.php123
+</code></pre>
+<h3 id="错误配置导致的漏洞">错误配置导致的漏洞</h3>
+<h4 id="1addhandler-php5-script-php-只要文件名里包含php-即使文件名是-test2phpjpg-也会以-php-来执行">1.AddHandler php5-script .php  ：只要文件名里包含.php 即使文件名是 test2.php.jpg 也会以 php 来执行</h4>
+<h4 id="2addtype-applicationx-httpd-php-jpg-扩展名是jpg会按照php来进行执行">2.AddType application/x-httpd-php .jpg ：扩展名是jpg会按照php来进行执行</h4>
+<h3 id="影响版本和集成环境">影响版本和集成环境</h3>
+<pre><code class="language-shell">WampServer2.0AllVersion(WampServer2.0i/Apache2.2.11)
+WampServer2.1AllVersion(WampServer2.1e-x32/Apache2.2.17)
+Wamp5AllVersion(Wamp5_1.7.4/Apache2.2.6)
+AppServ2.4AllVersion(AppServ-2.4.9/Apache2.0.59)
+AppServ2.5AllVersion(AppServ-2.5.10/Apache2.2.8)
+AppServ2.6AllVersion(AppServ-2.6.0/Apache2.2.8)
+
+Apache2.0.x&lt;=2.0.59
+Apache2.2.x&lt;=2.2.17
+</code></pre>
+<h3 id="参考文献">参考文献</h3>
+<pre><code class="language-shell">https://skewwg.github.io/2021/02/19/shang-chuan-lou-dong/
+</code></pre>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[使用Fail2Ban防御SSH暴力破解攻击]]></title>
         <id>https://esp0x.github.io/post/shi-yong-fail2ban-fang-yu-ssh-bao-li-po-jie-gong-ji/</id>
@@ -614,16 +644,6 @@ timedatectl set-time &quot;2019-09-19 15:50:20&quot;
 
 # 开启 NTP
 timedatectl set-ntp true/flase
-</code></pre>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[如何避免在第一次SSH登陆时输入yes提示符]]></title>
-        <id>https://esp0x.github.io/post/ru-he-bi-mian-zai-di-yi-ci-ssh-deng-lu-shi-shu-ru-yes-ti-shi-fu/</id>
-        <link href="https://esp0x.github.io/post/ru-he-bi-mian-zai-di-yi-ci-ssh-deng-lu-shi-shu-ru-yes-ti-shi-fu/">
-        </link>
-        <updated>2021-06-23T03:46:19.000Z</updated>
-        <content type="html"><![CDATA[<pre><code class="language-shell">echo &quot;StrictHostKeyChecking no&quot; &gt;~/.ssh/config
 </code></pre>
 ]]></content>
     </entry>
